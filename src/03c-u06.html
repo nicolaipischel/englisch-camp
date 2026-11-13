@@ -1,0 +1,148 @@
+<script>
+/* ==========================================================================================
+   WORLD u6 – Tierwald (forest, moss-green). Pets + animals; have got / has got.
+   Code Lab: while loops. Boss: Zischel the snake, who hisses because he has no friends.
+   ========================================================================================== */
+addWorld({
+  unit: { id:'u6', num:6, title:'Tierwald', subtitle:'Haustiere & Tiere', accent:'#6f9e3c', scene:'forest', status:'open', after:'u5',
+    monster:['moss-1','moss-2','moss-3'], monsterNames:['Moosi','Moosling','Moosaurus'],
+    intro:'Im Tierwald zischt es aus dem Gebüsch. Wer ist da nur so schlecht gelaunt? 🌲' },
+
+  words: [
+    { id:'dog',       unit:'u6', cat:'pet',    en:'dog',      de:'Hund',        icon:'dog',      emoji:'🐶', pron:'dogg',      exampleEn:'My dog is brown.',              exampleDe:'Mein Hund ist braun.' },
+    { id:'cat',       unit:'u6', cat:'pet',    en:'cat',      de:'Katze',       icon:'cat',      emoji:'🐱', pron:'kät',       exampleEn:'The cat is on the sofa.',       exampleDe:'Die Katze ist auf dem Sofa.' },
+    { id:'bird',      unit:'u6', cat:'pet',    en:'bird',     de:'Vogel',       icon:'bird',     emoji:'🐦', pron:'börd',      exampleEn:'The bird can sing.',            exampleDe:'Der Vogel kann singen.' },
+    { id:'fish',      unit:'u6', cat:'pet',    en:'fish',     de:'Fisch',       icon:'fish',     emoji:'🐟', pron:'fisch',     exampleEn:'My fish is orange.',            exampleDe:'Mein Fisch ist orange.' },
+    { id:'rabbit',    unit:'u6', cat:'pet',    en:'rabbit',   de:'Kaninchen / Hase', icon:'rabbit', emoji:'🐰', pron:'RÄ-bit', exampleEn:"I've got a white rabbit.",      exampleDe:'Ich habe ein weißes Kaninchen.' },
+    { id:'horse',     unit:'u6', cat:'pet',    en:'horse',    de:'Pferd',       icon:'horse',    emoji:'🐴', pron:'hors',      exampleEn:'The horse is big.',             exampleDe:'Das Pferd ist groß.' },
+    { id:'mouse',     unit:'u6', cat:'pet',    en:'mouse',    de:'Maus',        icon:'mouse',    emoji:'🐭', pron:'maus',      exampleEn:'The mouse is under the bed.',   exampleDe:'Die Maus ist unter dem Bett.' },
+    { id:'hamster',   unit:'u6', cat:'pet',    en:'hamster',  de:'Hamster',     icon:'hamster',  emoji:'🐹', pron:'HÄM-ster',  exampleEn:'Her hamster is very small.',    exampleDe:'Ihr Hamster ist sehr klein.' },
+    { id:'tortoise',  unit:'u6', cat:'pet',    en:'tortoise', de:'Schildkröte', icon:'tortoise', emoji:'🐢', pron:'TOR-tes',   exampleEn:'My tortoise is old.',           exampleDe:'Meine Schildkröte ist alt.' },
+    { id:'snake',     unit:'u6', cat:'wild',   en:'snake',    de:'Schlange',    icon:'snake',    emoji:'🐍', pron:'snäik',     exampleEn:'Zischel is a green snake.',     exampleDe:'Zischel ist eine grüne Schlange.' },
+    { id:'frog',      unit:'u6', cat:'wild',   en:'frog',     de:'Frosch',      icon:'frog',     emoji:'🐸', pron:'frogg',     exampleEn:'The frog is in the water.',     exampleDe:'Der Frosch ist im Wasser.' },
+    { id:'owl',       unit:'u6', cat:'wild',   en:'owl',      de:'Eule',        icon:'owl',      emoji:'🦉', pron:'aul',       exampleEn:'The owl is in the tree.',       exampleDe:'Die Eule ist im Baum.' },
+    { id:'fox',       unit:'u6', cat:'wild',   en:'fox',      de:'Fuchs',       icon:'fox',      emoji:'🦊',                   exampleEn:'The fox is red.',               exampleDe:'Der Fuchs ist rot.' },
+    { id:'hedgehog',  unit:'u6', cat:'wild',   en:'hedgehog', de:'Igel',        icon:'hedgehog', emoji:'🦔', pron:'HÄDSCH-hog', exampleEn:'The hedgehog is in the garden.', exampleDe:'Der Igel ist im Garten.' },
+    { id:'ivegot',    unit:'u6', cat:'phrase', en:"I've got a dog.", de:'Ich habe einen Hund.', icon:'ivegot', emoji:'🙋', exampleEn:"I've got a dog. His name is Bello.", exampleDe:'Ich habe einen Hund. Er heißt Bello.' },
+    { id:'haveyougot',unit:'u6', cat:'phrase', en:'Have you got a pet?', de:'Hast du ein Haustier?', icon:'haveyougot', emoji:'🐾', exampleEn:'Have you got a pet? – Yes, I have.', exampleDe:'Hast du ein Haustier? – Ja.' }
+  ],
+
+  levels: [
+    { id:'u6l1', unit:'u6', type:'catch', title:'Haustiere', minutes:'2–3',
+      story:{ before:'Am Waldrand wohnen viele Haustiere. Fang ihre Namen ein!', after:'Die Haustiere wedeln, flattern und blubbern dir zu! 🐾' },
+      plan:[ {intro:['dog','cat','bird','fish']},
+             {k:'catch', words:['dog','cat','bird','fish'], reps:2, opts:3} ] },
+
+    { id:'u6l2', unit:'u6', type:'listen', title:'Auf dem Tierhof', minutes:'3',
+      story:{ before:'Auf dem Tierhof ist viel los. Hör genau hin! 👂', after:'Stark! Du erkennst jedes Tier.' },
+      plan:[ {intro:['rabbit','horse','mouse','hamster','tortoise']},
+             {k:'listen', words:['rabbit','horse','mouse','hamster','tortoise'], reps:2, opts:3},
+             {k:'speak', words:['hamster','tortoise']} ] },
+
+    { id:'u6l3', unit:'u6', type:'memory', title:'Wald-Memory', minutes:'3–4',
+      story:{ before:'Tief im Wald verstecken sich Tiere. Finde die Paare!', after:'Alle Waldtiere gefunden! 🦉' },
+      plan:[ {intro:['snake','frog','owl','fox','hedgehog']},
+             {k:'memory', words:['snake','frog','owl','fox','hedgehog','rabbit']},
+             {k:'listen', words:['snake','frog','owl','fox','hedgehog'], reps:1, opts:3} ] },
+
+    { id:'u6l4', unit:'u6', type:'dialogue', title:'Hast du ein Haustier?', minutes:'3–4',
+      story:{ before:'Juno kommt mit einem kleinen Käfig vorbei. Was ist da wohl drin?', after:'Krümel der Hamster mag dich! 🐹' },
+      plan:[ {intro:['ivegot','haveyougot']},
+             {k:'dialogue', id:'d_u6_juno'},
+             {k:'speak', words:['haveyougot','ivegot']} ] },
+
+    { id:'u6l5', unit:'u6', type:'spell', title:'Tier-Steckbriefe', minutes:'3–4',
+      story:{ before:'Die Waldschule macht Tier-Steckbriefe. Schreibst du die Namen?', after:'Alle Steckbriefe sind fertig! ✨' },
+      plan:[ {k:'spell', words:['dog','cat','bird','fish','horse','mouse','frog','owl','fox','snake'], mode:'tiles'},
+             {k:'spell', words:['rabbit','hamster','tortoise','hedgehog'], mode:'first'} ] },
+
+    { id:'u6l6', unit:'u6', type:'codelab', title:'Code Lab: while-Schleifen', minutes:'4–5', reward:'room_tank',
+      story:{ before:'Prof. Pixel zählt Vögel im Wald – aber wie lange? Eine [[while]]-Schleife weiß es!', after:'Die Schleife zählt und stoppt genau richtig. Compile successful! 💻' },
+      plan:[
+        {k:'card', title:'while-Schleife ⏳', text:'[[while]] heißt „solange“. Die Schleife läuft, solange die Bedingung stimmt. [[<]] heißt „kleiner als“.', code:'eggs = 0\nwhile eggs < 3:\n    eggs = eggs + 1\nprint(eggs)', out:'3'},
+        {k:'trace', code:'birds = 1\nwhile birds < 4:\n    birds = birds + 1', var:'birds', steps:[{line:0, v:'1', alt:['0','4']},{line:2, v:'2', alt:['1','4']},{line:2, v:'3', alt:['2','5']},{line:2, v:'4', alt:['3','5']}], explain:'Bei 4 stimmt [[birds < 4]] nicht mehr – die Schleife stoppt.', uses:['bird']},
+        {k:'predict', code:'fish = 3\nwhile fish > 0:\n    print("Blub")\n    fish = fish - 1', options:['Blub\nBlub\nBlub','Blub','Blub\nBlub'], answer:0, explain:'3, 2, 1 – dreimal [[Blub]]. Dann ist [[fish]] 0 und die Schleife stoppt.', uses:['fish']},
+        {k:'card', title:'Endlosschleife 😵', text:'Ändert sich in der Schleife nichts, läuft sie für immer! Das ist ein Bug. Hier fehlt [[frogs = frogs + 1]].', code:'frogs = 1\nwhile frogs < 5:\n    print("Quak")'},
+        {k:'predict', code:'hops = 0\nwhile hops < 2:\n    print("hop")\n    hops = hops + 1\nprint("frog!")', options:['hop\nhop\nfrog!','hop\nfrog!\nhop\nfrog!','frog!\nhop\nhop'], answer:0, explain:'Die Schleife läuft 2-mal. [[frog!]] steht nicht eingerückt – es kommt danach, nur einmal.', uses:['frog']},
+        {k:'order', de:'Bau das Programm: Der Fuchs zählt bis 3.', lines:['n = 1','while n <= 3:','    print(n)','    n = n + 1'], out:'1\n2\n3', explain:'[[<=]] heißt „kleiner oder gleich“. Bei 4 stoppt die Schleife.', uses:['fox']},
+        {k:'build', code:true, parts:['while','mice','<','5',':'], de:'Bau die Bedingung: solange weniger als 5 Mäuse da sind', py:'while mice < 5:\n    mice = mice + 1', uses:['mouse']},
+        {k:'build', parts:["I've",'got','a','hedgehog.'], de:'Ich habe einen Igel.', py:'print("I\'ve got a hedgehog.")', uses:['ivegot','hedgehog']},
+        {k:'predict', code:'pet = "owl"\nif pet == "owl":\n    print("It has got big eyes.")', options:['It has got big eyes.','It have got big eyes.','owl'], answer:0, explain:'Bei [[it]] heißt es [[has got]].', uses:['owl']}
+      ] },
+
+    { id:'u6l7', unit:'u6', type:'bughunt', title:'Bug-Jagd: have got / has got', minutes:'3–4',
+      story:{ before:'Im Tierwald krabbeln Bugs zwischen den Blättern! 🐞', after:'Alle Bugs gefangen! Der Igel ist beeindruckt.' },
+      plan:[
+        {k:'card', title:'Bug-Jagd 🐞', text:"[[I've got]] = ich habe. [[He/She/It has got]] = er/sie/es hat. Frage: [[Have you got a pet?]] – [[Yes, I have.]] / [[No, I haven't.]]"},
+        {k:'bug', tokens:['I','has','got','a','dog.'], bug:1, options:['have','am','is'], fix:'have', explain:'Bei [[I]] heißt es [[have got]].', uses:['dog','ivegot']},
+        {k:'bug', tokens:['She','have','got','a','cat.'], bug:1, options:['has','haves','is'], fix:'has', explain:'Bei [[she]] heißt es [[has got]].', uses:['cat']},
+        {k:'bug', tokens:['Have','you','get','a','pet?'], bug:2, options:['got','gets','gotten'], fix:'got', explain:'Es heißt [[Have you got a pet?]]', uses:['haveyougot']},
+        {k:'bug', tokens:['Have','you','got','a','fish?','Yes,','I','am.'], bug:7, options:['have.','has.','got.'], fix:'have.', explain:'Auf [[Have you got …?]] antwortest du [[Yes, I have.]]', uses:['haveyougot','fish']},
+        {k:'bug', tokens:['My','horse','has','got','four','leg.'], bug:5, options:['legs.','leges.','legz.'], fix:'legs.', explain:'Vier Beine – mehr als eins: [[legs]].', uses:['horse']},
+        {k:'bug', tokens:['The','mause','is','small.'], bug:1, options:['mouse','mous','mauss'], fix:'mouse', explain:'Maus = [[mouse]] mit o-u-s-e.', uses:['mouse']},
+        {k:'bug', tokens:['Two','rabbit','in','the','garden.'], bug:1, options:['rabbits','rabbites','rabbitz'], fix:'rabbits', explain:'Zwei Kaninchen: [[rabbits]].', uses:['rabbit']},
+        {k:'bug', tokens:['The','owl','have','got','big','eyes.'], bug:2, options:['has','haves','is'], fix:'has', explain:'Bei einem Tier ([[it]]) heißt es [[has got]].', uses:['owl']},
+        {k:'bug', tokens:['A','tortoys','is','slow.'], bug:1, options:['tortoise','tortise','tortose'], fix:'tortoise', explain:'Schildkröte = [[tortoise]] – man sagt „TOR-tes“.', uses:['tortoise']},
+        {k:'bug', tokens:['The','frog','is','grean.'], bug:3, options:['green.','grien.','gren.'], fix:'green.', explain:'Grün = [[green]] mit zwei e.', uses:['frog']}
+      ] },
+
+    { id:'u6boss', unit:'u6', type:'boss', title:'Boss: Zischel die Schlange', minutes:'6–8', reward:'acc_leaf',
+      boss:{ name:'Zischel', art:'snake' },
+      story:{ before:'Zischel zischt alle Tiere weg. Aber warum eigentlich? Find es heraus!',
+              after:{ flag:'u6pet', dog:'Zischel spielt jetzt mit deinem Hund Fangen. Na ja – er versucht es! 🐍',
+                      cat:'Zischel und deine Katze machen zusammen ein Nickerchen in der Sonne. 🐍',
+                      default:'Zischel hat jetzt viele Freunde im Tierwald! 🐍' } },
+      plan:[
+        {k:'catch', words:['dog'], opts:3},
+        {k:'listen', words:['tortoise'], opts:3},
+        {k:'spell', words:['fox'], mode:'tiles'},
+        {k:'listen', words:['hedgehog','owl'], opts:4},
+        {k:'speak', words:['ivegot']},
+        {k:'bug', tokens:['He','have','got','a','snake.'], bug:1, options:['has','haves','is'], fix:'has', explain:'Bei [[he]] heißt es [[has got]].', uses:['snake']},
+        {k:'catch', words:['hamster','rabbit'], opts:4},
+        {k:'build', parts:['Have','you','got','a','pet?'], de:'Hast du ein Haustier?', py:'print("Have you got a pet?")', uses:['haveyougot']},
+        {k:'predict', code:'friends = 0\nwhile friends < 1:\n    friends = friends + 1\nprint("Zischel has got a friend!")', options:['Zischel has got a friend!','friends','(nichts, die Schleife läuft ewig)'], answer:0, explain:'Nach einer Runde ist [[friends]] 1 – die Schleife stoppt. Zischel hat einen Freund!', uses:['snake']},
+        {k:'listen', words:['horse','mouse'], opts:4},
+        {k:'catch', words:['frog','bird'], opts:4},
+        {k:'spell', words:['cat'], mode:'tiles'},
+        {k:'listen', words:['fish','snake','haveyougot'], opts:4},
+        {k:'dialogue', id:'d_zischel'}
+      ] },
+
+    { id:'u6secret', unit:'u6', type:'falling', secret:true, title:'Geheim: Tierregen', minutes:'3', reward:'room_mushroom',
+      story:{ before:'Psst … auf der Lichtung regnet es Tiere! Keine Sorge, ganz sanft. ☔', after:'Du hast den Tierregen gemeistert! 🍄' },
+      plan:[ {k:'falling', words:['dog','cat','bird','fish','rabbit','horse','mouse','frog','owl','fox'], rounds:8, opts:3} ] }
+  ],
+
+  dialogues: {
+    d_u6_juno: { npc:'juno', nodes:[
+      { say:'Have you got a pet?', de:'Hast du ein Haustier?' },
+      { story:'Welches Haustier hast du? Du darfst auch träumen!', flag:'u6pet', options:[ {de:'🐶 Einen Hund', value:'dog'}, {de:'🐱 Eine Katze', value:'cat'} ] },
+      { ask:'Antworte: Ja, habe ich!', options:[ {en:'Yes, I have.', ok:true}, {en:'Yes, I am.', hint:'Auf [[Have you got …?]] antwortest du mit [[Yes, I have.]]'} ] },
+      { say:"Cool! I've got a hamster. Its name is Krümel.", de:'Cool! Ich habe einen Hamster. Er heißt Krümel.' },
+      { ask:'Frag: Hat Krümel ein Haus?', options:[ {en:'Have it got a house?', hint:'Bei [[it]] heißt es [[has got]].'}, {en:'Has it got a house?', ok:true} ] },
+      { say:"Yes, it has. And it's got a wheel.", de:'Ja. Und es hat ein Laufrad.' },
+      { ask:'Erzähl: Dein Opa hat ein Pferd!', options:[ {en:'My grandpa has got a horse.', ok:true}, {en:'My grandpa have got a horse.', hint:'Bei [[he]] und [[grandpa]] heißt es [[has got]].'} ] },
+      { say:'Wow! I love horses!', de:'Wow! Ich liebe Pferde!' }
+    ]},
+    d_zischel: { npc:'snake', nodes:[
+      { say:'Ssss! Go away! Ssss!', de:'Ssss! Geht weg! Ssss!' },
+      { ask:'Keine Angst! Frag ihn, wie es ihm geht.', options:[ {en:'Hello, Zischel! How are you?', ok:true}, {en:'Help! A snake!', hint:'Zischel ist nicht gefährlich – frag nett 🙂'} ] },
+      { say:"I'm sad. The animals have got friends. I haven't got a friend.", de:'Ich bin traurig. Die Tiere haben Freunde. Ich habe keinen Freund.' },
+      { ask:'Sag ihm: Jetzt hast du einen Freund!', options:[ {en:"You haven't got a dog.", hint:'Mach ihm Mut 💚'}, {en:"You've got a friend now!", ok:true} ] },
+      { say:'Really? Have you got time to play?', de:'Wirklich? Hast du Zeit zum Spielen?' },
+      { ask:'Ja, hast du!', options:[ {en:'Yes, I have!', ok:true}, {en:'No, I am.', hint:'Antworte mit [[Yes, I have!]]'} ] },
+      { say:'Hooray! Thank you, friend!', de:'Hurra! Danke, mein Freund!' }
+    ]}
+  },
+
+  items: [
+    { id:'acc_leaf',      kind:'acc', slot:'head', name:'Blätterkrone', price:null },
+    { id:'room_tank',     kind:'room', name:'Aquarium',     price:null, pos:{x:14,y:72,w:20} },
+    { id:'room_mushroom', kind:'room', name:'Pilzlampe',    price:null, pos:{x:92,y:94,w:12} },
+    { id:'room_nest',     kind:'room', name:'Vogelnest',    price:null, pos:{x:84,y:22,w:12} }
+  ],
+  badges: [ { id:'b_boss_u6', name:'Tierfreundin', desc:'Zischel hat Freunde gefunden', emblem:'paw', when:{level:'u6boss'} } ],
+  secrets: [ { id:'s_u6_nest', unit:'u6', item:'room_nest', x:16, y:28, text:'Du hast ein Vogelnest gefunden – leer und gemütlich! 🪺' } ]
+});
+</script>
