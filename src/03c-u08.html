@@ -1,0 +1,156 @@
+<script>
+/* ==========================================================================================
+   WORLD u8 – Uhrenturm (clock tower, indigo). My day, time, weekdays; he/she -s, always/never.
+   Code Lab: input + strings. Boss: Zeitwichtel Wusel, who mixed up all days and clocks.
+   Weekdays are capitalised, so they are practised by build/speak instead of tile spelling.
+   ========================================================================================== */
+addWorld({
+  unit: { id:'u8', num:8, title:'Uhrenturm', subtitle:'Mein Tag & die Uhrzeit', accent:'#6a6fd8', scene:'clocktower', status:'open', after:'u7',
+    monster:['bell-1','bell-2','bell-3'], monsterNames:['Glöckli','Glöckling','Glockoria'],
+    intro:'Im Uhrenturm gehen alle Uhren falsch. Ein Wichtel hat die Tage durcheinandergebracht! ⏰' },
+
+  words: [
+    { id:'monday',    unit:'u8', cat:'day',    en:'Monday',    de:'Montag',     icon:'day:1', pron:'MAN-däi',   exampleEn:'On Monday I go to school.',      exampleDe:'Am Montag gehe ich zur Schule.' },
+    { id:'tuesday',   unit:'u8', cat:'day',    en:'Tuesday',   de:'Dienstag',   icon:'day:2', pron:'TJUUS-däi', exampleEn:'On Tuesday I play tennis.',      exampleDe:'Am Dienstag spiele ich Tennis.' },
+    { id:'wednesday', unit:'u8', cat:'day',    en:'Wednesday', de:'Mittwoch',   icon:'day:3',                    exampleEn:'Wednesday is in the middle.',    exampleDe:'Mittwoch ist in der Mitte.' },
+    { id:'thursday',  unit:'u8', cat:'day',    en:'Thursday',  de:'Donnerstag', icon:'day:4',                    exampleEn:'On Thursday we have music.',     exampleDe:'Am Donnerstag haben wir Musik.' },
+    { id:'friday',    unit:'u8', cat:'day',    en:'Friday',    de:'Freitag',    icon:'day:5', pron:'FRAI-däi',  exampleEn:'Friday is my favourite day.',    exampleDe:'Freitag ist mein Lieblingstag.' },
+    { id:'saturday',  unit:'u8', cat:'day',    en:'Saturday',  de:'Samstag',    icon:'day:6', pron:'SÄ-ter-däi', exampleEn:'On Saturday I sleep long.',     exampleDe:'Am Samstag schlafe ich lange.' },
+    { id:'sunday',    unit:'u8', cat:'day',    en:'Sunday',    de:'Sonntag',    icon:'day:7', pron:'SAN-däi',   exampleEn:'On Sunday we visit grandma.',    exampleDe:'Am Sonntag besuchen wir Oma.' },
+    { id:'morning',   unit:'u8', cat:'time',   en:'morning',   de:'Morgen / Vormittag', icon:'morning', emoji:'🌅', pron:'MOR-ning', exampleEn:'Good morning, Juno!', exampleDe:'Guten Morgen, Juno!' },
+    { id:'evening',   unit:'u8', cat:'time',   en:'evening',   de:'Abend',      icon:'evening', emoji:'🌆', pron:'IIV-ning',  exampleEn:'In the evening I read.',         exampleDe:'Am Abend lese ich.' },
+    { id:'getup',     unit:'u8', cat:'day',    en:'get up',    de:'aufstehen',  icon:'getup', emoji:'⏰',                    exampleEn:'I get up at seven.',             exampleDe:'Ich stehe um sieben auf.' },
+    { id:'breakfast', unit:'u8', cat:'meal',   en:'breakfast', de:'Frühstück',  icon:'breakfast', emoji:'🥣', pron:'BRÄK-fest', exampleEn:'I have breakfast at half past seven.', exampleDe:'Ich frühstücke um halb acht.' },
+    { id:'lunch',     unit:'u8', cat:'meal',   en:'lunch',     de:'Mittagessen', icon:'lunch', emoji:'🥪', pron:'lantsch',  exampleEn:'We have lunch at one.',          exampleDe:'Wir essen um eins zu Mittag.' },
+    { id:'homework',  unit:'u8', cat:'day',    en:'homework',  de:'Hausaufgaben', icon:'homework', emoji:'📝', pron:'HOUM-wörk', exampleEn:'I do my homework after lunch.', exampleDe:'Nach dem Mittagessen mache ich meine Hausaufgaben.' },
+    { id:'gotobed',   unit:'u8', cat:'day',    en:'go to bed', de:'ins Bett gehen', icon:'gotobed', emoji:'🛌',              exampleEn:'I go to bed at eight.',          exampleDe:'Ich gehe um acht ins Bett.' },
+    { id:'always',    unit:'u8', cat:'often',  en:'always',    de:'immer',      icon:'always', emoji:'🔁', pron:'OL-wäis',   exampleEn:'I always have breakfast.',       exampleDe:'Ich frühstücke immer.' },
+    { id:'never',     unit:'u8', cat:'often',  en:'never',     de:'nie',        icon:'never', emoji:'⛔', pron:'NÄ-wer',     exampleEn:'Nuvi never gets up early.',      exampleDe:'Nuvi steht nie früh auf.' },
+    { id:'oclock',    unit:'u8', cat:'clock',  en:"o'clock",   de:'Uhr (volle Stunde)', icon:'oclock', emoji:'🕖', pron:'o-KLOCK', exampleEn:"It's seven o'clock.", exampleDe:'Es ist sieben Uhr.' },
+    { id:'halfpast',  unit:'u8', cat:'clock',  en:'half past', de:'halb (eine halbe Stunde nach)', icon:'halfpast', emoji:'🕡', exampleEn:"It's half past six.", exampleDe:'Es ist halb sieben.' }
+  ],
+
+  levels: [
+    { id:'u8l1', unit:'u8', type:'catch', title:'Wochentage', minutes:'2–3',
+      story:{ before:'Die Glocken läuten die Wochentage durcheinander. Fang sie ein!', after:'Die ersten Glocken läuten wieder richtig! 🔔' },
+      plan:[ {intro:['monday','tuesday','wednesday','thursday']},
+             {k:'catch', words:['monday','tuesday','wednesday','thursday'], reps:2, opts:3} ] },
+
+    { id:'u8l2', unit:'u8', type:'listen', title:'Wochenende', minutes:'3',
+      story:{ before:'Hör genau hin – welcher Tag wird ausgerufen? 👂', after:'Stark! Jetzt kennst du alle sieben Tage.' },
+      plan:[ {intro:['friday','saturday','sunday']},
+             {k:'listen', words:['friday','saturday','sunday','monday'], reps:2, opts:3},
+             {k:'speak', words:['friday','saturday','sunday']} ] },
+
+    { id:'u8l3', unit:'u8', type:'memory', title:'Mein Tag', minutes:'3–4',
+      story:{ before:'Wusel hat die Tagesplan-Karten gemischt. Finde die Paare!', after:'Dein Tag ist wieder in Ordnung! 🌅' },
+      plan:[ {intro:['morning','evening','getup','breakfast','lunch']},
+             {k:'memory', words:['morning','evening','getup','breakfast','lunch','monday']},
+             {k:'listen', words:['morning','evening','getup','breakfast','lunch'], reps:1, opts:3} ] },
+
+    { id:'u8l4', unit:'u8', type:'dialogue', title:'Wie spät ist es?', minutes:'3–4',
+      story:{ before:'Juno rennt die Treppe hoch. Sie hat keine Uhr dabei!', after:'Juno ist pünktlich – dank dir! ⏰' },
+      plan:[ {intro:['homework','gotobed','oclock','halfpast']},
+             {k:'dialogue', id:'d_u8_juno'},
+             {k:'speak', words:['oclock','halfpast','gotobed','wednesday','thursday']} ] },
+
+    { id:'u8l5', unit:'u8', type:'spell', title:'Der Stundenplan', minutes:'3–4',
+      story:{ before:'Der Stundenplan im Turm ist leer. Füllst du ihn aus?', after:'Der Stundenplan ist fertig! ✨' },
+      plan:[ {intro:['always','never']},
+             {k:'spell', words:['lunch','never','always','morning','evening'], mode:'tiles'},
+             {k:'spell', words:['breakfast','homework'], mode:'first'},
+             {k:'build', parts:['I','go','to','bed','at','eight.'], de:'Ich gehe um acht ins Bett.', py:'print("I go to bed at eight.")', uses:['gotobed']},
+             {k:'build', parts:['On','Thursday','we','have','music.'], de:'Am Donnerstag haben wir Musik.', py:'print("On Thursday we have music.")', uses:['thursday']},
+             {k:'build', parts:['Today','is','Monday.'], de:'Heute ist Montag.', py:'print("Today is Monday.")', uses:['monday']} ] },
+
+    { id:'u8l6', unit:'u8', type:'codelab', title:'Code Lab: input & Text', minutes:'4–5', reward:'room_clock',
+      story:{ before:'Prof. Pixel baut eine sprechende Uhr. Sie soll Fragen stellen können!', after:'Die sprechende Uhr fragt und antwortet. Compile successful! 💻' },
+      plan:[
+        {k:'card', title:'input ⌨️', text:'[[input]] stellt dem Menschen am Computer eine Frage. Was er eintippt, landet in einer Box.', code:'day = input("What day is it? ")\nprint("Today is " + day + ".")', out:'What day is it? Monday\nToday is Monday.'},
+        {k:'predict', code:'day = "Friday"\nprint("Today is " + day + ".")', options:['Today is Friday.','Today is day.','Today is + day.'], answer:0, explain:'[[+]] klebt Texte zusammen. In [[day]] liegt „Friday“.', uses:['friday']},
+        {k:'predict', code:'name = "Wusel"\nprint(name + " gets up at seven.")', options:['Wusel gets up at seven.','name gets up at seven.','Wusel get up at seven.'], answer:0, explain:'In [[name]] liegt „Wusel“. Und bei he/she: [[gets]] mit -s.', uses:['getup']},
+        {k:'card', title:'Text-Tricks ✂️', text:'Texte können mehr: [[upper()]] macht GROSSBUCHSTABEN, [[len()]] zählt die Buchstaben.', code:'day = "Sunday"\nprint(day.upper())\nprint(len(day))', out:'SUNDAY\n6'},
+        {k:'predict', code:'day = "Monday"\nprint(len(day))', options:['6','5','Monday'], answer:0, explain:'M-o-n-d-a-y: 6 Buchstaben.', uses:['monday']},
+        {k:'order', de:'Bau das Programm: Frag nach der Uhrzeit und antworte.', lines:['time = input("What time is it? ")','print("It is " + time + ".")'], extra:['print("It is time.")'], out:"What time is it? 7 o'clock\nIt is 7 o'clock.", explain:'Erst fragen, dann antworten. Ohne Anführungszeichen wird der Inhalt von [[time]] angezeigt.', uses:['oclock']},
+        {k:'trace', code:'text = "Satur"\ntext = text + "day"\ntext = text.upper()', var:'text', steps:[{v:'Satur', alt:['day','Saturday']},{v:'Saturday', alt:['Saturday day','Satur day']},{v:'SATURDAY', alt:['saturday','Saturday']}], explain:'Erst wird angeklebt, dann alles groß gemacht: [[SATURDAY]].', uses:['saturday']},
+        {k:'build', parts:['On','Tuesday','I','do','my','homework.'], de:'Am Dienstag mache ich meine Hausaufgaben.', py:'print("On Tuesday I do my homework.")', uses:['tuesday','homework']},
+        {k:'build', code:true, parts:['name','=','input(','"Name? "',')'], de:'Bau eine Frage nach dem Namen!', py:'name = input("Name? ")\nprint("Hello, " + name)', uses:[]}
+      ] },
+
+    { id:'u8l7', unit:'u8', type:'bughunt', title:'Bug-Jagd: he/she -s', minutes:'3–4',
+      story:{ before:'Im Uhrwerk krabbeln Bugs! Die Zahnräder knirschen. 🐞', after:'Alle Bugs gefangen! Die Uhr tickt wieder.' },
+      plan:[
+        {k:'card', title:'Bug-Jagd 🐞', text:'Bei he/she/it bekommt das Tuwort ein -s: [[She gets up at seven.]] [[always]] (immer) und [[never]] (nie) stehen vor dem Tuwort. Wochentage schreibt man groß!'},
+        {k:'bug', tokens:['She','get','up','at','seven.'], bug:1, options:['gets','getting','got'], fix:'gets', explain:'Bei [[she]]: [[gets]] mit -s.', uses:['getup']},
+        {k:'bug', tokens:['He','have','lunch','at','one.'], bug:1, options:['has','haves','is'], fix:'has', explain:'Bei [[he]] wird [[have]] zu [[has]].', uses:['lunch']},
+        {k:'bug', tokens:['I','allways','do','my','homework.'], bug:1, options:['always','alwais','ollways'], fix:'always', explain:'Immer = [[always]] – mit einem l.', uses:['always','homework']},
+        {k:'bug', tokens:['Juno','never','go','to','bed','at','eight.'], bug:2, options:['goes','gos','going'], fix:'goes', explain:'Juno = [[she]]: [[goes]].', uses:['never','gotobed']},
+        {k:'bug', tokens:['Today','is','monday.'], bug:2, options:['Monday.','Munday.','Mondey.'], fix:'Monday.', explain:'Wochentage schreibt man im Englischen immer groß: [[Monday]].', uses:['monday']},
+        {k:'bug', tokens:['See','you','on','Wensday!'], bug:3, options:['Wednesday!','Wendsday!','Wednsday!'], fix:'Wednesday!', explain:'Mittwoch = [[Wednesday]] – das erste d spricht man nicht!', uses:['wednesday']},
+        {k:'bug', tokens:["It's",'seven',"o'clocks."], bug:2, options:["o'clock.",'oclock.',"o'klock."], fix:"o'clock.", explain:"Volle Stunde: [[seven o'clock]] – ohne s.", uses:['oclock']},
+        {k:'bug', tokens:['I','have','brekfast','at','seven.'], bug:2, options:['breakfast','brekfest','breakfest'], fix:'breakfast', explain:'Frühstück = [[breakfast]] – mit e-a.', uses:['breakfast']},
+        {k:'bug', tokens:['In','the','evning','I','read.'], bug:2, options:['evening','eavning','ievning'], fix:'evening', explain:'Abend = [[evening]] – mit e-v-e.', uses:['evening']},
+        {k:'bug', tokens:['He','watch','TV','on','Saturdays.'], bug:1, options:['watches','watchs','watching'], fix:'watches', explain:'Nach ch kommt -es: [[watches]].', uses:['saturday']}
+      ] },
+
+    { id:'u8boss', unit:'u8', type:'boss', title:'Boss: Zeitwichtel Wusel', minutes:'6–8', reward:'acc_starhat',
+      boss:{ name:'Wusel', art:'gnome' },
+      story:{ before:'Zeitwichtel Wusel dreht an allen Uhren. Niemand weiß mehr, welcher Tag ist!',
+              after:{ flag:'u8day', sleep:'Am Samstag schlaft ihr alle lange – Wusel auch. Die Uhren ticken richtig! ⏰',
+                      football:'Am Samstag spielt Wusel Schiedsrichter – mit Stoppuhr! ⏰',
+                      default:'Wusel kennt jetzt alle Tage. Die Turmuhr schlägt richtig! ⏰' } },
+      plan:[
+        {k:'catch', words:['monday'], opts:3},
+        {k:'listen', words:['thursday'], opts:3},
+        {k:'spell', words:['lunch'], mode:'tiles'},
+        {k:'listen', words:['saturday','sunday'], opts:4},
+        {k:'speak', words:['getup']},
+        {k:'bug', tokens:['He','get','up','at','six.'], bug:1, options:['gets','getting','got'], fix:'gets', explain:'Bei [[he]]: [[gets]].', uses:['getup']},
+        {k:'catch', words:['morning','evening'], opts:4},
+        {k:'build', parts:['I','never','do','homework','on','Sunday.'], de:'Sonntags mache ich nie Hausaufgaben.', py:'print("I never do homework on Sunday.")', uses:['never','homework','sunday']},
+        {k:'predict', code:'day = "Wednesday"\nprint("Today is " + day + "!")', options:['Today is Wednesday!','Today is day!','Wednesday is today!'], answer:0, explain:'In [[day]] liegt „Wednesday“. Wusel weiß endlich, welcher Tag ist!', uses:['wednesday']},
+        {k:'listen', words:['friday','tuesday'], opts:4},
+        {k:'catch', words:['breakfast','gotobed'], opts:4},
+        {k:'spell', words:['never'], mode:'tiles'},
+        {k:'listen', words:['oclock','halfpast','always'], opts:4},
+        {k:'dialogue', id:'d_wusel'}
+      ] },
+
+    { id:'u8secret', unit:'u8', type:'falling', secret:true, title:'Geheim: Zeitregen', minutes:'3', reward:'room_hourglass',
+      story:{ before:'Psst … ganz oben im Turm regnet es Wochentage! ☔', after:'Du hast den Zeitregen gemeistert! ⏳' },
+      plan:[ {k:'falling', words:['monday','tuesday','wednesday','thursday','friday','saturday','sunday','morning'], rounds:8, opts:3} ] }
+  ],
+
+  dialogues: {
+    d_u8_juno: { npc:'juno', nodes:[
+      { say:'Hi! What time is it?', de:'Hi! Wie spät ist es?' },
+      { ask:'Es ist sieben Uhr.', options:[ {en:"It's seven o'clock.", ok:true}, {en:"It's seven clock.", hint:"Volle Stunde: [[o'clock]]."} ] },
+      { say:'Oh no! I always get up at seven!', de:'Oh nein! Ich stehe immer um sieben auf!' },
+      { ask:'Sag: Ich frühstücke um halb acht.', options:[ {en:'I have breakfast at half seven.', hint:'Halb acht = eine halbe Stunde nach sieben: [[half past seven]].'}, {en:'I have breakfast at half past seven.', ok:true} ] },
+      { say:'What day is it today?', de:'Welcher Tag ist heute?' },
+      { ask:'Heute ist Freitag.', options:[ {en:'Today is Friday.', ok:true}, {en:'Today is Fridays.', hint:'Ein Tag – ohne s: [[Friday]].'} ] },
+      { say:'Friday! I never do homework on Fridays.', de:'Freitag! Freitags mache ich nie Hausaufgaben.' },
+      { story:'Juno fragt: Was machst du am Samstag?', flag:'u8day', options:[ {de:'🛌 Lange schlafen', value:'sleep'}, {de:'⚽ Mit Juno Fußball spielen', value:'football'} ] },
+      { say:'Great! See you on Saturday!', de:'Super! Bis Samstag!' }
+    ]},
+    d_wusel: { npc:'gnome', nodes:[
+      { say:'Tick, tock! Today is Sunday! No, Monday! No, Tuesday!', de:'Tick, tack! Heute ist Sonntag! Nein, Montag! Nein, Dienstag!' },
+      { ask:'Beruhige ihn!', options:[ {en:'Stop, Wusel! Look at the clock.', ok:true}, {en:'Go to bed, Wusel!', hint:'Hilf ihm, die Uhr zu lesen ⏰'} ] },
+      { say:'What time is it?', de:'Wie spät ist es?' },
+      { ask:'Es ist halb vier.', options:[ {en:"It's three o'clock.", hint:'Der große Zeiger steht unten – das ist halb.'}, {en:"It's half past three.", ok:true} ] },
+      { say:'And what day is it?', de:'Und welcher Tag ist heute?' },
+      { ask:'Heute ist Mittwoch.', options:[ {en:'Today is Wednesday.', ok:true}, {en:'Today is Thursday.', hint:'Mittwoch = [[Wednesday]].'} ] },
+      { say:'Wednesday! Thank you! Now I always know the time!', de:'Mittwoch! Danke! Jetzt weiß ich immer, wie spät es ist!' }
+    ]}
+  },
+
+  items: [
+    { id:'acc_starhat',    kind:'acc', slot:'head', name:'Sternenhut', price:null },
+    { id:'room_clock',     kind:'room', name:'Wanduhr',    price:null, pos:{x:40,y:24,w:12} },
+    { id:'room_hourglass', kind:'room', name:'Sanduhr',    price:null, pos:{x:72,y:92,w:10} },
+    { id:'room_calendar',  kind:'room', name:'Kalender',   price:null, pos:{x:8,y:44,w:12} }
+  ],
+  badges: [ { id:'b_boss_u8', name:'Zeitmeisterin', desc:'Wusel kennt wieder alle Tage', emblem:'clock', when:{level:'u8boss'} } ],
+  secrets: [ { id:'s_u8_calendar', unit:'u8', item:'room_calendar', x:84, y:30, text:'Du hast einen alten Kalender gefunden! 📅' } ]
+});
+</script>
