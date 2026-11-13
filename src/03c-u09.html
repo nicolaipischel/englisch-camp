@@ -1,0 +1,148 @@
+<script>
+/* ==========================================================================================
+   WORLD u9 – Marktplatz (market, orange). Food + shopping; some/any, How much …?, I'd like …
+   Code Lab: dictionaries. Boss: Möwe Schnapp, a greedy seagull who steals food.
+   ========================================================================================== */
+addWorld({
+  unit: { id:'u9', num:9, title:'Marktplatz', subtitle:'Essen & Einkaufen', accent:'#ff9a2e', scene:'market', status:'open', after:'u8',
+    monster:['crumb-1','crumb-2','crumb-3'], monsterNames:['Knuspi','Knusperling','Knusperella'],
+    intro:'Auf dem Marktplatz duftet es lecker – aber eine Möwe klaut alles! 🧺' },
+
+  words: [
+    { id:'apple',     unit:'u9', cat:'fruit',  en:'apple',     de:'Apfel',       icon:'apple',     emoji:'🍎', pron:'ÄPP-l',     exampleEn:'An apple a day!',                  exampleDe:'Ein Apfel am Tag!' },
+    { id:'banana',    unit:'u9', cat:'fruit',  en:'banana',    de:'Banane',      icon:'banana',    emoji:'🍌', pron:'ba-NAA-na', exampleEn:'Monkeys like bananas.',            exampleDe:'Affen mögen Bananen.' },
+    { id:'carrot',    unit:'u9', cat:'fruit',  en:'carrot',    de:'Karotte / Möhre', icon:'carrot', emoji:'🥕', pron:'KÄ-rot',  exampleEn:'Hoppel loves carrots.',            exampleDe:'Hoppel liebt Karotten.' },
+    { id:'tomato',    unit:'u9', cat:'fruit',  en:'tomato',    de:'Tomate',      icon:'tomato',    emoji:'🍅', pron:'to-MAA-to', exampleEn:'The tomato is red.',               exampleDe:'Die Tomate ist rot.' },
+    { id:'bread',     unit:'u9', cat:'food',   en:'bread',     de:'Brot',        icon:'bread',     emoji:'🍞', pron:'bräd',      exampleEn:'Some bread, please.',              exampleDe:'Etwas Brot, bitte.' },
+    { id:'milk',      unit:'u9', cat:'food',   en:'milk',      de:'Milch',       icon:'milk',      emoji:'🥛', pron:'milk',      exampleEn:'I drink milk for breakfast.',      exampleDe:'Zum Frühstück trinke ich Milch.' },
+    { id:'cheese',    unit:'u9', cat:'food',   en:'cheese',    de:'Käse',        icon:'cheese',    emoji:'🧀', pron:'tschiis',   exampleEn:'Cheese is yellow.',                exampleDe:'Käse ist gelb.' },
+    { id:'egg',       unit:'u9', cat:'food',   en:'egg',       de:'Ei',          icon:'egg',       emoji:'🥚', pron:'ägg',       exampleEn:"I've got two eggs.",               exampleDe:'Ich habe zwei Eier.' },
+    { id:'juice',     unit:'u9', cat:'food',   en:'juice',     de:'Saft',        icon:'juice',     emoji:'🧃', pron:'dschuus',   exampleEn:'Apple juice, please!',             exampleDe:'Apfelsaft, bitte!' },
+    { id:'pizza',     unit:'u9', cat:'treat',  en:'pizza',     de:'Pizza',       icon:'pizza',     emoji:'🍕', pron:'PIIT-sa',   exampleEn:'Pizza is my favourite food.',      exampleDe:'Pizza ist mein Lieblingsessen.' },
+    { id:'chocolate', unit:'u9', cat:'treat',  en:'chocolate', de:'Schokolade',  icon:'chocolate', emoji:'🍫', pron:'TSCHOK-let', exampleEn:'Chocolate is sweet.',             exampleDe:'Schokolade ist süß.' },
+    { id:'water',     unit:'u9', cat:'food',   en:'water',     de:'Wasser',      icon:'water',     emoji:'💧',                   exampleEn:'Can I have some water, please?',   exampleDe:'Kann ich bitte etwas Wasser haben?' },
+    { id:'icecream',  unit:'u9', cat:'treat',  en:'ice cream', de:'Eis (zum Essen)', icon:'icecream', emoji:'🍦',               exampleEn:"I'd like an ice cream, please.",   exampleDe:'Ich hätte gern ein Eis, bitte.' },
+    { id:'money',     unit:'u9', cat:'shop',   en:'money',     de:'Geld',        icon:'money',     emoji:'💶', pron:'MA-ni',     exampleEn:"I haven't got any money.",         exampleDe:'Ich habe kein Geld.' },
+    { id:'howmuch',   unit:'u9', cat:'phrase', en:'How much is it?', de:'Wie viel kostet das?', icon:'howmuch', emoji:'🏷️',      exampleEn:"How much is it? – It's two euros.", exampleDe:'Wie viel kostet das? – Zwei Euro.' },
+    { id:'idlike',    unit:'u9', cat:'phrase', en:"I'd like an apple, please.", de:'Ich hätte gern einen Apfel, bitte.', icon:'idlike', emoji:'🛒', exampleEn:"I'd like an apple, please. – Here you are.", exampleDe:'Ich hätte gern einen Apfel, bitte. – Bitte schön.' }
+  ],
+
+  levels: [
+    { id:'u9l1', unit:'u9', type:'catch', title:'Obst & Gemüse', minutes:'2–3',
+      story:{ before:'Am Obststand rollen Äpfel über den Platz. Fang sie ein!', after:'Alles wieder in den Kisten! 🍎' },
+      plan:[ {intro:['apple','banana','carrot','tomato']},
+             {k:'catch', words:['apple','banana','carrot','tomato'], reps:2, opts:3} ] },
+
+    { id:'u9l2', unit:'u9', type:'listen', title:'Der Frühstückstisch', minutes:'3',
+      story:{ before:'Im Marktcafé wird Frühstück bestellt. Hör genau hin! 👂', after:'Stark! Jede Bestellung war richtig.' },
+      plan:[ {intro:['bread','milk','cheese','egg','juice']},
+             {k:'listen', words:['bread','milk','cheese','egg','juice'], reps:2, opts:3},
+             {k:'speak', words:['cheese','juice']} ] },
+
+    { id:'u9l3', unit:'u9', type:'memory', title:'Lecker-Memory', minutes:'3–4',
+      story:{ before:'Am Süßigkeitenstand liegen Karten. Finde die Paare!', after:'Alle Paare gefunden – lecker! 🍦' },
+      plan:[ {intro:['pizza','chocolate','water','icecream','money']},
+             {k:'memory', words:['pizza','chocolate','water','icecream','money','apple']},
+             {k:'listen', words:['pizza','chocolate','water','icecream','money'], reps:1, opts:3} ] },
+
+    { id:'u9l4', unit:'u9', type:'dialogue', title:'Am Marktstand', minutes:'3–4',
+      story:{ before:'Juno hilft am Stand ihrer Tante. Kauf etwas bei ihr!', after:'Einkauf geschafft! Juno schenkt dir eine Kirsche dazu. 🍒' },
+      plan:[ {intro:['howmuch','idlike']},
+             {k:'dialogue', id:'d_u9_juno'},
+             {k:'speak', words:['howmuch','idlike']} ] },
+
+    { id:'u9l5', unit:'u9', type:'spell', title:'Der Einkaufszettel', minutes:'3–4',
+      story:{ before:'Oma schickt dich einkaufen. Schreibst du den Zettel?', after:'Der Einkaufszettel ist fertig! ✨' },
+      plan:[ {k:'spell', words:['apple','bread','milk','egg','juice','pizza','water','money'], mode:'tiles'},
+             {k:'spell', words:['banana','cheese','carrot','tomato','chocolate'], mode:'first'} ] },
+
+    { id:'u9l6', unit:'u9', type:'codelab', title:'Code Lab: Wörterbücher', minutes:'4–5', reward:'room_fruit',
+      story:{ before:'Prof. Pixel will eine Preisliste für den Markt programmieren.', after:'Die Preisliste rechnet alles aus. Compile successful! 💻' },
+      plan:[
+        {k:'card', title:'Wörterbuch 📖', text:'Ein Wörterbuch ([[dict]]) speichert Paare: Schlüssel und Wert – wie eine Preisliste! Es steht in geschweiften Klammern { }.', code:'prices = {"apple": 1, "pizza": 5}\nprint(prices["pizza"])', out:'5'},
+        {k:'predict', code:'prices = {"milk": 2, "bread": 3}\nprint(prices["bread"])', options:['3','2','bread'], answer:0, explain:'Zum Schlüssel [[bread]] gehört der Wert 3.', uses:['bread','milk']},
+        {k:'predict', code:'food = {"red": "apple", "yellow": "banana"}\nprint(food["yellow"])', options:['banana','apple','yellow'], answer:0, explain:'Zum Schlüssel [[yellow]] gehört [[banana]].', uses:['banana','apple']},
+        {k:'card', title:'Neue Paare ➕', text:'Mit einer Zuweisung kommt ein neues Paar dazu – oder ein Preis wird geändert.', code:'prices = {"egg": 1}\nprices["juice"] = 2\nprint(prices)', out:"{'egg': 1, 'juice': 2}"},
+        {k:'order', de:'Bau das Programm: Preisliste anlegen, Käse dazu, Käsepreis anzeigen.', lines:['prices = {"milk": 2}','prices["cheese"] = 4','print(prices["cheese"])'], extra:['print("cheese")'], out:'4', uses:['cheese','milk']},
+        {k:'trace', code:'money = 10\nmoney = money - 2\nmoney = money - 5', var:'money', steps:[{v:'10', alt:['8','0']},{v:'8', alt:['12','2']},{v:'3', alt:['5','13']}], explain:'Erst Milch für 2, dann Pizza für 5 – übrig bleiben 3 Euro.', uses:['money']},
+        {k:'predict', code:'cart = {"apple": 2, "egg": 6}\nfor food in cart:\n    print(food)', options:['apple\negg','2\n6','apple 2\negg 6'], answer:0, explain:'Eine Schleife über ein Wörterbuch nimmt die Schlüssel.', uses:['apple','egg']},
+        {k:'build', parts:['How','much','is','the','chocolate?'], de:'Wie viel kostet die Schokolade?', py:'print("How much is the chocolate?")', uses:['howmuch','chocolate']},
+        {k:'build', code:true, parts:['prices','["tomato"]','=','1'], de:'Füg der Preisliste eine Tomate für 1 Euro hinzu!', py:'prices["tomato"] = 1', uses:['tomato']}
+      ] },
+
+    { id:'u9l7', unit:'u9', type:'bughunt', title:'Bug-Jagd: some / any', minutes:'3–4',
+      story:{ before:'Auf den Preisschildern krabbeln Bugs! 🐞', after:'Alle Bugs gefangen! Einer wollte die Schokolade.' },
+      plan:[
+        {k:'card', title:'Bug-Jagd 🐞', text:"[[some]] = etwas, einige – in Bitten und normalen Sätzen: [[I'd like some milk.]] [[any]] in Fragen und mit not: [[Have you got any eggs?]] [[There isn't any juice.]]"},
+        {k:'bug', tokens:['Have','you','got','some','eggs?'], bug:3, options:['any','a','many'], fix:'any', explain:'In Fragen meist [[any]]: [[Have you got any eggs?]]', uses:['egg']},
+        {k:'bug', tokens:['There',"isn't",'some','juice.'], bug:2, options:['any','no','a'], fix:'any', explain:'Mit not heißt es [[any]].', uses:['juice']},
+        {k:'bug', tokens:["I'd",'like','any','bread,','please.'], bug:2, options:['some','a','many'], fix:'some', explain:'In einer Bitte heißt es [[some]].', uses:['bread','idlike']},
+        {k:'bug', tokens:['How','many','is','the','pizza?'], bug:1, options:['much','more','mutch'], fix:'much', explain:'Nach dem Preis fragst du: [[How much is …?]]', uses:['howmuch','pizza']},
+        {k:'bug', tokens:['Two','tomatos,','please.'], bug:1, options:['tomatoes,','tomates,','tomatoz,'], fix:'tomatoes,', explain:'Bei tomato kommt -es dazu: [[tomatoes]].', uses:['tomato']},
+        {k:'bug', tokens:['I','like','choclate.'], bug:2, options:['chocolate.','schokolate.','chocolat.'], fix:'chocolate.', explain:'Schokolade = [[chocolate]] – man spricht nur „TSCHOK-let“.', uses:['chocolate']},
+        {k:'bug', tokens:['A','bananna','is','yellow.'], bug:1, options:['banana','banane','bannana'], fix:'banana', explain:'Banane = [[banana]] – ohne e am Ende.', uses:['banana']},
+        {k:'bug', tokens:['Can','I','have','some','wather?'], bug:4, options:['water?','wotter?','vater?'], fix:'water?', explain:'Wasser = [[water]].', uses:['water']},
+        {k:'bug', tokens:['I',"haven't",'got','some','money.'], bug:3, options:['any','a','much'], fix:'any', explain:'Mit not heißt es [[any]].', uses:['money']},
+        {k:'bug', tokens:['The','chease','is','yellow.'], bug:1, options:['cheese','chees','tchiis'], fix:'cheese', explain:'Käse = [[cheese]] mit zwei e.', uses:['cheese']}
+      ] },
+
+    { id:'u9boss', unit:'u9', type:'boss', title:'Boss: Möwe Schnapp', minutes:'6–8', reward:'acc_chef',
+      boss:{ name:'Schnapp', art:'gull' },
+      story:{ before:'Möwe Schnapp klaut Pizza, Brot und Käse vom Markt. Bring ihm bei, nett zu fragen!',
+              after:{ flag:'u9buy', chocolate:'Schnapp teilt jetzt sogar seine Schokolade mit dir. 🍫',
+                      carrots:'Schnapp bringt Hoppel die Karotten vorbei – ohne zu naschen! 🥕',
+                      default:'Schnapp fragt jetzt immer: [[Can I have some bread, please?]] 🐦' } },
+      plan:[
+        {k:'catch', words:['apple'], opts:3},
+        {k:'listen', words:['milk'], opts:3},
+        {k:'spell', words:['egg'], mode:'tiles'},
+        {k:'listen', words:['carrot','tomato'], opts:4},
+        {k:'speak', words:['idlike']},
+        {k:'bug', tokens:['Have','you','got','some','fish?'], bug:3, options:['any','a','many'], fix:'any', explain:'In Fragen: [[any]].', uses:[]},
+        {k:'catch', words:['pizza','cheese'], opts:4},
+        {k:'build', parts:['How','much','is','the','ice','cream?'], de:'Wie viel kostet das Eis?', py:'print("How much is the ice cream?")', uses:['howmuch','icecream']},
+        {k:'predict', code:'bag = {"bread": 2, "fish": 0}\nif bag["fish"] == 0:\n    print("Sorry, no fish!")', options:['Sorry, no fish!','0','fish'], answer:0, explain:'Im Wörterbuch steht bei [[fish]] eine 0. Pech für Schnapp!', uses:[]},
+        {k:'listen', words:['chocolate','water'], opts:4},
+        {k:'catch', words:['juice','banana'], opts:4},
+        {k:'spell', words:['bread'], mode:'tiles'},
+        {k:'listen', words:['money','icecream','howmuch'], opts:4},
+        {k:'dialogue', id:'d_schnapp'}
+      ] },
+
+    { id:'u9secret', unit:'u9', type:'falling', secret:true, title:'Geheim: Obstregen', minutes:'3', reward:'room_basket',
+      story:{ before:'Psst … hinter den Ständen regnet es Obst! ☔', after:'Du hast den Obstregen gemeistert! 🧺' },
+      plan:[ {k:'falling', words:['apple','banana','carrot','tomato','bread','milk','cheese','egg'], rounds:8, opts:3} ] }
+  ],
+
+  dialogues: {
+    d_u9_juno: { npc:'juno', nodes:[
+      { say:'Hello! Can I help you?', de:'Hallo! Kann ich dir helfen?' },
+      { ask:'Sag: Ich hätte gern einen Apfel, bitte.', options:[ {en:"I'd like an apple, please.", ok:true}, {en:"I'd like a apple, please.", hint:'Vor apple heißt es [[an]] – weißt du noch? 🍎'} ] },
+      { say:'Here you are. Anything else?', de:'Bitte schön. Sonst noch etwas?' },
+      { story:'Was kaufst du noch?', flag:'u9buy', options:[ {de:'🍫 Schokolade', value:'chocolate'}, {de:'🥕 Karotten für Hoppel', value:'carrots'} ] },
+      { ask:'Frag nach dem Preis!', options:[ {en:'How many is it?', hint:'Nach dem Preis fragst du mit [[How much]].'}, {en:'How much is it?', ok:true} ] },
+      { say:"It's two euros, please.", de:'Das macht zwei Euro, bitte.' },
+      { ask:'Bezahle und bedank dich.', options:[ {en:'Here you are. Thank you!', ok:true}, {en:'Go away. Thank you!', hint:'Sei freundlich zu Juno 🙂'} ] },
+      { say:'Thank you! Goodbye!', de:'Danke! Tschüss!' }
+    ]},
+    d_schnapp: { npc:'gull', nodes:[
+      { say:'Mine! Mine! All the pizza is mine!', de:'Meins! Meins! Die ganze Pizza gehört mir!' },
+      { ask:'Sag ihm: Stopp! Frag lieber!', options:[ {en:'Stop! Ask, please!', ok:true}, {en:'Take the cheese!', hint:'Schnapp soll nicht klauen 🙅'} ] },
+      { say:'Ask? How?', de:'Fragen? Wie?' },
+      { ask:'Zeig es ihm!', options:[ {en:"Say: I'd like any bread.", hint:'Bei einer Bitte heißt es [[some]] – und [[please]]!'}, {en:"Say: I'd like some bread, please.", ok:true} ] },
+      { say:"I'd like some bread, please. Have you got any fish?", de:'Ich hätte gern etwas Brot, bitte. Hast du Fisch?' },
+      { ask:'Leider gibt es keinen Fisch.', options:[ {en:"Sorry, there isn't any fish.", ok:true}, {en:"Sorry, there isn't some fish.", hint:'Mit not heißt es [[any]].'} ] },
+      { say:'OK! Bread is nice too. Thank you!', de:'Okay! Brot ist auch lecker. Danke!' }
+    ]}
+  },
+
+  items: [
+    { id:'acc_chef',     kind:'acc', slot:'head', name:'Kochmütze', price:null },
+    { id:'room_fruit',   kind:'room', name:'Obstschale',  price:null, pos:{x:60,y:60,w:14} },
+    { id:'room_basket',  kind:'room', name:'Einkaufskorb', price:null, pos:{x:20,y:96,w:14} },
+    { id:'room_coinjar', kind:'room', name:'Spardose',    price:null, pos:{x:94,y:56,w:10} }
+  ],
+  badges: [ { id:'b_boss_u9', name:'Marktheldin', desc:'Schnapp fragt jetzt nett', emblem:'basket', when:{level:'u9boss'} } ],
+  secrets: [ { id:'s_u9_coinjar', unit:'u9', item:'room_coinjar', x:14, y:30, text:'Du hast eine Spardose gefunden! Klimper, klimper. 🪙' } ]
+});
+</script>
