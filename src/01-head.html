@@ -64,8 +64,10 @@
 
  ADDING CONTENT
   - See the CONTENT block at the top of the <script>. Add a word = add an object to
-    CONTENT.words. Add a level = add an object to CONTENT.levels. New unit = add to
-    CONTENT.units and set status:'open'. The validation tells you what is missing.
+    CONTENT.words. Add a level = add an object to CONTENT.levels. New unit = new file
+    src/03c-uNN.html calling addWorld({...}). The validation tells you what is missing.
+  - Unit 11 runs real Python (Pyodide v0.29.5 from cdn.jsdelivr.net), loaded only when a
+    Python task starts. Offline it shows a German hint and offers to skip the task.
 ==========================================================================================
 
 ==========================================================================================
@@ -96,12 +98,28 @@
  Unit 1 – Hallohafen (harbour town, sea breeze, teal accent): the harbour bell is silent
    because nobody greets anymore. Problem: bring back "Hello". Payoff: Knarz says hello,
    the bell rings again.
- Unit 2 – Farbenfeld (meadow route, butter-yellow accent): the flowers lost their colours
-   (colours, school things; Code Lab if/else).
- Unit 3 – Familienfelsen (cliff village, rose accent): a lost pet needs its family
-   (family, pets; Code Lab lists).
- Unit 4 – Blockdorf (blocky village, grass-green accent): build and decorate a home
-   (rooms, furniture; Code Lab loops).
+ Unit 2 – Farbenfeld (meadow, butter-yellow): Grauwolke Nebelino drained the colours.
+   Colours, school things; a/an, plural. Code Lab if/else.
+ Unit 3 – Regelturm (school tower, sky-blue): Robo Kommandix only shouts orders. Classroom
+   rules; imperatives, don't, can/can't, please. Code Lab True/False, and/or.
+ Unit 4 – Familienfelsen (cliffs, rose): Hoppel, a shy lost rabbit, looks for his family.
+   Family; 's, my/your/his/her. Code Lab lists. Opens Unit 11.
+ Unit 5 – Blockdorf (blocky village, terracotta): Blockgolem Klotz wants a home. Rooms,
+   furniture; there is/are, in/on/under. Code Lab for loops.
+ Unit 6 – Tierwald (forest, moss-green): Zischel the snake hisses because he has no friends.
+   Pets, animals; have got/has got. Code Lab while loops.
+ Unit 7 – Spielinsel (island, coral): Faultier Gähnix finds everything boring. Hobbies;
+   like + -ing, he/she -s. Code Lab functions.
+ Unit 8 – Uhrenturm (clock tower, indigo): Zeitwichtel Wusel mixed up days and clocks.
+   Weekdays, time, daily routine; he/she -s, always/never. Code Lab input + strings.
+ Unit 9 – Marktplatz (market, orange): Möwe Schnapp steals food. Food, shopping; some/any,
+   How much …?, I'd like … Code Lab dictionaries.
+ Unit 10 – Festbucht (harbour at night, gold): finale party for Glimmer, a shy dragon whose
+   birthday nobody knows. Months, birthday, ordinals; present progressive. Code Lab mini project.
+ Unit 11 – Pixels Leuchtturm (bonus route, lighthouse at night, mint; opens after Unit 4):
+   real Python via Pyodide (loaded from the CDN only here; offline = German hint + skip).
+   Words = English words behind Python keywords. Boss: Der Große Bug, who learns that bugs
+   help us learn.
 
  Tone: funny, short, never babyish. English bits inside German text are marked [[like this]].
  Mistake language: "Fast!", "Bug gefunden! Jetzt weißt du's.", "Probier's nochmal 💪".
@@ -120,7 +138,9 @@
    sylveon: bg #ffe1ef > #d6ecff, primary #f2559c, secondary #6cbcf5, en #b0246a
    umbreon: bg #1b1937 > #2f2b63, primary gold #f2c14e (dark text), en #ffd76a
    mew:     bg #ffe4ef > #d3f7f0, primary #e85d9f, secondary #34bfae, en #0b7a6e
- Unit accents: u1 teal #2fb3c6, u2 butter #f2b33d, u3 rose #f07aa0, u4 grass #6cc070.
+ Unit accents: u1 teal #2fb3c6, u2 butter #f2b33d, u3 sky #4aa8e8, u4 rose #f07aa0,
+   u5 terracotta #d9774f, u6 moss #6f9e3c, u7 coral #ff7f6b, u8 indigo #6a6fd8, u9 orange #ff9a2e,
+   u10 gold #d4a017, u11 mint #3cc9a0 (u10/u11 use dark scenes: unit.dark).
  Pastel palette for art: lavender #cdb8f5, mint #b9efd9, peach #ffd2b8, rose #ffc2d6,
    sky #bfe3ff, butter #ffe7a0.
  Components: .btn (chunky, 52px+, 3D bottom shadow, press squash), .card (rounded 22px,
