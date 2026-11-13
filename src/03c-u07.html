@@ -1,0 +1,148 @@
+<script>
+/* ==========================================================================================
+   WORLD u7 – Spielinsel (island/beach, coral). Hobbies; like + -ing, simple present (he plays).
+   Code Lab: functions (def, parameters, return). Boss: Gähnix the sloth, who finds everything boring.
+   ========================================================================================== */
+addWorld({
+  unit: { id:'u7', num:7, title:'Spielinsel', subtitle:'Hobbys & Freizeit', accent:'#ff7f6b', scene:'island', status:'open', after:'u6',
+    monster:['hop-1','hop-2','hop-3'], monsterNames:['Hüpfi','Hüpfling','Hüpfolina'],
+    intro:'Auf der Spielinsel ist immer was los – nur einer gähnt den ganzen Tag. 🏝️' },
+
+  words: [
+    { id:'football',   unit:'u7', cat:'sport',  en:'football',   de:'Fußball',     icon:'football',   emoji:'⚽', pron:'FUTT-bol',   exampleEn:'I play football with Juno.',     exampleDe:'Ich spiele mit Juno Fußball.' },
+    { id:'basketball', unit:'u7', cat:'sport',  en:'basketball', de:'Basketball',  icon:'basketball', emoji:'🏀', pron:'BAA-sket-bol', exampleEn:'Leo plays basketball.',        exampleDe:'Leo spielt Basketball.' },
+    { id:'tennis',     unit:'u7', cat:'sport',  en:'tennis',     de:'Tennis',      icon:'tennis',     emoji:'🎾', pron:'TÄN-nis',    exampleEn:'Do you play tennis?',            exampleDe:'Spielst du Tennis?' },
+    { id:'swimming',   unit:'u7', cat:'sport',  en:'swimming',   de:'Schwimmen',   icon:'swimming',   emoji:'🏊',                    exampleEn:'Swimming is fun!',               exampleDe:'Schwimmen macht Spaß!' },
+    { id:'dancing',    unit:'u7', cat:'hobby',  en:'dancing',    de:'Tanzen',      icon:'dancing',    emoji:'💃', pron:'DAAN-sing',  exampleEn:'Juno likes dancing.',            exampleDe:'Juno tanzt gern.' },
+    { id:'singing',    unit:'u7', cat:'hobby',  en:'singing',    de:'Singen',      icon:'singing',    emoji:'🎤', pron:'SING-ing',   exampleEn:'Nuvi loves singing.',            exampleDe:'Nuvi liebt Singen.' },
+    { id:'painting',   unit:'u7', cat:'hobby',  en:'painting',   de:'Malen',       icon:'painting',   emoji:'🖌️', pron:'PÄIN-ting',  exampleEn:'I like painting pictures.',      exampleDe:'Ich male gern Bilder.' },
+    { id:'skating',    unit:'u7', cat:'sport',  en:'skating',    de:'Eislaufen / Skaten', icon:'skating', emoji:'⛸️', pron:'SKÄI-ting', exampleEn:'Skating is cool!',          exampleDe:'Eislaufen ist cool!' },
+    { id:'cycling',    unit:'u7', cat:'sport',  en:'cycling',    de:'Radfahren',   icon:'cycling',    emoji:'🚲', pron:'SAI-kling',  exampleEn:'We go cycling in the park.',     exampleDe:'Wir fahren im Park Rad.' },
+    { id:'reading',    unit:'u7', cat:'hobby',  en:'reading',    de:'Lesen',       icon:'reading',    emoji:'📚', pron:'RII-ding',   exampleEn:'My grandma likes reading.',      exampleDe:'Meine Oma liest gern.' },
+    { id:'games',      unit:'u7', cat:'hobby',  en:'games',      de:'Spiele / Videospiele', icon:'games', emoji:'🎮', pron:'gäims', exampleEn:'Do you like computer games?',  exampleDe:'Magst du Computerspiele?' },
+    { id:'music',      unit:'u7', cat:'hobby',  en:'music',      de:'Musik',       icon:'music',      emoji:'🎵', pron:'MJUU-sik',   exampleEn:'I listen to music.',             exampleDe:'Ich höre Musik.' },
+    { id:'guitar',     unit:'u7', cat:'hobby',  en:'guitar',     de:'Gitarre',     icon:'guitar',     emoji:'🎸', pron:'gi-TAA',     exampleEn:'My brother plays the guitar.',   exampleDe:'Mein Bruder spielt Gitarre.' },
+    { id:'piano',      unit:'u7', cat:'hobby',  en:'piano',      de:'Klavier',     icon:'piano',      emoji:'🎹', pron:'pi-Ä-no',    exampleEn:'She plays the piano.',           exampleDe:'Sie spielt Klavier.' },
+    { id:'ilike',      unit:'u7', cat:'phrase', en:'I like swimming.', de:'Ich schwimme gern.', icon:'ilike', emoji:'👍',          exampleEn:'I like swimming. And you?',      exampleDe:'Ich schwimme gern. Und du?' },
+    { id:'idontlike',  unit:'u7', cat:'phrase', en:"I don't like football.", de:'Ich mag keinen Fußball.', icon:'idontlike', emoji:'👎', exampleEn:"I don't like football. I like tennis.", exampleDe:'Ich mag keinen Fußball. Ich mag Tennis.' }
+  ],
+
+  levels: [
+    { id:'u7l1', unit:'u7', type:'catch', title:'Ballspiele', minutes:'2–3',
+      story:{ before:'Am Strand fliegen Bälle durch die Luft. Fang die Wörter!', after:'Tor! Die Spielinsel jubelt. ⚽' },
+      plan:[ {intro:['football','basketball','tennis','swimming']},
+             {k:'catch', words:['football','basketball','tennis','swimming'], reps:2, opts:3} ] },
+
+    { id:'u7l2', unit:'u7', type:'listen', title:'Hobby-Radio', minutes:'3',
+      story:{ before:'Das Insel-Radio stellt Hobbys vor. Hör genau hin! 📻', after:'Stark! Du kennst schon viele Hobbys.' },
+      plan:[ {intro:['dancing','singing','painting','skating','cycling']},
+             {k:'listen', words:['dancing','singing','painting','skating','cycling'], reps:2, opts:3},
+             {k:'speak', words:['dancing','cycling']} ] },
+
+    { id:'u7l3', unit:'u7', type:'memory', title:'Musik-Memory', minutes:'3–4',
+      story:{ before:'In der Strandhütte liegen Karten. Finde die Paare!', after:'Alle Paare gefunden! 🎸' },
+      plan:[ {intro:['reading','games','music','guitar','piano']},
+             {k:'memory', words:['reading','games','music','guitar','piano','singing']},
+             {k:'listen', words:['reading','games','music','guitar','piano'], reps:1, opts:3} ] },
+
+    { id:'u7l4', unit:'u7', type:'dialogue', title:'Was machst du gern?', minutes:'3–4',
+      story:{ before:'Juno will wissen, was du gern machst.', after:'Juno und du plant schon das nächste Spiel! 💛' },
+      plan:[ {intro:['ilike','idontlike']},
+             {k:'dialogue', id:'d_u7_juno'},
+             {k:'speak', words:['ilike','idontlike']} ] },
+
+    { id:'u7l5', unit:'u7', type:'spell', title:'Hobby-Poster', minutes:'3–4',
+      story:{ before:'Für das Inselfest braucht es Hobby-Poster. Schreibst du die Wörter?', after:'Die Poster hängen am Strand! ✨' },
+      plan:[ {k:'spell', words:['tennis','music','piano','games','guitar','reading','singing','dancing'], mode:'tiles'},
+             {k:'spell', words:['football','basketball','swimming','painting','skating','cycling'], mode:'first'} ] },
+
+    { id:'u7l6', unit:'u7', type:'codelab', title:'Code Lab: Funktionen', minutes:'4–5', reward:'room_ball',
+      story:{ before:'Prof. Pixel ist faul geworden. Er will Code nur einmal schreiben – und oft benutzen!', after:'Die Funktionen laufen wie geschmiert. Compile successful! 💻' },
+      plan:[
+        {k:'card', title:'Funktionen 🧩', text:'Mit [[def]] gibst du einem Stück Code einen Namen. Danach rufst du es mit diesem Namen auf – so oft du willst!', code:'def cheer():\n    print("Go, team!")\n\ncheer()\ncheer()', out:'Go, team!\nGo, team!'},
+        {k:'predict', code:'def hello():\n    print("Hello!")\n\nhello()', options:['Hello!','hello()','(nichts)'], answer:0, explain:'[[hello()]] ruft die Funktion auf – sie zeigt [[Hello!]] an.', uses:[]},
+        {k:'predict', code:'def hobby():\n    print("I like dancing.")\n\nprint("Hi!")', options:['Hi!','I like dancing.\nHi!','Hi!\nI like dancing.'], answer:0, explain:'Die Funktion wird nie aufgerufen – also läuft sie auch nicht!', uses:['dancing']},
+        {k:'card', title:'Funktionen mit Box 📦', text:'In die Klammern kannst du etwas hineingeben. Das heißt Parameter – eine Box, die bei jedem Aufruf etwas anderes enthält.', code:'def like(hobby):\n    print("I like " + hobby + ".")\n\nlike("tennis")', out:'I like tennis.'},
+        {k:'predict', code:'def like(hobby):\n    print("I like " + hobby + ".")\n\nlike("skating")\nlike("music")', options:['I like skating.\nI like music.','I like hobby.\nI like hobby.','I like music.\nI like skating.'], answer:0, explain:'Beim ersten Aufruf ist [[skating]] in der Box, beim zweiten [[music]].', uses:['skating','music','ilike']},
+        {k:'order', de:'Bau das Programm: Eine Funktion [[goal]], die einmal aufgerufen wird.', lines:['def goal():','    print("Goal!")','goal()'], extra:['    goal()'], out:'Goal!', explain:'Erst die Funktion festlegen, dann aufrufen – ohne Einrückung.', uses:['football']},
+        {k:'trace', code:'def add_point(p):\n    return p + 1\n\npoints = 0\npoints = add_point(points)\npoints = add_point(points)', var:'points', steps:[{line:3, v:'0', alt:['1','None']},{line:4, v:'1', alt:['0','2']},{line:5, v:'2', alt:['1','3']}], explain:'[[return]] gibt das Ergebnis zurück: jedes Mal 1 Punkt mehr.', uses:['games']},
+        {k:'build', parts:['She','likes','dancing.'], de:'Sie tanzt gern.', py:'print("She likes dancing.")', uses:['dancing']},
+        {k:'build', code:true, parts:['def','play','(',')',':'], de:'Bau den Anfang einer Funktion namens [[play]]!', py:'def play():\n    print("I like games.")', uses:['games']}
+      ] },
+
+    { id:'u7l7', unit:'u7', type:'bughunt', title:'Bug-Jagd: like + -ing', minutes:'3–4',
+      story:{ before:'Auf den Hobby-Postern krabbeln Bugs! 🐞', after:'Alle Bugs gefangen! Einer tanzt sogar.' },
+      plan:[
+        {k:'card', title:'Bug-Jagd 🐞', text:"Nach [[like]] kommt die -ing-Form: [[I like swimming.]] Bei he/she/it bekommt das Tuwort ein -s: [[She plays tennis.]] Nein heißt: [[I don't like …]]"},
+        {k:'bug', tokens:['I','like','swim.'], bug:2, options:['swimming.','swiming.','swims.'], fix:'swimming.', explain:'Nach [[like]] kommt -ing. Bei swim wird das m verdoppelt: [[swimming]].', uses:['swimming','ilike']},
+        {k:'bug', tokens:['Juno','like','dancing.'], bug:1, options:['likes','liking','liks'], fix:'likes', explain:'Juno = [[she]] – also [[likes]] mit -s.', uses:['dancing']},
+        {k:'bug', tokens:['I','not','like','football.'], bug:1, options:["don't","doesn't",'no'], fix:"don't", explain:"Verneinung: [[I don't like football.]]", uses:['idontlike','football']},
+        {k:'bug', tokens:['He','play','the','guitar.'], bug:1, options:['plays','playing','plaies'], fix:'plays', explain:'Bei [[he]] bekommt das Tuwort ein -s: [[plays]].', uses:['guitar']},
+        {k:'bug', tokens:['We','like','singing','and','danceing.'], bug:4, options:['dancing.','dansing.','dancin.'], fix:'dancing.', explain:'Bei dance fällt das e weg: [[dancing]].', uses:['singing','dancing']},
+        {k:'bug', tokens:['My','sister','plays','the','pianno.'], bug:4, options:['piano.','piyano.','pieno.'], fix:'piano.', explain:'Klavier = [[piano]] – mit einem n.', uses:['piano']},
+        {k:'bug', tokens:['Do','you','like','tenis?'], bug:3, options:['tennis?','tenniss?','tänis?'], fix:'tennis?', explain:'Tennis = [[tennis]] mit zwei n.', uses:['tennis']},
+        {k:'bug', tokens:['I','listen','to','musik.'], bug:3, options:['music.','musick.','musiq.'], fix:'music.', explain:'Musik = [[music]] – mit c am Ende.', uses:['music']},
+        {k:'bug', tokens:['She','likes','paintting.'], bug:2, options:['painting.','paintin.','paintng.'], fix:'painting.', explain:'Malen = [[painting]] – mit einem t in der Mitte.', uses:['painting']},
+        {k:'bug', tokens:['Leo','go','cycling','on','Sundays.'], bug:1, options:['goes','gos','going'], fix:'goes', explain:'Bei [[he]] (Leo) wird [[go]] zu [[goes]].', uses:['cycling']}
+      ] },
+
+    { id:'u7boss', unit:'u7', type:'boss', title:'Boss: Faultier Gähnix', minutes:'6–8', reward:'acc_shades',
+      boss:{ name:'Gähnix', art:'sloth' },
+      story:{ before:'Faultier Gähnix hängt im Baum und findet alles langweilig. Bring ihn zum Lachen!',
+              after:{ flag:'u7hobby', football:'Gähnix steht im Tor – und hält sogar einen Ball. Ganz langsam! ⚽',
+                      painting:'Gähnix malt mit dir ein riesiges Bild. Ganz langsam, aber wunderschön! 🎨',
+                      default:'Gähnix singt jetzt jeden Abend am Strand! 🎤' } },
+      plan:[
+        {k:'catch', words:['football'], opts:3},
+        {k:'listen', words:['skating'], opts:3},
+        {k:'spell', words:['games'], mode:'tiles'},
+        {k:'listen', words:['guitar','piano'], opts:4},
+        {k:'speak', words:['ilike']},
+        {k:'bug', tokens:['He','like','reading.'], bug:1, options:['likes','liking','liks'], fix:'likes', explain:'Bei [[he]]: [[likes]] mit -s.', uses:['reading']},
+        {k:'catch', words:['basketball','tennis'], opts:4},
+        {k:'build', parts:['I',"don't",'like','football.'], de:'Ich mag keinen Fußball.', py:'print("I don\'t like football.")', uses:['idontlike','football']},
+        {k:'predict', code:'def wake_up():\n    print("Let\'s play!")\n\nwake_up()', options:["Let's play!",'wake_up()','(nichts)'], answer:0, explain:'Die Funktion wird aufgerufen – Gähnix wacht auf!', uses:[]},
+        {k:'listen', words:['dancing','singing'], opts:4},
+        {k:'catch', words:['swimming','cycling'], opts:4},
+        {k:'spell', words:['music'], mode:'tiles'},
+        {k:'listen', words:['painting','reading','idontlike'], opts:4},
+        {k:'dialogue', id:'d_gaehnix'}
+      ] },
+
+    { id:'u7secret', unit:'u7', type:'falling', secret:true, title:'Geheim: Spielregen', minutes:'3', reward:'room_guitar',
+      story:{ before:'Psst … in der Lagune regnet es Hobbys! ☔', after:'Du hast den Spielregen gemeistert! 🎸' },
+      plan:[ {k:'falling', words:['football','basketball','tennis','swimming','dancing','singing','reading','music'], rounds:8, opts:3} ] }
+  ],
+
+  dialogues: {
+    d_u7_juno: { npc:'juno', nodes:[
+      { say:'What do you like doing?', de:'Was machst du gern?' },
+      { story:'Was machst du am allerliebsten?', flag:'u7hobby', options:[ {de:'⚽ Fußball spielen', value:'football'}, {de:'🎨 Malen', value:'painting'} ] },
+      { ask:'Sag: Ich schwimme gern!', options:[ {en:'I like swimming.', ok:true}, {en:'I like swim.', hint:'Nach [[like]] kommt die -ing-Form: [[swimming]].'} ] },
+      { say:'Me too! Do you like football?', de:'Ich auch! Magst du Fußball?' },
+      { ask:'Nein, Fußball magst du nicht.', options:[ {en:'No, I not like football.', hint:"Verneinung mit [[don't]]: [[I don't like …]]"}, {en:"No, I don't like football.", ok:true} ] },
+      { say:'OK! My brother plays the guitar. He likes music.', de:'Okay! Mein Bruder spielt Gitarre. Er mag Musik.' },
+      { ask:'Erzähl: Deine Schwester spielt Klavier.', options:[ {en:'My sister plays the piano.', ok:true}, {en:'My sister play the piano.', hint:'Bei he/she bekommt das Tuwort ein -s: [[plays]].'} ] },
+      { say:"Cool! Let's make music together!", de:'Cool! Lass uns zusammen Musik machen!' }
+    ]},
+    d_gaehnix: { npc:'sloth', nodes:[
+      { say:'Yawn … Everything is boring.', de:'Gähn … Alles ist langweilig.' },
+      { ask:'Frag ihn, ob er Fußball mag.', options:[ {en:'Do you like football?', ok:true}, {en:'Are you football?', hint:'Frag: [[Do you like …?]]'} ] },
+      { say:"No. I don't like football. It's too fast.", de:'Nein. Ich mag keinen Fußball. Das ist zu schnell.' },
+      { ask:'Versuch etwas Langsames: Lesen!', options:[ {en:'Do you like running?', hint:'Etwas Langsames … wie Lesen 📚'}, {en:'Do you like reading?', ok:true} ] },
+      { say:'Reading? Hmm … I like reading! And I like music.', de:'Lesen? Hmm … Ich lese gern! Und ich mag Musik.' },
+      { ask:'Lad ihn zum Singen ein!', options:[ {en:"Let's sing together!", ok:true}, {en:"Let's sleep together!", hint:'Gähnix soll doch aufwachen 🎤'} ] },
+      { say:'Singing is fun! Thank you!', de:'Singen macht Spaß! Danke!' }
+    ]}
+  },
+
+  items: [
+    { id:'acc_shades',  kind:'acc', slot:'face', name:'Sonnenbrille', price:null },
+    { id:'room_ball',   kind:'room', name:'Fußball',   price:null, pos:{x:46,y:96,w:12} },
+    { id:'room_guitar', kind:'room', name:'Gitarre',   price:null, pos:{x:6,y:84,w:14} },
+    { id:'room_kite',   kind:'room', name:'Drachen',   price:null, pos:{x:94,y:20,w:12} }
+  ],
+  badges: [ { id:'b_boss_u7', name:'Spielheldin', desc:'Gähnix hat Spaß gefunden', emblem:'ball', when:{level:'u7boss'} } ],
+  secrets: [ { id:'s_u7_kite', unit:'u7', item:'room_kite', x:16, y:24, text:'Du hast einen Drachen im Sand gefunden! 🪁' } ]
+});
+</script>
