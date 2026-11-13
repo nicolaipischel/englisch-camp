@@ -220,7 +220,6 @@ html[data-theme=umbreon] .btn.pri{text-shadow:none}
 .bubble{position:relative;background:var(--card);border-radius:18px;padding:9px 12px;box-shadow:0 4px 14px var(--shadow);font-weight:700;font-size:.98rem;line-height:1.25;flex:1;display:flex;gap:6px;align-items:center;min-height:48px;animation:pop .25s ease-out}
 .bubble::before{content:"";position:absolute;left:-7px;bottom:14px;border:8px solid transparent;border-right-color:var(--card);border-left:0}
 .bubble .txt{flex:1;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.bubble .ibtn{width:48px;height:48px;min-width:48px;box-shadow:none;background:var(--chip)}
 .bubble.soft{background:color-mix(in srgb,var(--card) 85%,var(--soft) 15%)}
 
 /* ---------- map ---------- */
@@ -254,6 +253,7 @@ html[data-theme=umbreon] .node.done{background:linear-gradient(180deg,#45408f,#2
 .node .lock{position:absolute;top:-6px;right:-6px;width:28px;height:28px;border-radius:50%;background:var(--card);display:grid;place-items:center;box-shadow:0 2px 4px var(--shadow)}
 .node .lock svg{width:16px;height:16px}
 .node.secret{background:radial-gradient(circle,#fff6c9,#ffd76a);animation:glow 2s ease-in-out infinite}
+.node.secret.done{animation:none}
 .nuvi-pin{position:absolute;width:54px;height:54px;transform:translate(-50%,-50%);pointer-events:none;z-index:3}
 .spark-btn{position:absolute;width:48px;height:48px;border:0;background:transparent;padding:10px;z-index:2}
 .spark-btn svg{width:28px;height:28px;animation:twinkle 1.8s ease-in-out infinite}
@@ -1590,16 +1590,15 @@ function applyLook() {
   if (m) m.content = { sylveon:'#ffd6ea', umbreon:'#1b1937', mew:'#ffd9ea' }[S.settings.theme] || '#ffd6ea';
 }
 
-/* companion dock: Nuvi + speech bubble (max 2 lines) + read-aloud for German */
+/* companion dock: Nuvi + speech bubble (max 2 lines); no read-aloud: the device voice clashed with the recorded clips */
 function dock(mood = 'happy', text = '') {
-  const d = el(`<div class="dock"><button class="mini" style="border:0;background:none;padding:0" aria-label="Nuvi">${ART.nuvi(mood)}</button><div class="bubble"><span class="txt"></span><button class="ibtn" aria-label="Vorlesen">${IC('speaker')}</button></div></div>`);
+  const d = el(`<div class="dock"><button class="mini" style="border:0;background:none;padding:0" aria-label="Nuvi">${ART.nuvi(mood)}</button><div class="bubble"><span class="txt"></span></div></div>`);
   let taps = 0;
   d.querySelector('.mini').onclick = () => {
     taps++; Sfx.play('pop');
     if (taps === 7) { taps = 0; setDock(d, 'cheer', 'Psst: Mein Lieblings-Pokémon ist … Umbreon! Nein, Sylveon! Nein, Mew! 😵‍💫'); return; }
     setDock(d, 'cheer', rnd(CONTENT.lines.idle));
   };
-  d.querySelector('.bubble .ibtn').onclick = () => sayDe(d.dataset.say || '');
   setDock(d, mood, text);
   return d;
 }
@@ -1610,7 +1609,6 @@ function setDock(d, mood, text, soft = false) {
   b.classList.toggle('soft', soft);
   b.style.visibility = text ? 'visible' : 'hidden';
   b.querySelector('.txt').innerHTML = fmt(text);
-  d.dataset.say = plain(text);
   b.style.animation = 'none'; void b.offsetWidth; b.style.animation = '';
   if (text) live(plain(text));
 }
@@ -2640,10 +2638,8 @@ SCREENS.onb = step => {
   } else {
     node = el(`<div class="screen onb">${dots}
       <div class="hero" style="width:200px">${ART.nuvi('cheer', 'cheer')}</div>
-      <div class="bubble" style="flex:none"><span class="txt">${fmt('Ich bin Nuvi, dein Trainingspartner! [[Hello]], ' + playerName() + '!')}</span><button class="ibtn" data-say aria-label="Anhören">${IC('speaker')}</button></div>
+      <div class="bubble" style="flex:none"><span class="txt">${fmt('Ich bin Nuvi, dein Trainingspartner! [[Hello]], ' + playerName() + '!')}</span></div>
       <button class="btn pri big block" data-n>Zum ersten Level!</button></div>`);
-    $('[data-say]', node).onclick = () => sayEn('Hello, ' + playerName() + '!');
-    setTimeout(() => sayEn('Hello, ' + playerName() + '!'), 300);
     $('[data-n]', node).onclick = () => { S.onboarded = true; save(); startLevel(CONTENT.levels[0].id); };
   }
   return node;
@@ -2760,12 +2756,11 @@ function levelSheet(lv) {
   const resumeHere = S.resume && S.resume.levelId === lv.id;
   const it = lv.reward && ITEM(lv.reward);
   sheet(`<div class="row"><span style="width:44px;color:var(--pri)">${IC(lv.type)}</span><div><span class="tag">${{ catch:'Fangen', listen:'Hören', memory:'Memory', dialogue:'Gespräch', spell:'Schreiben', codelab:'Code Lab', bughunt:'Bug-Jagd', boss:'Boss', falling:'Mini-Game' }[lv.type] || ''} · ca. ${esc(lv.minutes || '3')} Min.</span><h2 style="margin:0">${esc(lv.title)}</h2></div></div>
-    <div class="dock" style="padding:6px 0"><div class="mini">${ART.nuvi(lv.type === 'boss' ? 'surprised' : 'happy')}</div><div class="bubble"><span class="txt">${fmt(lv.story ? lv.story.before : '')}</span><button class="ibtn" data-sd aria-label="Vorlesen">${IC('speaker')}</button></div></div>
+    <div class="dock" style="padding:6px 0"><div class="mini">${ART.nuvi(lv.type === 'boss' ? 'surprised' : 'happy')}</div><div class="bubble"><span class="txt">${fmt(lv.story ? lv.story.before : '')}</span></div></div>
     <div class="row wrap" style="margin:6px 0 14px">${done ? `<span class="chip">${[1, 2, 3].map(k => ART.star(k <= rec.stars)).join('')}</span>` : ''}
       <span class="chip">${it && !S.owned.includes(it.id) ? '🎁 Überraschung' : ART.coin() + ' Bonus-Münzen'}</span></div>
     <div class="stack"><button class="btn pri big block" data-start>${resumeHere ? 'Weitermachen' : done ? 'Nochmal spielen' : 'Start!'}</button>
     ${resumeHere ? '<button class="btn ghost block" data-fresh>Von vorne beginnen</button>' : ''}</div>`, sh => {
-    sh.querySelector('[data-sd]').onclick = () => sayDe(plain(lv.story ? lv.story.before : ''));
     sh.querySelector('[data-start]').onclick = () => { closeSheet(); resumeHere ? resumeLevel() : startLevel(lv.id); };
     const f = sh.querySelector('[data-fresh]'); if (f) f.onclick = () => { closeSheet(); startLevel(lv.id); };
   });
@@ -2790,7 +2785,7 @@ SCREENS.result = r => {
     ${r.turbo != null ? `<div class="bigword"><span style="font-size:3rem;font-weight:900">${r.turbo}</span><br><span class="muted" style="font-size:1rem">richtige Antworten</span></div>`
       : `<div class="bigstars" aria-label="${r.stars} von 3 Sternen">${[1, 2, 3].map(k => ART.star(k <= r.stars, k <= r.stars ? 'on' : '')).join('')}</div>`}
     <div class="gains"><span class="chip">+${r.xp} XP</span><span class="chip">${ART.coin()} +${r.coins}</span></div>
-    ${r.story ? `<div class="bubble" style="flex:none;width:100%"><span class="txt">${fmt(r.story)}</span><button class="ibtn" data-sd aria-label="Vorlesen">${IC('speaker')}</button></div>` : ''}
+    ${r.story ? `<div class="bubble" style="flex:none;width:100%"><span class="txt">${fmt(r.story)}</span></div>` : ''}
     <div class="reveal-area stack" style="width:100%;align-items:center">
       ${r.prize ? `<button class="gift" data-gift aria-label="Geschenk öffnen">${ART.gift(false)}</button><b>Tipp aufs Geschenk!</b>` : ''}
     </div>
@@ -2799,7 +2794,6 @@ SCREENS.result = r => {
   Sfx.play('reward'); vib([30, 40, 30]);
   if (r.stars === 3 || r.best) setTimeout(() => burst(innerWidth / 2, innerHeight * .3, 18), 400);
   const area = $('.reveal-area', node);
-  const sd = $('[data-sd]', node); if (sd) sd.onclick = () => sayDe(plain(r.story));
   const gift = $('[data-gift]', node);
   if (gift) gift.onclick = async () => {
     gift.style.animation = 'none'; gift.innerHTML = ART.gift(true); Sfx.play('pop');

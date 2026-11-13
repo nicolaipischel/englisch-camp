@@ -1,0 +1,836 @@
+<script>
+/* ==========================================================================================
+   LEVEL ENGINE – generic runner + task renderers (no unit-specific logic)
+   ========================================================================================== */
+let Run = null;
+const REQUEUE_KINDS = ['catch', 'listen', 'spell'];
+
+function newRun(level, tasks) {
+  const words = new Set();
+  tasks.forEach(t => taskWords(t).forEach(id => words.add(id)));
+  return { level, tasks, idx: 0, total: 0, first: 0, itemWrong: 0, helpLevel: 0, onHelp: null, perWord: {},
+           levelWords: words, timed: level.timed || 0, turboScore: 0, timers: [], raf: null };
+}
+function startLevel(id) {
+  const lv = L(id);
+  if (!lv) { go('map'); return; }
+  Run = newRun(lv, expandPlan(lv));
+  persistResume();
+  go('level');
+}
+function resumeLevel() {
+  const r = S.resume, lv = r && L(r.levelId);
+  if (!lv || !Array.isArray(r.tasks) || r.idx >= r.tasks.length) { S.resume = null; save(); go('map'); return; }
+  Run = newRun(lv, r.tasks);
+  Object.assign(Run, { idx: r.idx, total: r.total || 0, first: r.first || 0, perWord: r.perWord || {} });
+  go('level');
+}
+function startReview() {
+  const due = dueIds().slice(0, 8);
+  if (due.length < 5) { go('map'); return; }
+  const lv = { id: 'review', pseudo: 'review', type: 'review', title: 'Review Challenge', plan: [] };
+  Run = newRun(lv, [{ k: 'falling', words: due, rounds: due.length, opts: 3, uid: 'review:0' }]);
+  go('level');
+}
+function startTurbo() {
+  const lv = { id: 'turbo', pseudo: 'turbo', type: 'turbo', title: 'Turbo-Challenge', plan: [], timed: 60 };
+  Run = newRun(lv, [turboTask(), turboTask()]);
+  Run.levelWords = new Set(learnedIds());
+  go('level');
+}
+function turboTask() {
+  const ids = learnedIds();
+  return { k: Math.random() < .5 ? 'catch' : 'listen', w: rnd(ids), opts: 3, uid: 'turbo:' + Math.random().toString(36).slice(2) };
+}
+function persistResume() {
+  if (!Run || Run.level.pseudo) return;
+  S.resume = { levelId: Run.level.id, tasks: Run.tasks, idx: Run.idx, total: Run.total, first: Run.first, perWord: Run.perWord };
+  save();
+}
+function stopRunTimers() {
+  if (!Run) return;
+  Run.timers.forEach(t => clearInterval(t)); Run.timers = [];
+  if (Run.raf) cancelAnimationFrame(Run.raf); Run.raf = null;
+}
+
+/* ---------------- shared bits ---------------- */
+function qRow(text, icon = 'bulb') {
+  return `<div class="q">${IC(icon)}<span class="txt">${fmt(text)}</span><button class="ibtn" data-say-de="${esc(plain(text))}" aria-label="Anleitung vorlesen">${IC('speaker')}</button></div>`;
+}
+function audioBtns(text, extra = '') {
+  return `<div class="abar"><button class="btn small pri" data-say-en="${esc(sub(text))}">${IC('speaker')} Anhören</button><button class="btn small" data-say-en="${esc(sub(text))}" data-slow>${IC('turtle')} Langsam</button>${extra}</div>`;
+}
+function distractors(wid, n, poolIds) {
+  const w = W(wid);
+  const base = poolIds ? poolIds.map(W).filter(Boolean) : CONTENT.words.filter(x => x.unit === w.unit && (Run.levelWords.has(x.id) || (S.words[x.id] && S.words[x.id].box > 0)));
+  let pool = base.filter(x => x.id !== wid && norm(x.en) !== norm(w.en));
+  if (pool.length < n) pool = CONTENT.words.filter(x => x.id !== wid && x.unit === w.unit);
+  if (pool.length < n) pool = CONTENT.words.filter(x => x.id !== wid);
+  const same = shuffle(pool.filter(x => x.cat === w.cat)), other = shuffle(pool.filter(x => x.cat !== w.cat));
+  return same.concat(other).slice(0, n).map(x => x.id);
+}
+function hl(line) {
+  return esc(sub(line)).replace(/(&quot;.*?&quot;)|\b(print|if|else|for|in|range|repeat|while)\b|([=+()])/g,
+    (m, s, k, o) => s ? `<span class="st">${s}</span>` : k ? `<span class="kw">${k}</span>` : `<span class="op">${o}</span>`);
+}
+const codeBlock = code => `<div class="code" lang="en">${sub(code).split('\n').map((l, i) => `<div class="ln"><span class="num">${i + 1}</span><span>${hl(l)}</span></div>`).join('')}</div>`;
+const tokClass = p => /^".*"$/.test(p) ? 'st' : /^[=+()]$/.test(p) ? 'op' : /^(print|if|else|for|in)$/.test(p) ? 'kw' : 'va';
+function wordsIn(text) {
+  const t = norm(text);
+  return CONTENT.words.filter(w => norm(w.en).length > 1 && (t === norm(w.en) || (norm(w.en).length > 2 && t.includes(norm(w.en))))).map(w => w.id);
+}
+function throwBall(from, to) {
+  return new Promise(res => {
+    if (reducedMotion()) { res(); return; }
+    const [x0, y0] = center(from), [x1, y1] = center(to);
+    const b = el(`<div class="flyball">${ART.ball()}</div>`);
+    b.style.left = (x0 - 26) + 'px'; b.style.top = (y0 - 26) + 'px';
+    document.body.append(b);
+    Sfx.play('whoosh');
+    requestAnimationFrame(() => requestAnimationFrame(() => { b.style.transform = `translate(${x1 - x0}px,${y1 - y0}px) rotate(540deg) scale(.7)`; }));
+    setTimeout(() => { b.remove(); res(); }, 480);
+  });
+}
+function optButtons(ids, withCap = false) {
+  return ids.map(id => { const w = W(id); return `<button class="opt" data-id="${id}" aria-label="Bild: ${esc(sub(w.de))}">${ART.pic(w, 'pic', false)}${withCap ? `<span class="cap">${enSpan(w.en)}</span>` : ''}</button>`; }).join('');
+}
+
+/* ---------------- level screen ---------------- */
+SCREENS.level = () => {
+  const lv = Run.level;
+  const node = el(`<div class="screen">
+    <div class="lvtop">
+      <button class="ibtn" data-a="pause" aria-label="Pause">${IC('pause')}</button>
+      <div class="bar" role="progressbar" aria-label="Fortschritt" aria-valuemin="0" aria-valuemax="100"><i></i></div>
+      ${Run.timed ? `<span class="chip timer" aria-label="Sekunden übrig">${Run.timed}</span>` : ''}
+      <button class="ibtn hintbtn" data-a="hint" aria-label="Tipp holen">${IC('bulb')}<small></small></button>
+    </div>
+    ${lv.boss ? `<div class="boss" aria-label="Boss ${esc(lv.boss.name)}">${ART.crab('grumpy')}<div class="grow"><b>${esc(lv.boss.name)}</b><div class="hp"><i></i></div></div></div>` : ''}
+    <div class="stage"></div>
+    <div class="foot"></div>
+  </div>`);
+  Run.node = node; Run.stage = $('.stage', node); Run.foot = $('.foot', node);
+  Run.dock = dock('happy', '');
+  node.append(Run.dock);
+  node.addEventListener('click', e => {
+    const de = e.target.closest('[data-say-de]'); if (de) { sayDe(de.dataset.sayDe); return; }
+    const en = e.target.closest('[data-say-en]'); if (en) { sayEn(en.dataset.sayEn, en.hasAttribute('data-slow')); return; }
+    const a = e.target.closest('[data-a]'); if (!a) return;
+    if (a.dataset.a === 'pause') pauseSheet();
+    if (a.dataset.a === 'hint') useHint();
+  });
+  cleanups.push(stopRunTimers);
+  if (Run.timed) {
+    Run.endAt = Date.now() + Run.timed * 1000;
+    Run.timers.push(setInterval(() => {
+      const left = Math.max(0, Math.ceil((Run.endAt - Date.now()) / 1000));
+      const t = $('.timer', node); if (t) t.textContent = left;
+      if (left <= 0) { stopRunTimers(); finishLevel(); }
+    }, 250));
+  }
+  setTimeout(showTask, 0);
+  return node;
+};
+function pauseSheet() {
+  sheet(`<h2>Pause ☕</h2><p>Dein Fortschritt ist gespeichert. Du kannst jederzeit weitermachen.</p>
+    <div class="stack"><button class="btn pri big block" data-x="go">Weiter spielen</button><button class="btn block" data-x="map">${IC('map')} Zur Karte</button></div>`, sh => {
+    sh.querySelector('[data-x=go]').onclick = closeSheet;
+    sh.querySelector('[data-x=map]').onclick = () => { closeSheet(); stopRunTimers(); go('map'); };
+  });
+}
+function updateBar() {
+  const p = Run.timed ? 1 - Math.max(0, (Run.endAt - Date.now()) / (Run.timed * 1000)) : Run.idx / Run.tasks.length;
+  const bar = $('.bar', Run.node);
+  bar.firstElementChild.style.transform = `scaleX(${Math.max(.03, p)})`;
+  bar.setAttribute('aria-valuenow', Math.round(p * 100));
+  const hp = $('.boss .hp i', Run.node);
+  if (hp) hp.style.transform = `scaleX(${Math.max(0, 1 - Run.idx / Run.tasks.length)})`;
+}
+function updateHintBtn() {
+  const b = $('.hintbtn', Run.node); if (!b) return;
+  b.querySelector('small').innerHTML = S.hintsFree > 0 ? String(S.hintsFree) : `${ART.coin('')}`.replace('<svg', '<svg style="width:14px;height:14px;display:inline"') + '5';
+  b.setAttribute('aria-label', S.hintsFree > 0 ? `Tipp holen, ${S.hintsFree} gratis` : 'Tipp holen für 5 Münzen');
+  b.style.opacity = Run.onHelp ? 1 : .55;
+}
+function useHint() {
+  if (!Run.onHelp) { setDock(Run.dock, 'happy', 'Hier brauchst du keinen Tipp – leg einfach los! 🙂'); return; }
+  if (Run.helpLevel >= 2) { setDock(Run.dock, 'proud', 'Mehr verrate ich nicht – du schaffst das! 💪'); return; }
+  if (S.hintsFree > 0) S.hintsFree--;
+  else if (S.coins >= 5) S.coins -= 5;
+  setDock(Run.dock, 'thinking', S.coins < 5 && S.hintsFree === 0 ? 'Der hier ist geschenkt! 🎁' : rnd(CONTENT.lines.hint));
+  applyHelp(Run.helpLevel + 1);
+  save(); updateHintBtn();
+}
+function applyHelp(n) {
+  if (!Run.onHelp || n <= Run.helpLevel) return;
+  Run.helpLevel = n;
+  try { Run.onHelp(n); } catch (e) { console.error('help failed', e); }
+}
+function showTask() {
+  if (!Run || currentScreen !== 'level') return;
+  if (Run.timed && Run.idx >= Run.tasks.length - 1) Run.tasks.push(turboTask());
+  const t = Run.tasks[Run.idx];
+  Run.stage.replaceChildren(); Run.foot.replaceChildren();
+  Run.onHelp = null; Run.itemWrong = 0; Run.helpLevel = 0;
+  updateBar(); updateHintBtn();
+  setDock(Run.dock, 'happy', '');
+  try { TASKS[t.k](t, api); }
+  catch (e) {
+    console.error('Task failed', t, e);
+    Run.stage.replaceChildren(el(`<div class="warn">Ups, diese Aufgabe klemmt. Wir überspringen sie einfach.</div>`));
+    footBtn('Weiter', () => api.next());
+  }
+  Run.stage.scrollTop = 0;
+}
+function footBtn(label, fn, pri = true) {
+  const b = el(`<button class="btn big block ${pri ? 'pri' : ''}">${esc(label)}</button>`);
+  b.onclick = () => { b.disabled = true; fn(); };
+  Run.foot.replaceChildren(b);
+  return b;
+}
+function stat(id, ok) { const p = Run.perWord[id] || (Run.perWord[id] = { ok: 0, bad: 0 }); ok ? p.ok++ : p.bad++; }
+
+const api = {
+  right(words = [], node) {
+    Sfx.play('good'); vib(20);
+    if (node) burst(...center(node));
+    const first = Run.itemWrong === 0;
+    Run.total++; if (first) Run.first++;
+    words.forEach(id => stat(id, first));
+    if (Run.timed) Run.turboScore++;
+    Run.itemWrong = 0; Run.helpLevel = 0;
+    setDock(Run.dock, 'cheer', rnd(CONTENT.lines.right));
+    if (Run.level.boss) { const b = $('.boss', Run.node); b.classList.remove('hit'); void b.offsetWidth; b.classList.add('hit'); Sfx.play('hit'); }
+    return first;
+  },
+  miss(words = [], msg) {
+    Run.itemWrong++; Sfx.play('soft'); vib(8);
+    setDock(Run.dock, 'thinking', msg || rnd(CONTENT.lines.miss), true);
+    if (Run.timed) return;
+    const n = Run.itemWrong;
+    if (n === 2) applyHelp(1); else if (n === 3) applyHelp(2); else if (n >= 4) applyHelp(3);
+  },
+  demo(words = []) {
+    Run.total++; words.forEach(id => stat(id, false));
+    Run.itemWrong = 0; Run.helpLevel = 0;
+    setDock(Run.dock, 'proud', rnd(CONTENT.lines.demo));
+    const t = Run.tasks[Run.idx];
+    if (REQUEUE_KINDS.includes(t.k) && !t.again && !Run.timed) Run.tasks.push({ ...t, again: true, uid: t.uid + 'b' });
+  },
+  addScore(total, first, words = []) { Run.total += total; Run.first += first; words.forEach(id => stat(id, true)); },
+  setHelp(fn) { Run.onHelp = fn; Run.helpLevel = 0; updateHintBtn(); },
+  say(mood, text, soft) { setDock(Run.dock, mood, text, soft); },
+  next() {
+    if (!Run || currentScreen !== 'level') return;
+    Run.idx++; Run.itemWrong = 0; Run.helpLevel = 0; Run.onHelp = null;
+    stopRaf();
+    persistResume();
+    if (Run.idx >= Run.tasks.length && !Run.timed) finishLevel(); else showTask();
+  }
+};
+function stopRaf() { if (Run && Run.raf) { cancelAnimationFrame(Run.raf); Run.raf = null; } }
+
+/* ==========================================================================================
+   TASK RENDERERS – each gets (task, api); adding a kind = adding a function here
+   ========================================================================================== */
+const TASKS = {};
+
+TASKS.intro = (t, api) => {
+  const w = W(t.w);
+  Run.stage.append(el(`<div class="task">
+    <div class="tag center">Neues Wort ✨</div>
+    <div class="bigpic">${ART.pic(w, 'pic', false)}</div>
+    <div class="bigword">${enSpan(w.en)}</div>
+    <div class="center de-hint" style="font-size:1.1rem;font-weight:800">${esc(sub(w.de))}</div>
+    ${audioBtns(w.en)}
+    ${w.pron ? `<div class="center pron">Klingt ungefähr wie: „${esc(w.pron)}“</div>` : ''}
+    <div class="ex"><button class="ibtn" style="float:right;width:48px;height:48px;box-shadow:none;background:var(--chip)" data-say-en="${esc(sub(w.exampleEn))}" aria-label="Beispiel anhören">${IC('speaker')}</button>${enSpan(w.exampleEn)}<br><span class="de-hint">${esc(sub(w.exampleDe))}</span></div>
+  </div>`));
+  api.say('happy', Run.idx === 0 && Run.level.tutorial ? 'Tipp auf [[Anhören]], so oft du magst!' : 'Ein neues Wort für dich!');
+  setTimeout(() => sayEn(w.en), 350);
+  stat(t.w, true);
+  footBtn('Weiter', () => api.next());
+};
+
+TASKS.card = (t, api) => {
+  Run.stage.append(el(`<div class="task"><div class="card stack center">
+    <h2 style="margin:0">${esc(t.title)}</h2>
+    <p style="margin:0;font-weight:700">${fmt(t.text)}</p>
+    ${t.code ? codeBlock(t.code) : ''}${t.out ? `<div class="console" style="text-align:left">&gt; ${esc(sub(t.out))}</div>` : ''}
+    <div class="row" style="justify-content:center"><button class="btn small" data-say-de="${esc(plain(t.title + '. ' + t.text))}">${IC('speaker')} Vorlesen</button></div>
+  </div></div>`));
+  footBtn('Verstanden!', () => api.next());
+};
+
+TASKS.catch = (t, api) => {
+  const w = W(t.w), n = t.opts || 3;
+  const ids = shuffle([t.w, ...distractors(t.w, n - 1)]);
+  const tut = Run.level.tutorial && !isDone(Run.level.id) && !Run.tasks.slice(0, Run.idx).some(x => x.k === 'catch');
+  const box = el(`<div class="task">
+    ${qRow(tut ? 'Tippe auf das Bild, das passt!' : 'Wirf den Ball auf das passende Bild!', 'catch')}
+    <div class="ballrow"><button class="ballchip" aria-label="Ball mit Wort, zum Anhören tippen">${ART.ball()}${enSpan(w.en)}</button></div>
+    <div class="opts ${n === 3 ? 'n3' : ''}">${optButtons(ids)}</div></div>`);
+  Run.stage.append(box);
+  const chip = $('.ballchip', box);
+  let busy = false;
+  const choose = async (btn, thrown) => {
+    if (busy || btn.classList.contains('gone')) return;
+    busy = true;
+    $$('.pointer', box).forEach(p => p.remove());
+    if (!thrown) await throwBall(chip.querySelector('svg'), btn);
+    if (btn.dataset.id === t.w) {
+      btn.classList.add('right'); api.right([t.w], btn); sayEn(w.en);
+      await sleep(950); api.next();
+    } else {
+      btn.classList.add('miss'); setTimeout(() => btn.classList.remove('miss'), 500);
+      api.miss([t.w]); busy = false;
+    }
+  };
+  $$('.opt', box).forEach(b => b.onclick = () => choose(b));
+  /* drag the ball onto a picture (tap is the alternative) */
+  let sx = 0, sy = 0, dragging = false;
+  chip.addEventListener('pointerdown', e => { sx = e.clientX; sy = e.clientY; dragging = false; chip.setPointerCapture(e.pointerId); });
+  chip.addEventListener('pointermove', e => {
+    if (!chip.hasPointerCapture(e.pointerId)) return;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (!dragging && Math.hypot(dx, dy) > 10) { dragging = true; chip.classList.add('drag'); }
+    if (dragging) chip.style.transform = `translate(${dx}px,${dy}px)`;
+  });
+  const end = e => {
+    if (!chip.hasPointerCapture(e.pointerId)) return;
+    chip.releasePointerCapture(e.pointerId);
+    if (!dragging) { sayEn(w.en); return; }
+    chip.style.transform = ''; chip.classList.remove('drag');
+    const hit = document.elementsFromPoint(e.clientX, e.clientY).find(n => n.classList && n.classList.contains('opt'));
+    if (hit && box.contains(hit)) choose(hit, true);
+    setTimeout(() => { dragging = false; }, 0);
+  };
+  chip.addEventListener('pointerup', end); chip.addEventListener('pointercancel', end);
+  chip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); sayEn(w.en); } });
+  chip.onclick = e => e.preventDefault();
+  const right = () => box.querySelector(`.opt[data-id="${t.w}"]`);
+  if (tut) {
+    const p = el('<span class="pointer" style="font-size:44px;right:6px;bottom:0">👆</span>');
+    right().append(p);
+    api.say('happy', `Tipp auf das Bild, das zu [[${w.en}]] passt!`);
+  }
+  api.setHelp(lvl => {
+    if (lvl === 1) { const d = $$('.opt:not(.gone)', box).find(b => b.dataset.id !== t.w); if (d) d.classList.add('gone'); }
+    if (lvl === 2) { sayEn(w.en, true); api.say('thinking', `Psst: [[${w.en}]] heißt „${sub(w.de)}“.`); }
+    if (lvl === 3) {
+      busy = true; right().classList.add('hintme'); api.say('thinking', 'Schau mal, hier! 👀');
+      setTimeout(async () => { await throwBall(chip.querySelector('svg'), right()); right().classList.remove('hintme'); right().classList.add('right'); sayEn(w.en); api.demo([t.w]); await sleep(1300); api.next(); }, 1200);
+    }
+  });
+  setTimeout(() => sayEn(w.en), 300);
+};
+
+TASKS.listen = (t, api) => {
+  const w = W(t.w), n = t.opts || 3;
+  const ids = shuffle([t.w, ...distractors(t.w, n - 1)]);
+  const box = el(`<div class="task">
+    ${qRow('Hör gut zu! Welches Bild passt?', 'listen')}
+    ${audioBtns(w.en, `<button class="btn small" data-reveal>${IC('eye')} Text</button>`)}
+    <div class="reveal"></div>
+    <div class="opts ${n === 3 ? 'n3' : ''}">${optButtons(ids)}</div></div>`);
+  Run.stage.append(box);
+  const reveal = () => { $('.reveal', box).innerHTML = enSpan(w.en); };
+  $('[data-reveal]', box).onclick = reveal;
+  if (!hasVoiceFor(w.en)) { reveal(); api.say('thinking', 'Keine englische Stimme gefunden – lies einfach mit! 👀'); }
+  let busy = false;
+  $$('.opt', box).forEach(b => b.onclick = async () => {
+    if (busy || b.classList.contains('gone')) return;
+    if (b.dataset.id === t.w) {
+      busy = true; b.classList.add('right'); reveal();
+      if (api.right([t.w], b)) S.stats.listenFirst++;
+      sayEn(w.en); await sleep(1000); api.next();
+    } else { b.classList.add('miss'); setTimeout(() => b.classList.remove('miss'), 500); api.miss([t.w]); sayEn(w.en); }
+  });
+  api.setHelp(lvl => {
+    if (lvl === 1) { const d = $$('.opt:not(.gone)', box).find(b => b.dataset.id !== t.w); if (d) d.classList.add('gone'); }
+    if (lvl === 2) { reveal(); sayEn(w.en, true); }
+    if (lvl === 3) {
+      busy = true; const r = box.querySelector(`.opt[data-id="${t.w}"]`); r.classList.add('hintme'); reveal();
+      setTimeout(async () => { r.classList.remove('hintme'); r.classList.add('right'); sayEn(w.en); api.demo([t.w]); await sleep(1400); api.next(); }, 1200);
+    }
+  });
+  setTimeout(() => sayEn(w.en), 350);
+};
+
+TASKS.spell = (t, api) => {
+  const w = W(t.w), word = w.en.toLowerCase(), mode = t.mode || 'tiles';
+  const box = el(`<div class="task">
+    ${qRow(`Schreib auf Englisch: „${sub(w.de)}“`, 'spell')}
+    <div class="row" style="justify-content:center;gap:14px"><div style="width:110px">${ART.pic(w, 'pic', false)}</div>
+      <div class="stack" style="gap:8px"><button class="btn small pri" data-say-en="${esc(word)}">${IC('speaker')} Anhören</button><button class="btn small" data-say-en="${esc(word)}" data-slow>${IC('turtle')} Langsam</button></div></div>
+    <div class="spellzone stack"></div><div class="fixbox"></div></div>`);
+  Run.stage.append(box);
+  const zone = $('.spellzone', box), fixbox = $('.fixbox', box);
+  let done = false;
+  const success = async (near) => {
+    done = true;
+    fixbox.innerHTML = `<div class="fix">${near ? "Fast! So schreibt man's: " : '✓ '}${enSpan(word)}</div>`;
+    api.right([t.w], fixbox); sayEn(word);
+    await sleep(near ? 1900 : 1100); api.next();
+  };
+  if (mode === 'tiles') {
+    let tiles = shuffle(word.split('').map((c, i) => ({ c, i })));
+    if (word.length > 1 && tiles.map(x => x.c).join('') === word) tiles.push(tiles.shift());
+    const slots = Array(word.length).fill(null), locked = new Set();
+    zone.innerHTML = `<div class="slots"></div><div class="tiles"></div>`;
+    const render = () => {
+      $('.slots', zone).innerHTML = slots.map((ti, p) => `<button class="slot ${ti != null ? 'filled' : ''} ${locked.has(p) ? 'lockd' : ''}" data-p="${p}" aria-label="Feld ${p + 1}${ti != null ? ': ' + tiles[ti].c : ' leer'}" lang="en-GB">${ti != null ? tiles[ti].c : ''}</button>`).join('');
+      $('.tiles', zone).innerHTML = tiles.map((x, i) => `<button class="tile ${slots.includes(i) ? 'used' : ''}" data-i="${i}" lang="en-GB" aria-label="Buchstabe ${x.c}">${x.c}</button>`).join('');
+    };
+    const check = () => {
+      if (slots.some(s => s == null)) return;
+      const built = slots.map(i => tiles[i].c).join('');
+      if (built === word) { locked.clear(); word.split('').forEach((_, p) => locked.add(p)); render(); success(false); return; }
+      api.miss([t.w]);
+      slots.forEach((ti, p) => { if (!locked.has(p) && tiles[ti].c !== word[p]) slots[p] = null; });
+      render();
+    };
+    zone.onclick = e => {
+      if (done) return;
+      const tile = e.target.closest('.tile'), slot = e.target.closest('.slot');
+      if (tile) { const p = slots.findIndex((s, i) => s == null && !locked.has(i)); if (p < 0) return; slots[p] = +tile.dataset.i; Sfx.play('pop'); render(); check(); }
+      if (slot) { const p = +slot.dataset.p; if (locked.has(p) || slots[p] == null) return; slots[p] = null; render(); }
+    };
+    const lockPos = p => {
+      if (slots[p] != null && tiles[slots[p]].c === word[p]) { locked.add(p); return; }
+      slots[p] = null;
+      let ti = tiles.findIndex((x, i) => x.c === word[p] && !slots.includes(i));
+      if (ti < 0) { const q = slots.findIndex((s, i) => s != null && !locked.has(i) && tiles[s].c === word[p]); ti = slots[q]; slots[q] = null; }
+      slots[p] = ti; locked.add(p);
+    };
+    api.setHelp(lvl => {
+      if (done) return;
+      if (lvl === 1) lockPos(0);
+      if (lvl === 2) { for (let p = 0; p < Math.ceil(word.length / 2); p++) lockPos(p); sayEn(word, true); }
+      if (lvl === 3) { done = true; for (let p = 0; p < word.length; p++) lockPos(p); render(); fixbox.innerHTML = `<div class="fix">So schreibt man's: ${enSpan(word)}</div>`; sayEn(word); api.demo([t.w]); setTimeout(() => api.next(), 2000); return; }
+      render();
+    });
+    render();
+  } else {
+    let pre = mode === 'first' ? word[0] : '';
+    zone.innerHTML = `<label class="typebox"><span class="pre" lang="en-GB">${pre}</span><input lang="en-GB" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="Englisches Wort eintippen"></label>`;
+    const inp = $('input', zone);
+    const check = () => {
+      if (done) return;
+      const j = judgeTyped(pre + inp.value, word);
+      if (j === 'empty') { api.say('happy', 'Tipp erst ein paar Buchstaben 🙂'); inp.focus(); return; }
+      if (j === 'exact' || j === 'near') { inp.blur(); success(j === 'near'); return; }
+      api.miss([t.w]); inp.focus(); inp.select();
+    };
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); check(); } });
+    footBtn('Prüfen', () => { check(); const b = Run.foot.querySelector('button'); if (b && !done) b.disabled = false; });
+    api.setHelp(lvl => {
+      if (done) return;
+      if (lvl === 1) { if (!pre) { pre = word[0]; $('.pre', zone).textContent = pre; if (inp.value[0] === pre) inp.value = inp.value.slice(1); } inp.placeholder = '_ '.repeat(word.length - pre.length).trim(); }
+      if (lvl === 2) { const half = word.slice(pre.length, Math.ceil(word.length / 2)); inp.placeholder = half + '_'.repeat(word.length - pre.length - half.length); sayEn(word, true); }
+      if (lvl === 3) { done = true; inp.value = word.slice(pre.length); fixbox.innerHTML = `<div class="fix">So schreibt man's: ${enSpan(word)}</div>`; sayEn(word); api.demo([t.w]); setTimeout(() => api.next(), 2200); }
+    });
+    setTimeout(() => inp.focus({ preventScroll: true }), 400);
+  }
+  setTimeout(() => sayEn(word), 350);
+};
+
+TASKS.speak = (t, api) => {
+  const w = W(t.w);
+  const rec = Mic.canRecord(), sr = !!Mic.SR;
+  const box = el(`<div class="task">
+    ${qRow('Hör zu und sprich laut nach!', 'mic')}
+    <div class="row" style="justify-content:center;gap:12px"><div style="width:96px">${ART.pic(w, 'pic', false)}</div>
+      <div><div class="bigword" style="font-size:1.6rem;text-align:left">${enSpan(w.en)}</div><div class="de-hint">${esc(sub(w.de))}</div></div></div>
+    ${audioBtns(w.en)}
+    ${w.pron ? `<div class="center pron">Klingt ungefähr wie: „${esc(w.pron)}“</div>` : ''}
+    ${rec || sr ? `<div class="speakrow">${rec ? `<button class="btn small" data-rec>${IC('mic')} Aufnehmen</button><button class="btn small" data-me hidden>${IC('play')} Meine Stimme</button>` : ''}${sr ? `<button class="btn small" data-sr>${IC('sparkle')} Mikro-Check</button>` : ''}</div>` : ''}
+    <div class="center muted status" style="min-height:1.4em;font-weight:700"></div>
+  </div>`);
+  Run.stage.append(box);
+  const status = $('.status', box);
+  const micErr = e => e === 'NotAllowedError' || e === 'not-allowed' || e === 'SecurityError' ? 'Mikro ist aus – das ist okay! Sprich einfach laut. 🙂' : e === 'no-speech' ? 'Ich hab nichts gehört – sprich ruhig laut!' : 'Mikro klappt gerade nicht – kein Problem!';
+  const recBtn = $('[data-rec]', box), meBtn = $('[data-me]', box), srBtn = $('[data-sr]', box);
+  if (recBtn) recBtn.onclick = async () => {
+    recBtn.disabled = true; status.innerHTML = '<span class="recdot" style="display:inline-block;vertical-align:middle"></span> Ich höre zu … (3 Sek.)';
+    const r = await Mic.record(3000);
+    recBtn.disabled = false;
+    if (r.ok) { status.textContent = 'Hör dich an und vergleich mit dem Original!'; meBtn.hidden = false; meBtn.onclick = () => { const a = new Audio(r.url); a.play().catch(e => { console.warn('playback', e); status.textContent = 'Abspielen klappt hier leider nicht.'; }); }; }
+    else { status.textContent = micErr(r.error); if (r.error === 'unsupported') recBtn.hidden = true; }
+  };
+  if (srBtn) srBtn.onclick = async () => {
+    srBtn.disabled = true; status.textContent = '🎙️ Sprich jetzt!';
+    const r = await Mic.recognize();
+    srBtn.disabled = false;
+    if (!r.ok) { status.textContent = micErr(r.error); if (r.error === 'unsupported' || r.error === 'service-not-allowed') srBtn.hidden = true; return; }
+    const best = r.alts.reduce((a, h) => Math.max(a, similar(h, w.en)), 0);
+    status.innerHTML = best >= .7 ? `Klingt super! ✨ Ich hab ${enSpan(r.alts[0])} gehört.` : `Ich hab ${enSpan(r.alts[0])} verstanden. Probier's gern nochmal!`;
+  };
+  Run.foot.append(el(`<div class="rate">
+    <div class="row"><button class="btn grow" data-r="super">🌟 Klang super!</button><button class="btn grow" data-r="ok">🙂 Ganz okay</button></div>
+    <button class="btn block" data-r="again">${IC('replay')} Nochmal üben</button></div>`));
+  let done = false;
+  Run.foot.onclick = async e => {
+    const b = e.target.closest('[data-r]'); if (!b || done) return;
+    if (b.dataset.r === 'again') { api.say('happy', 'Hör nochmal genau hin – und los! 🎧'); sayEn(w.en, true); return; }
+    done = true; S.stats.speaks++;
+    api.right([t.w], b);
+    if (b.dataset.r === 'super') api.say('cheer', 'Wow! Weiter so! 🌟');
+    await sleep(800); api.next();
+  };
+  api.setHelp(lvl => { sayEn(w.en, true); if (lvl >= 2) api.say('thinking', 'Sprich langsam, Silbe für Silbe. Das klappt! 🐢'); });
+  api.say('happy', 'Sprich laut nach und bewerte dich dann selbst!');
+  setTimeout(() => sayEn(w.en), 350);
+};
+
+TASKS.memory = (t, api) => {
+  const ids = t.words.slice(0, 6);
+  const cards = shuffle(ids.flatMap(id => [{ id, ty: 'w' }, { id, ty: 'p' }]));
+  const box = el(`<div class="task">${qRow('Finde die Paare: Wort und Bild!', 'memory')}
+    <div class="mem">${cards.map((c, i) => `<button class="mcard" data-i="${i}" data-id="${c.id}" data-ty="${c.ty}" aria-label="Verdeckte Karte ${i + 1}"><div class="in"><div class="b">${ART.ball()}</div><div class="f">${c.ty === 'w' ? enSpan(W(c.id).en) : ART.pic(W(c.id), '', false)}</div></div></button>`).join('')}</div></div>`);
+  Run.stage.append(box);
+  let open = [], lock = false, matched = 0, mism = 0, streak = 0;
+  const btns = $$('.mcard', box);
+  const peek = () => {
+    const left = ids.filter(id => !btns.some(b => b.classList.contains('done') && cards[+b.dataset.i].id === id));
+    const id = rnd(left); if (!id) return;
+    btns.filter(b => cards[+b.dataset.i].id === id).forEach(b => { b.classList.add('peek'); setTimeout(() => b.classList.remove('peek'), 1600); });
+    api.say('thinking', 'Psst – die zwei leuchtenden gehören zusammen! ✨');
+  };
+  box.querySelector('.mem').onclick = async e => {
+    const b = e.target.closest('.mcard'); if (!b || lock || b.classList.contains('up')) return;
+    const c = cards[+b.dataset.i];
+    b.classList.add('up'); Sfx.play('flip');
+    b.setAttribute('aria-label', c.ty === 'w' ? 'Wort ' + sub(W(c.id).en) : 'Bild ' + sub(W(c.id).de));
+    if (c.ty === 'w') sayEn(W(c.id).en);
+    open.push(b);
+    if (open.length < 2) return;
+    const [a, z] = open.map(x => cards[+x.dataset.i]);
+    lock = true;
+    if (a.id === z.id && a.ty !== z.ty) {
+      open.forEach(x => x.classList.add('done')); matched++; streak = 0;
+      Sfx.play('good'); burst(...center(b)); sayEn(W(a.id).en);
+      api.say('cheer', rnd(CONTENT.lines.right));
+      open = []; lock = false;
+      if (matched === ids.length) {
+        const first = Math.max(Math.ceil(ids.length / 2), ids.length - Math.max(0, mism - ids.length));
+        api.addScore(ids.length, first, ids);
+        await sleep(1000); api.next();
+      }
+    } else {
+      mism++; streak++; Sfx.play('soft');
+      api.say('thinking', streak === 1 ? 'Kein Paar – merk dir, wo die Karten liegen! 🧠' : rnd(CONTENT.lines.miss), true);
+      await sleep(1000);
+      open.forEach(x => { x.classList.remove('up'); x.setAttribute('aria-label', 'Verdeckte Karte'); }); open = []; lock = false;
+      if (streak >= 3) { streak = 0; peek(); }
+    }
+  };
+  api.setHelp(() => peek());
+  api.say('happy', 'Dreh zwei Karten um: Wort + Bild!');
+};
+
+TASKS.dialogue = (t, api) => {
+  const d = CONTENT.dialogues[t.id];
+  const npcArt = d.npc === 'crab' ? ART.crab('happy') : ART.juno();
+  const meArt = ART.avatar(S.profile.avatar, S.equip);
+  const box = el(`<div class="task"><div class="chat"></div></div>`);
+  Run.stage.append(box);
+  const chat = $('.chat', box);
+  let i = 0;
+  const add = (who, inner) => { const m = el(`<div class="msg ${who === 'me' ? 'mine' : ''}"><div class="who">${who === 'me' ? meArt : npcArt}</div><div class="bub">${inner}</div></div>`); chat.append(m); m.scrollIntoView({ block: 'end', behavior: reducedMotion() ? 'auto' : 'smooth' }); return m; };
+  const step = async () => {
+    const n = d.nodes[i];
+    Run.foot.replaceChildren();
+    if (!n) { await sleep(600); api.next(); return; }
+    if (n.say) {
+      const m = add('npc', `${enSpan(n.say)}<span class="de-hint de" hidden>${esc(sub(n.de))}</span>
+        <div class="tools"><button class="ibtn" data-say-en="${esc(sub(n.say))}" aria-label="Anhören">${IC('speaker')}</button><button class="ibtn" data-say-en="${esc(sub(n.say))}" data-slow aria-label="Langsam anhören">${IC('turtle')}</button><button class="ibtn" data-de aria-label="Deutsch zeigen">${IC('eye')}</button></div>`);
+      m.querySelector('[data-de]').onclick = () => { m.querySelector('.de').hidden = false; };
+      if (!hasVoiceFor(n.say)) m.querySelector('.de').hidden = false;
+      await sayEn(n.say); await sleep(450);
+      i++; step(); return;
+    }
+    if (n.story) {
+      api.say('happy', n.story);
+      const wrap = el(`<div class="choices">${n.options.map((o, k) => `<button class="btn block" data-k="${k}">${esc(o.de)}</button>`).join('')}</div>`);
+      Run.foot.append(wrap);
+      wrap.onclick = e => { const b = e.target.closest('[data-k]'); if (!b) return; const o = n.options[+b.dataset.k]; S.flags[n.flag] = o.value; save(); add('me', `<b>${esc(o.de)}</b>`); Sfx.play('pop'); i++; step(); };
+      api.setHelp(null); return;
+    }
+    if (n.ask) {
+      api.say('happy', n.ask);
+      const opts = shuffle(n.options.map((o, k) => ({ ...o, k })));
+      const wrap = el(`<div class="choices"><div class="story">${fmt(n.ask)}</div>${opts.map(o => `<button class="btn block" data-k="${o.k}" lang="en-GB"><span class="en">${esc(sub(o.en))}</span></button>`).join('')}</div>`);
+      Run.foot.append(wrap);
+      let busy = false;
+      const pick = async (b, demo) => {
+        const o = n.options[+b.dataset.k];
+        if (o.ok) {
+          busy = true; add('me', enSpan(o.en));
+          if (demo) api.demo(wordsIn(o.en)); else api.right(wordsIn(o.en), b);
+          Run.foot.replaceChildren(); await sayEn(o.en); await sleep(300); i++; step();
+        } else { b.classList.add('miss'); api.miss(wordsIn(n.options.find(x => x.ok).en), o.hint); }
+      };
+      wrap.onclick = e => { const b = e.target.closest('[data-k]'); if (b && !busy) pick(b); };
+      api.setHelp(lvl => {
+        const good = wrap.querySelector(`[data-k="${n.options.findIndex(o => o.ok)}"]`);
+        if (lvl === 1) { const bad = $$('[data-k]', wrap).find(b => b !== good && !b.classList.contains('miss')); if (bad) bad.classList.add('miss'); }
+        if (lvl === 2) { good.classList.add('hintme'); sayEn(n.options.find(o => o.ok).en, true); }
+        if (lvl === 3) { busy = true; good.classList.add('hintme'); setTimeout(() => pick(good, true), 1100); }
+      });
+    }
+  };
+  step();
+};
+
+TASKS.build = (t, api) => {
+  const isCode = !!t.code;
+  const parts = t.parts.map(sub);
+  let tiles = shuffle(parts.concat((t.extra || []).map(sub)).map((p, i) => ({ p, i })));
+  if (tiles.length > 1 && tiles.map(x => x.p).join('\u0001') === parts.join('\u0001')) tiles.push(tiles.shift());
+  const box = el(`<div class="task">
+    ${qRow(isCode ? t.de : `Bau den Satz auf Englisch: „${sub(t.de)}“`, 'codelab')}
+    <div class="code"><div class="ln"><span class="num">1</span><span class="cm"># ${isCode ? 'Python' : esc(sub(t.de))}</span></div>
+      <div class="ln"><span class="num">2</span><div class="line"></div></div></div>
+    <div class="tiles"></div><div class="out stack"></div></div>`);
+  Run.stage.append(box);
+  let placed = [], lockedN = 0, done = false;
+  const line = $('.line', box), tray = $('.tiles', box), out = $('.out', box);
+  const render = () => {
+    line.innerHTML = (isCode ? '' : '<span class="kw">say</span><span class="op">(</span>') +
+      placed.map((ti, k) => `<button class="placed ${k < lockedN ? 'lockd' : ''} ${isCode ? tokClass(tiles[ti].p) : 'en'}" data-k="${k}" ${isCode ? '' : 'lang="en-GB"'}>${esc(tiles[ti].p)}</button>`).join('') +
+      (done ? '' : '<span class="cur"></span>') + (isCode ? '' : '<span class="op">)</span>');
+    tray.innerHTML = tiles.map((x, i) => `<button class="tile ${isCode ? 'ctile ' + tokClass(x.p) : ''} ${placed.includes(i) ? 'used' : ''}" data-i="${i}" ${isCode ? '' : 'lang="en-GB"'} style="font-size:1.2rem">${esc(x.p)}</button>`).join('');
+  };
+  const finish = (demo) => {
+    done = true; render();
+    out.innerHTML = `<div class="console">✓ Compile successful</div>
+      <div class="snip"><div class="tag">So sieht das in echtem Python aus</div>${codeBlock(t.py)}</div>`;
+    if (!isCode) sayEn(parts.join(' '));
+    if (demo) api.demo(t.uses || []); else api.right(t.uses || [], out);
+    footBtn('Weiter', () => api.next());
+    setTimeout(() => out.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 50);
+  };
+  const check = () => {
+    if (placed.length < parts.length) return;
+    if (placed.map(i => tiles[i].p).join('\u0001') === parts.join('\u0001')) { finish(false); return; }
+    out.innerHTML = `<div class="console meh">⚠ Hmm, fast! Die Reihenfolge stimmt noch nicht ganz.</div>`;
+    api.miss(t.uses || [], 'Fast! Der Compiler hat einen kleinen Bug gefunden. 🐞');
+    let k = lockedN; while (k < placed.length && tiles[placed[k]].p === parts[k]) k++;
+    placed = placed.slice(0, k); render();
+  };
+  const lockN = n => {
+    placed = [];
+    for (let k = 0; k < n; k++) placed.push(tiles.findIndex((x, i) => x.p === parts[k] && !placed.includes(i)));
+    lockedN = n; render();
+  };
+  box.onclick = e => {
+    if (done) return;
+    const tl = e.target.closest('.tile'), pl = e.target.closest('.placed');
+    if (tl) { placed.push(+tl.dataset.i); Sfx.play('pop'); out.innerHTML = ''; render(); check(); }
+    if (pl && +pl.dataset.k >= lockedN) { placed.splice(+pl.dataset.k, 1); render(); }
+  };
+  api.setHelp(lvl => {
+    if (done) return;
+    if (lvl === 1) lockN(Math.max(lockedN, 1));
+    if (lvl === 2) { lockN(Math.max(lockedN, Math.ceil(parts.length / 2))); if (!isCode) sayEn(parts.join(' '), true); }
+    if (lvl === 3) { lockN(parts.length); finish(true); }
+  });
+  render();
+  api.say('happy', isCode ? 'Tippe die Bausteine in die richtige Reihenfolge.' : 'Tippe die Wörter der Reihe nach an!');
+};
+
+TASKS.predict = (t, api) => {
+  const opts = shuffle(t.options.map((o, k) => ({ o, k })));
+  const box = el(`<div class="task">${qRow('Was zeigt der Computer an?', 'codelab')}${codeBlock(t.code)}
+    <div class="stack popts">${opts.map(x => `<button class="btn block ctile" data-k="${x.k}" lang="en-GB" style="font-family:var(--mono)">${esc(sub(x.o))}</button>`).join('')}</div><div class="out stack"></div></div>`);
+  Run.stage.append(box);
+  let done = false;
+  const finish = (demo) => {
+    done = true;
+    const ans = sub(t.options[t.answer]);
+    $('.popts', box).hidden = true;
+    $('.out', box).innerHTML = `<div class="console">&gt; ${esc(ans)}</div><div class="ex">${fmt(t.explain || '')}</div>`;
+    sayEn(ans);
+    if (demo) api.demo(t.uses || []); else api.right(t.uses || [], $('.out', box));
+    footBtn('Weiter', () => api.next());
+  };
+  $('.popts', box).onclick = e => {
+    const b = e.target.closest('[data-k]'); if (!b || done) return;
+    if (+b.dataset.k === t.answer) finish(false);
+    else { b.disabled = true; api.miss(t.uses || [], 'Fast! Lies den Code nochmal Zeile für Zeile. 🔍'); }
+  };
+  api.setHelp(lvl => {
+    if (done) return;
+    if (lvl === 1) { const b = $$('.popts [data-k]', box).find(x => +x.dataset.k !== t.answer && !x.disabled); if (b) b.disabled = true; }
+    if (lvl === 2) api.say('thinking', 'Tipp: [[print]] zeigt den Inhalt an – nicht den Namen der Box.');
+    if (lvl === 3) finish(true);
+  });
+};
+
+TASKS.bug = (t, api) => {
+  const toks = t.tokens.map(sub);
+  const fixed = toks.map((x, i) => i === t.bug ? sub(t.fix) : x).join(' ');
+  const box = el(`<div class="task">${qRow('Finde den Bug! 🐞 Tippe auf das falsche Wort.', 'bughunt')}
+    <div class="sentence">${toks.map((x, i) => `<button class="tok" data-i="${i}" lang="en-GB">${esc(x)}</button>`).join('')}</div>
+    <div class="fixarea stack"></div></div>`);
+  Run.stage.append(box);
+  const area = $('.fixarea', box), bugTok = box.querySelector(`[data-i="${t.bug}"]`);
+  let phase = 1, done = false;
+  const solved = (demo, node) => {
+    done = true; phase = 3;
+    bugTok.textContent = sub(t.fix); bugTok.classList.remove('bug', 'glow'); bugTok.classList.add('fixed');
+    area.innerHTML = `<div class="ex">${demo ? 'So ist es richtig: ' : '✓ '}${fmt(t.explain)}</div>`;
+    sayEn(fixed);
+    if (demo) api.demo(t.uses || []); else api.right(t.uses || [], node || bugTok);
+    footBtn('Weiter', () => api.next());
+  };
+  const showFixes = () => {
+    phase = 2; bugTok.classList.add('bug');
+    api.say('cheer', 'Bug gefunden! Wie ist es richtig?');
+    area.innerHTML = `<div class="story">Wie ist es richtig?</div>${shuffle(t.options).map(o => `<button class="btn block" data-o="${esc(o)}" lang="en-GB"><span class="en">${esc(sub(o))}</span></button>`).join('')}`;
+  };
+  box.querySelector('.sentence').onclick = e => {
+    const b = e.target.closest('.tok'); if (!b || phase !== 1) return;
+    if (+b.dataset.i === t.bug) { Sfx.play('pop'); showFixes(); }
+    else { b.classList.add('ok'); b.disabled = true; api.miss(t.uses || [], 'Das Wort ist okay ✓ – such weiter! 🔍'); }
+  };
+  area.onclick = e => {
+    const b = e.target.closest('[data-o]'); if (!b || phase !== 2) return;
+    if (b.dataset.o === t.fix) solved(false, b);
+    else { b.disabled = true; api.miss(t.uses || []); }
+  };
+  api.setHelp(lvl => {
+    if (done) return;
+    if (lvl === 3) { solved(true); return; }
+    if (phase === 1) {
+      if (lvl === 1) { const ok = $$('.tok', box).find(b => +b.dataset.i !== t.bug && !b.disabled); if (ok) { ok.classList.add('ok'); ok.disabled = true; } }
+      if (lvl === 2) bugTok.classList.add('glow');
+    } else {
+      if (lvl === 1) { const bad = $$('[data-o]', area).find(b => b.dataset.o !== t.fix && !b.disabled); if (bad) bad.disabled = true; }
+      if (lvl === 2) sayEn(fixed, true);
+    }
+  });
+};
+
+TASKS.falling = (t, api) => {
+  const pool = [...new Set(t.words.concat(learnedIds()))];
+  const order = shuffle(t.words);
+  const rounds = Math.min(t.rounds || order.length, order.length);
+  const n = Math.min(3, t.opts || 3);
+  const box = el(`<div class="task">${qRow('Fang das Wort, das zum Bild passt!', 'falling')}
+    <div class="target"><div class="tp"></div><div class="grow stack" style="gap:6px"><div class="row"><button class="btn small pri" data-play>${IC('speaker')} Anhören</button><button class="btn small" data-slowp aria-label="Langsam">${IC('turtle')}</button></div><b class="rc muted"></b></div></div>
+    <div class="arena" aria-label="Wörter fallen herunter. Tippe auf das richtige Wort."></div></div>`);
+  Run.stage.append(box);
+  const arena = $('.arena', box);
+  let r = 0, drops = [], target = null, busy = false, last = 0;
+  const still = reducedMotion();
+  $('[data-play]', box).onclick = () => sayEn(W(target).en);
+  $('[data-slowp]', box).onclick = () => sayEn(W(target).en, true);
+  const round = () => {
+    target = order[r]; busy = false;
+    Run.itemWrong = 0; Run.helpLevel = 0;
+    $('.tp', box).innerHTML = ART.pic(W(target), 'pic', false); $('.tp', box).dataset.id = target;
+    $('.rc', box).textContent = `Runde ${r + 1} von ${rounds}`;
+    const ids = shuffle([target, ...distractors(target, n - 1, pool)]);
+    arena.replaceChildren();
+    const H = Math.max(240, arena.clientHeight);
+    drops = ids.map((id, i) => {
+      const b = el(`<button class="drop" data-id="${id}" lang="en-GB" style="left:${(i * 33.3 + 1.2).toFixed(1)}%"><span class="en">${esc(sub(W(id).en))}</span></button>`);
+      arena.append(b);
+      const d = { b, id, y: still ? 30 + i * ((H - 130) / Math.max(1, n - 1)) : 8 - i * 70, v: (H / 9) * (.85 + Math.random() * .3), slow: 1, frozen: false, gone: false };
+      b.style.transform = `translateY(${d.y}px)`;
+      return d;
+    });
+    setTimeout(() => sayEn(W(target).en), 250);
+  };
+  const tick = ts => {
+    const dt = last ? Math.min(.05, (ts - last) / 1000) : 0; last = ts;
+    const H = arena.clientHeight;
+    drops.forEach(d => {
+      if (d.frozen || d.gone) return;
+      d.y += d.v * d.slow * dt;
+      if (d.y > H) { d.y = -70 - Math.random() * 60; d.b.classList.remove('miss'); }
+      d.b.style.transform = `translateY(${d.y.toFixed(1)}px)`;
+    });
+    Run.raf = requestAnimationFrame(tick);
+  };
+  const advance = async () => {
+    await sleep(800);
+    r++;
+    if (r >= rounds) { stopRaf(); api.next(); } else round();
+  };
+  arena.onclick = e => {
+    const b = e.target.closest('.drop'); if (!b || busy || b.classList.contains('miss')) return;
+    const d = drops.find(x => x.b === b); if (!d || d.gone) return;
+    if (d.id === target) {
+      busy = true; d.frozen = true; b.classList.add('glow');
+      api.right([target], b); sayEn(W(target).en); advance();
+    } else {
+      b.classList.add('miss'); api.miss([target]);
+    }
+  };
+  api.setHelp(lvl => {
+    if (busy) return;
+    const good = drops.find(d => d.id === target);
+    if (lvl === 1) { const bad = drops.find(d => d.id !== target && !d.gone); if (bad) { bad.gone = true; bad.b.style.visibility = 'hidden'; } }
+    if (lvl === 2) { good.slow = .35; good.b.classList.add('glow'); sayEn(W(target).en, true); }
+    if (lvl === 3) {
+      busy = true; good.frozen = true; good.b.classList.add('glow');
+      if (good.y < 0 || good.y > arena.clientHeight - 60) { good.y = arena.clientHeight / 3; good.b.style.transform = `translateY(${good.y}px)`; }
+      setTimeout(() => { api.demo([target]); sayEn(W(target).en); advance(); }, 1300);
+    }
+  });
+  round();
+  if (!still) Run.raf = requestAnimationFrame(tick);
+  api.say('happy', 'Tipp auf das richtige Wort, bevor es weg ist – keine Sorge, es kommt wieder!');
+};
+
+/* ---------------- finishing a level ---------------- */
+function storyAfter(lv) {
+  const a = lv.story && lv.story.after;
+  if (!a) return '';
+  if (typeof a === 'string') return a;
+  return a[S.flags[a.flag]] || a.default || '';
+}
+function finishLevel() {
+  if (!Run) return;
+  stopRunTimers();
+  const lv = Run.level;
+  if (lv.pseudo === 'turbo') {
+    const score = Run.turboScore, best = score > S.stats.turboBest;
+    if (best) S.stats.turboBest = score;
+    S.coins += score; S.xp += score * 5;
+    Object.entries(Run.perWord).forEach(([id, p]) => { const r = wordRec(id); r.right += p.ok; r.wrong += p.bad; });
+    save();
+    go('result', { lv, turbo: score, best, coins: score, xp: score * 5, badges: checkBadges() });
+    return;
+  }
+  const ratio = Run.total ? Run.first / Run.total : 1;
+  const stars = ratio >= .85 ? 3 : ratio >= .6 ? 2 : 1;
+  const prev = S.levels[lv.id];
+  const firstClear = !lv.pseudo && !(prev && prev.done);
+  const rankBefore = rankOf(S.xp).name, stageBefore = lv.unit ? monsterStage(lv.unit) : 0;
+  const boss = lv.type === 'boss';
+  const xp = 10 * Run.total + 20 + stars * 10 + (boss ? 50 : 0);
+  const coins = 5 + stars * 3 + (boss ? 15 : 0);
+  S.xp += xp; S.coins += coins;
+  if (!lv.pseudo) S.levels[lv.id] = { done: true, stars: Math.max(prev ? prev.stars : 0, stars), plays: (prev ? prev.plays : 0) + 1 };
+  Object.entries(Run.perWord).forEach(([id, p]) => { const r = wordRec(id); r.right += p.ok; r.wrong += p.bad; });
+  if (lv.pseudo === 'review') { Object.entries(Run.perWord).forEach(([id, p]) => reviewResult(id, p.bad === 0)); S.stats.reviews++; }
+  else Run.levelWords.forEach(introduce);
+  let prize;
+  if (firstClear && lv.reward && !S.owned.includes(lv.reward)) { S.owned.push(lv.reward); prize = { item: lv.reward }; }
+  else { S.coins += 10; prize = { coins: 10 }; }
+  const k = dayKey(today());
+  S.stats.levelsByDay[k] = (S.stats.levelsByDay[k] || 0) + 1;
+  S.stats.levelsDone++;
+  bumpStreak();
+  const badges = checkBadges();
+  const stageAfter = lv.unit ? monsterStage(lv.unit) : 0, rankAfter = rankOf(S.xp).name;
+  S.resume = null; save();
+  go('result', { lv, stars, xp, coins, prize, badges, firstClear, story: storyAfter(lv),
+    evolve: stageAfter > stageBefore ? { unit: lv.unit, stage: stageAfter } : null,
+    rankUp: rankAfter !== rankBefore ? rankAfter : null });
+}
+</script>

@@ -1,0 +1,227 @@
+<script>
+'use strict';
+/* ==========================================================================================
+   CONTENT DATA  (learning content only – no logic here)
+   ------------------------------------------------------------------------------------------
+   HOW TO EXTEND
+   - Add a WORD: push an object into CONTENT.words:
+       { id:'red', unit:'u2', cat:'colour', en:'red', de:'rot', icon:'num:3' | '<ART.icons key>',
+         emoji:'🔴' (optional), pron:'...' (optional – leave out if unsure!),
+         exampleEn:'My bag is red.', exampleDe:'Meine Tasche ist rot.' }
+     {name} is replaced with the player's name. Use straight apostrophes (').
+   - Add a LEVEL: push an object into CONTENT.levels. Array order = order on the map.
+       { id, unit, type (map icon/feel), title, minutes, reward (item id), story:{before,after},
+         plan:[ segments ] }
+     Segments (expanded into tasks by expandPlan()):
+       {intro:[wordIds]}                                  new-word cards (see + hear)
+       {k:'catch'|'listen', words:[...], reps:2, opts:3}  pick the picture
+       {k:'spell', words:[...], mode:'tiles'|'first'|'free'}
+       {k:'speak', words:[...]}                           listen, repeat, self-rate
+       {k:'memory', words:[...]}                          word <-> picture pairs (max 6)
+       {k:'falling', words:[...], opts:3}                 mini-game: catch the falling word
+       {k:'dialogue', id:'<CONTENT.dialogues key>'}
+       {k:'build', parts:[...], extra:[...], de, py, uses:[wordIds], code:true|false}
+       {k:'predict', code, options:[...], answer:0, explain, uses}
+       {k:'bug', tokens:[...], bug:index, options:[...], fix, explain, uses}
+       {k:'card', title, text, code, out}                 info card (not scored)
+     Single-task segments may be listed in boss levels in any mix.
+   - English inside German text: wrap in [[double brackets]] -> rendered with lang="en-GB".
+   - The startup validation (see #debug) checks ids, references, distractors and that every
+     word appears >= 5 times in >= 3 modalities within its unit.
+   Vocabulary basis: Bildungsplan BW 2016 Englisch Kl. 5/6 (A1), typical 5th-grade order
+   (Welcome: greetings, introducing yourself, numbers 1-10, yes/no).
+   ========================================================================================== */
+const CONTENT = {
+  units: [
+    { id:'u1', num:1, title:'Hallohafen', subtitle:'Hallo, ich bin … & Zahlen 1–10', accent:'#2fb3c6', scene:'harbour', status:'open',
+      monster:['plaudi1','plaudi2','plaudi3'], monsterNames:['Plaudi','Plauderon','Plauderaxx'],
+      intro:'Willkommen in Hallohafen! Hier sagt keiner mehr [[Hello]]. Das ändern wir! ⚓' },
+    { id:'u2', num:2, title:'Farbenfeld', subtitle:'Farben & Schulsachen', accent:'#f2b33d', scene:'meadow', status:'soon' },
+    { id:'u3', num:3, title:'Familienfelsen', subtitle:'Familie & Haustiere', accent:'#f07aa0', scene:'cliffs', status:'soon' },
+    { id:'u4', num:4, title:'Blockdorf', subtitle:'Mein Zimmer & Zuhause', accent:'#6cc070', scene:'blocks', status:'soon' }
+  ],
+
+  /* cat = group used for distractors. pron = German-style hint, ONLY where it is not misleading
+     (omitted on purpose for th / w / v words and where German spelling misleads: one, three, four, five, seven, phrases). */
+  words: [
+    { id:'hello',     unit:'u1', cat:'greet',  en:'hello',     de:'hallo',              icon:'wave', emoji:'👋',  pron:'hä-LOU',  exampleEn:"Hello, I'm Nuvi!",               exampleDe:'Hallo, ich bin Nuvi!' },
+    { id:'goodbye',   unit:'u1', cat:'greet',  en:'goodbye',   de:'tschüss / auf Wiedersehen', icon:'bye', pron:'gud-BAI', exampleEn:'Goodbye, Juno!',            exampleDe:'Tschüss, Juno!' },
+    { id:'yes',       unit:'u1', cat:'greet',  en:'yes',       de:'ja',                 icon:'yes',   pron:'jess',    exampleEn:"Yes, I'm fine.",                 exampleDe:"Ja, mir geht's gut." },
+    { id:'no',        unit:'u1', cat:'greet',  en:'no',        de:'nein',               icon:'no',    pron:'nou',     exampleEn:"Are you Juno? – No, I'm {name}.", exampleDe:'Bist du Juno? – Nein, ich bin {name}.' },
+    { id:'whatsname', unit:'u1', cat:'phrase', en:"What's your name?", de:'Wie heißt du?', icon:'nameq',          exampleEn:"Hi! I'm Juno. What's your name?",  exampleDe:'Hi! Ich bin Juno. Wie heißt du?' },
+    { id:'im',        unit:'u1', cat:'phrase', en:"I'm {name}.",  de:'Ich bin {name}.',  icon:'name',              exampleEn:"Hi, Juno! I'm {name}.",           exampleDe:'Hi, Juno! Ich bin {name}.' },
+    { id:'howareyou', unit:'u1', cat:'phrase', en:'How are you?', de:"Wie geht's dir?",  icon:'howq',              exampleEn:'Hello, Nuvi! How are you?',       exampleDe:"Hallo, Nuvi! Wie geht's dir?" },
+    { id:'fine',      unit:'u1', cat:'phrase', en:"I'm fine, thank you.", de:"Mir geht's gut, danke.", icon:'fine', exampleEn:"I'm fine, thank you. And you?", exampleDe:"Mir geht's gut, danke. Und dir?" },
+    { id:'one',   unit:'u1', cat:'num', en:'one',   de:'eins',   icon:'num:1',                  exampleEn:'One biscuit for Nuvi!',     exampleDe:'Ein Keks für Nuvi!' },
+    { id:'two',   unit:'u1', cat:'num', en:'two',   de:'zwei',   icon:'num:2',  pron:'tuu',     exampleEn:"I've got two hands.",       exampleDe:'Ich habe zwei Hände.' },
+    { id:'three', unit:'u1', cat:'num', en:'three', de:'drei',   icon:'num:3',                  exampleEn:'One, two, three – go!',     exampleDe:'Eins, zwei, drei – los!' },
+    { id:'four',  unit:'u1', cat:'num', en:'four',  de:'vier',   icon:'num:4',                  exampleEn:'Four blocks for my house.', exampleDe:'Vier Blöcke für mein Haus.' },
+    { id:'five',  unit:'u1', cat:'num', en:'five',  de:'fünf',   icon:'num:5',                  exampleEn:'Five fingers on my hand.',  exampleDe:'Fünf Finger an meiner Hand.' },
+    { id:'six',   unit:'u1', cat:'num', en:'six',   de:'sechs',  icon:'num:6',  pron:'ßiks',    exampleEn:'Six biscuits, please!',     exampleDe:'Sechs Kekse, bitte!' },
+    { id:'seven', unit:'u1', cat:'num', en:'seven', de:'sieben', icon:'num:7',                  exampleEn:'Seven days in a week.',     exampleDe:'Eine Woche hat sieben Tage.' },
+    { id:'eight', unit:'u1', cat:'num', en:'eight', de:'acht',   icon:'num:8',  pron:'äit',     exampleEn:"Eight legs? That's a spider!", exampleDe:'Acht Beine? Das ist eine Spinne!' },
+    { id:'nine',  unit:'u1', cat:'num', en:'nine',  de:'neun',   icon:'num:9',  pron:'nain',    exampleEn:'Nine stars in the sky.',    exampleDe:'Neun Sterne am Himmel.' },
+    { id:'ten',   unit:'u1', cat:'num', en:'ten',   de:'zehn',   icon:'num:10', pron:'tänn',    exampleEn:'Ten points for you!',       exampleDe:'Zehn Punkte für dich!' }
+  ],
+
+  levels: [
+    { id:'u1l1', unit:'u1', type:'catch', title:'Hallo, Hafen!', minutes:'2–3', reward:'acc_cap', tutorial:true,
+      story:{ before:'Der Hafen ist so still … Lass uns die ersten Wörter fangen!', after:'Super! Die Möwen sagen schon [[hello]]. 🌊' },
+      plan:[ {intro:['hello','goodbye','yes','no']},
+             {k:'catch', words:['hello','goodbye','yes','no'], reps:2, opts:2} ] },
+
+    { id:'u1l2', unit:'u1', type:'listen', title:'Zähl mit!', minutes:'3', reward:'room_plant',
+      story:{ before:'Die Fischer zählen ihre Kisten. Hör genau hin! 👂', after:'Stark! Jetzt kannst du bis [[five]] zählen.' },
+      plan:[ {intro:['one','two','three','four','five']},
+             {k:'listen', words:['one','two','three','four','five'], reps:2, opts:3},
+             {k:'speak', words:['hello','three']} ] },
+
+    { id:'u1l3', unit:'u1', type:'memory', title:'Memory-Bucht', minutes:'3', reward:'room_rug',
+      story:{ before:'Die Flut hat Karten an den Strand gespült. Finde die Paare!', after:'Alle Paare gefunden! Bis [[ten]] – wow!' },
+      plan:[ {intro:['six','seven','eight','nine','ten']},
+             {k:'memory', words:['six','seven','eight','nine','ten','five']},
+             {k:'listen', words:['six','seven','eight','nine','ten'], reps:1, opts:3} ] },
+
+    { id:'u1l4', unit:'u1', type:'dialogue', title:'Wer bist du?', minutes:'3–4', reward:'acc_bow',
+      story:{ before:'Da kommt eine andere Trainerin! Sie heißt Juno.', after:'Juno ist jetzt deine Freundin. 💛' },
+      plan:[ {intro:['whatsname','im','howareyou','fine']},
+             {k:'dialogue', id:'d_juno'},
+             {k:'speak', words:['whatsname','howareyou','fine']} ] },
+
+    { id:'u1l5', unit:'u1', type:'spell', title:'Schreibwerkstatt', minutes:'3–4', reward:'room_lamp',
+      story:{ before:'Der Hafenmeister braucht neue Schilder. Hilfst du beim Schreiben?', after:'Die Schilder glänzen! ✨' },
+      plan:[ {k:'spell', words:['yes','no','two','ten','six','four','nine','seven','eight','one'], mode:'tiles'},
+             {k:'spell', words:['hello','five'], mode:'first'} ] },
+
+    { id:'u1l6', unit:'u1', type:'codelab', title:'Code Lab: print()', minutes:'3–4', reward:'room_pc',
+      story:{ before:'Prof. Pixel wartet im Leuchtturm. Computer sprechen Englisch!', after:'Compile successful! Prof. Pixel ist begeistert. 💻' },
+      plan:[
+        {k:'card', title:'Code Lab 💻', text:'Computer verstehen Englisch! [[print]] heißt „zeig an“.', code:'print("Hello")', out:'Hello'},
+        {k:'predict', code:'print("Goodbye")', options:['Goodbye','print','Hello'], answer:0, explain:'[[print]] zeigt an, was in den Anführungszeichen steht.', uses:['goodbye']},
+        {k:'card', title:'Variablen 📦', text:'Eine Variable ist eine Box mit Namen. In der Box [[name]] liegt dein Name.', code:'name = "{name}"'},
+        {k:'build', code:true, parts:['name','=','"{name}"'], de:'Bau die Box: Speichere deinen Namen!', py:'name = "{name}"\nprint(name)', uses:[]},
+        {k:'predict', code:'name = "Juno"\nprint("Hello, " + name)', options:['Hello, Juno','Hello, name','Goodbye, Juno'], answer:0, explain:'In [[name]] liegt „Juno“. Darum steht da [[Hello, Juno]].', uses:['hello']},
+        {k:'build', parts:['Hello,',"I'm",'{name}.'], de:'Hallo, ich bin {name}.', py:'print("Hello, I\'m {name}.")', uses:['hello','im']},
+        {k:'build', parts:["What's",'your','name?'], de:'Wie heißt du?', py:'print("What\'s your name?")', uses:['whatsname']},
+        {k:'build', parts:["I'm",'fine,','thank','you.'], de:"Mir geht's gut, danke.", py:'print("I\'m fine, thank you.")', uses:['fine']},
+        {k:'predict', code:'answer = "yes"\nprint(answer)', options:['yes','answer','no'], answer:0, explain:'Ohne Anführungszeichen ist [[answer]] die Box. Angezeigt wird, was drin ist.', uses:['yes']}
+      ] },
+
+    { id:'u1l7', unit:'u1', type:'bughunt', title:'Bug-Jagd', minutes:'3–4', reward:'acc_glasses',
+      story:{ before:'Auf den Hafenschildern krabbeln Bugs herum! 🐞', after:'Alle Bugs gefangen! Nuvi will einen behalten …' },
+      plan:[
+        {k:'card', title:'Bug-Jagd 🐞', text:'In jedem Satz steckt ein Fehler. Tipp ihn an! Tipp: [[I am]] = [[I\'m]].'},
+        {k:'bug', tokens:['Hello!',"i'm",'{name}.'], bug:1, options:["I'm",'Im','i am'], fix:"I'm", explain:'[[I]] (ich) schreibt man im Englischen immer groß.', uses:['hello','im']},
+        {k:'bug', tokens:['Im','fine,','thank','you.'], bug:0, options:["I'm",'I','Im'], fix:"I'm", explain:"[[I'm]] ist kurz für [[I am]]. Das ' zeigt: Da fehlt ein a.", uses:['fine']},
+        {k:'bug', tokens:['What','your','name?'], bug:0, options:["What's",'Wat','Who'], fix:"What's", explain:"[[What's]] ist kurz für [[What is]].", uses:['whatsname']},
+        {k:'bug', tokens:['One,','two,','tree!'], bug:2, options:['three!','free!','tre!'], fix:'three!', explain:'drei = [[three]] mit th. [[tree]] heißt Baum! 🌳', uses:['one','two','three']},
+        {k:'bug', tokens:['Six,','sefen,','eight.'], bug:1, options:['seven,','seben,','sewen,'], fix:'seven,', explain:'Sieben schreibt man mit v: [[seven]].', uses:['six','seven','eight']},
+        {k:'bug', tokens:['Hello!','I','Juno.'], bug:1, options:["I'm",'My','Is'], fix:"I'm", explain:'Im Englischen braucht man das [[am]]: [[I\'m Juno.]]', uses:['hello','im']},
+        {k:'bug', tokens:['Two','star','for','you!'], bug:1, options:['stars','stares','starz'], fix:'stars', explain:'Mehr als eins? Dann meistens mit -s: [[two stars]].', uses:['two']},
+        {k:'bug', tokens:['How','is','you?'], bug:1, options:['are','am','be'], fix:'are', explain:'Es heißt immer [[How are you?]]', uses:['howareyou']}
+      ] },
+
+    { id:'u1boss', unit:'u1', type:'boss', title:'Boss: Brummkrabbe Knarz', minutes:'6–8', reward:'acc_crown',
+      boss:{ name:'Knarz', art:'crab' },
+      story:{ before:'Knarz blockiert den Hafen und grüßt niemanden. Zeig ihm, was du kannst!',
+              after:{ flag:'gift', biscuit:'Juno bringt Knarz deinen Keks. Jetzt sind alle Freunde! 🍪 Die Glocke läutet!',
+                      star:'Juno klebt Knarz den Sternsticker auf den Panzer. ⭐ Die Glocke läutet!',
+                      default:'Knarz lächelt. Die Hafenglocke läutet wieder! 🔔' } },
+      plan:[
+        {k:'catch', words:['hello'], opts:3},
+        {k:'listen', words:['goodbye'], opts:3},
+        {k:'listen', words:['seven'], opts:4},
+        {k:'spell', words:['no'], mode:'tiles'},
+        {k:'catch', words:['yes'], opts:3},
+        {k:'speak', words:['im']},
+        {k:'bug', tokens:["i'm",'fine,','thank','you.'], bug:0, options:["I'm",'Im','i am'], fix:"I'm", explain:'[[I]] immer groß!', uses:['fine','im']},
+        {k:'listen', words:['eight'], opts:4},
+        {k:'build', parts:['How','are','you?'], de:"Wie geht's dir?", py:'print("How are you?")', uses:['howareyou']},
+        {k:'catch', words:['whatsname'], opts:3},
+        {k:'spell', words:['three'], mode:'tiles'},
+        {k:'listen', words:['two','six','nine'], opts:4},
+        {k:'speak', words:['seven','eight','goodbye']},
+        {k:'catch', words:['ten','one','four'], opts:4},
+        {k:'listen', words:['fine'], opts:3},
+        {k:'dialogue', id:'d_knarz'}
+      ] },
+
+    { id:'u1secret', unit:'u1', type:'falling', secret:true, title:'Geheim: Zahlen-Regen', minutes:'3', reward:'room_poster',
+      story:{ before:'Psst … ein geheimer Ort! Hier regnet es Zahlen. ☔', after:'Du hast den Zahlen-Regen gemeistert!' },
+      plan:[ {k:'falling', words:['one','two','three','four','five','six','seven','eight','nine','ten'], rounds:8, opts:3} ] }
+  ],
+
+  /* Dialogues: nodes run top to bottom. npc lines: en + de. choice: options with ok:true/false
+     (hint = gentle tip on a miss). story choice: German options that set a flag (no wrong answer). */
+  dialogues: {
+    d_juno: { npc:'juno', nodes:[
+      { say:'Hello!', de:'Hallo!' },
+      { ask:'Grüß Juno zurück!', options:[ {en:'Hello!', ok:true}, {en:'Goodbye!', hint:'Juno kommt gerade erst an 😄'} ] },
+      { say:"I'm Juno. What's your name?", de:'Ich bin Juno. Wie heißt du?' },
+      { ask:'Sag deinen Namen!', options:[ {en:"I'm {name}.", ok:true}, {en:'Yes.', hint:'Juno will deinen Namen wissen.'} ] },
+      { say:'Nice to meet you! How are you?', de:"Schön, dich kennenzulernen! Wie geht's dir?" },
+      { ask:"Wie geht's dir?", options:[ {en:'Goodbye!', hint:'Juno fragt, wie es dir geht.'}, {en:"I'm fine, thank you.", ok:true} ] },
+      { story:'Juno sieht hungrig aus. Was schenkst du ihr?', flag:'gift', options:[ {de:'🍪 Einen Keks', value:'biscuit'}, {de:'⭐ Einen Sternsticker', value:'star'} ] },
+      { say:'Thank you! Goodbye, {name}!', de:'Danke! Tschüss, {name}!' },
+      { ask:'Verabschiede dich!', options:[ {en:'Goodbye!', ok:true}, {en:'How are you?', hint:'Juno geht jetzt – sag tschüss!'} ] }
+    ]},
+    d_knarz: { npc:'crab', nodes:[
+      { say:'Hmpf! Go away!', de:'Hmpf! Geh weg!' },
+      { ask:'Sei freundlich!', options:[ {en:'Hello!', ok:true}, {en:'Goodbye!', hint:'Wir wollen doch Freunde werden 🙂'} ] },
+      { say:"Hello? Hmm … What's your name?", de:'Hallo? Hmm … Wie heißt du?' },
+      { ask:'Stell dich vor!', options:[ {en:'Ten.', hint:'Knarz fragt nach deinem Namen.'}, {en:"I'm {name}.", ok:true} ] },
+      { say:"I'm Knarz.", de:'Ich bin Knarz.' },
+      { ask:'Frag, wie es ihm geht!', options:[ {en:'How are you?', ok:true}, {en:'No.', hint:'Frag: Wie geht es dir?'} ] },
+      { say:"I'm fine, thank you! Hello, harbour!", de:'Mir geht es gut, danke! Hallo, Hafen!' }
+    ]}
+  },
+
+  /* Collectibles. price:null = only as level reward / secret. slot: head|face for accessories.
+     pos (room items): x/y in % of the room (y = bottom edge), w = width in %. */
+  items: [
+    { id:'acc_cap',     kind:'acc', slot:'head', name:'Trainer-Kappe', price:40 },
+    { id:'acc_bow',     kind:'acc', slot:'head', name:'Sternschleife', price:40 },
+    { id:'acc_phones',  kind:'acc', slot:'head', name:'Kopfhörer',     price:60 },
+    { id:'acc_clip',    kind:'acc', slot:'head', name:'Mondspange',    price:30 },
+    { id:'acc_crown',   kind:'acc', slot:'head', name:'Pixel-Krone',   price:null },
+    { id:'acc_glasses', kind:'acc', slot:'face', name:'Code-Brille',   price:50 },
+    { id:'room_plant',  kind:'room', name:'Blockpflanze',  price:30, pos:{x:88,y:80,w:16} },
+    { id:'room_lamp',   kind:'room', name:'Mondlampe',     price:35, pos:{x:12,y:62,w:14} },
+    { id:'room_rug',    kind:'room', name:'Wolkenteppich', price:30, pos:{x:50,y:98,w:52} },
+    { id:'room_pc',     kind:'room', name:'Coding-PC',     price:null, pos:{x:74,y:66,w:24} },
+    { id:'room_poster', kind:'room', name:'Sternposter',   price:null, pos:{x:50,y:42,w:22} },
+    { id:'room_bed',    kind:'room', name:'Kuschelbett',   price:60, pos:{x:24,y:90,w:36} },
+    { id:'room_shelf',  kind:'room', name:'Blockregal',    price:45, pos:{x:86,y:40,w:20} },
+    { id:'room_bean',   kind:'room', name:'Sitzsack',      price:40, pos:{x:66,y:94,w:20} },
+    { id:'room_shell',  kind:'room', name:'Glitzermuschel', price:null, pos:{x:20,y:40,w:12} }
+  ],
+
+  /* Badges: when = {stat,min} | {level:id} | {type:levelType} */
+  badges: [
+    { id:'b_first',   name:'Erste Schritte',   desc:'Dein erstes Level',                 emblem:'star',  when:{stat:'levelsDone', min:1} },
+    { id:'b_listen',  name:'Hör-Profi',        desc:'15 Hör-Aufgaben auf Anhieb',        emblem:'ear',   when:{stat:'listenFirst', min:15} },
+    { id:'b_bug',     name:'Bug-Jägerin',      desc:'Eine Bug-Jagd geschafft',           emblem:'bug',   when:{type:'bughunt'} },
+    { id:'b_code',    name:'Code-Starterin',   desc:'Dein erstes Code Lab',              emblem:'code',  when:{type:'codelab'} },
+    { id:'b_speak',   name:'Sprach-Echo',      desc:'10-mal nachgesprochen',             emblem:'mic',   when:{stat:'speaks', min:10} },
+    { id:'b_streak7', name:'7-Tage-Serie',     desc:'7 Tage dabei',                      emblem:'flame', when:{stat:'streak', min:7} },
+    { id:'b_review',  name:'Wiederholungs-Ass',desc:'Eine Review Challenge geschafft',   emblem:'cycle', when:{stat:'reviews', min:1} },
+    { id:'b_secret',  name:'Schatzsucherin',   desc:'Ein Geheimnis entdeckt',            emblem:'chest', when:{stat:'secrets', min:1} },
+    { id:'b_boss_u1', name:'Hafenheldin',      desc:'Knarz ist dein Freund',             emblem:'anchor',when:{level:'u1boss'} }
+  ],
+
+  ranks: [ {name:'Rookie', xp:0}, {name:'Trainer', xp:300}, {name:'Pro', xp:1200}, {name:'Master', xp:3000} ],
+
+  /* Hidden map treasures: one per unit scene. */
+  secrets: [ { id:'s_u1_shell', unit:'u1', item:'room_shell', x:84, y:16, text:'Du hast eine Glitzermuschel gefunden! ✨' } ],
+
+  /* Companion lines. Max 2 short lines each. */
+  lines: {
+    right: ['Super!', 'Stark! ✨', 'Genau!', 'Volltreffer!', 'Richtig gut!', 'Wow, klasse!', 'Yes! Das sitzt.'],
+    miss:  ["Fast! Probier's nochmal 💪", 'Knapp daneben – du schaffst das!', 'Kein Problem, nochmal!', 'Hmm, fast! Schau nochmal genau.'],
+    demo:  ["Bug gefunden! Jetzt weißt du's.", 'Schau, so geht’s! Das kommt gleich nochmal.'],
+    hint:  ['Psst, ich helf dir! 🤫', 'Hier ein kleiner Tipp für dich.', 'Kein Ding, ich zeig dir was.'],
+    idle:  ['Ich hab drei Kekse … nein, vier? 🍪', 'Umbreon, Sylveon oder Mew? Ich kann mich nie entscheiden!', 'Ein Level am Tag hält das Gehirn fit! 🧠'],
+    brk:   ['Du trainierst schon richtig lange – stark! Kurze Pause? 🧃']
+  }
+};
+</script>

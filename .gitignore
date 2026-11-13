@@ -1,0 +1,9 @@
+node_modules/
+tts/.venv/
+tts/__pycache__/
+tts/voices/
+tts/samples/
+tts/compare/
+*.onnx
+test/shots/
+test/run.log

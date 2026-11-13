@@ -1,0 +1,482 @@
+<script>
+/* ==========================================================================================
+   SCREENS – start, onboarding, map, result, album, shop, room, settings, parent area
+   ========================================================================================== */
+const sparkleField = n => Array.from({ length: n }, (_, i) => `<i style="left:${(i * 37) % 95}%;top:${(i * 53) % 90}%;animation-delay:${(i * .37) % 2.4}s">${ART.fx(i % 4 ? 'star' : 'heart')}</i>`).join('');
+
+SCREENS.start = () => {
+  const ret = S.onboarded, res = ret && S.resume && L(S.resume.levelId);
+  const node = el(`<div class="screen start">
+    <div class="sparkles">${sparkleField(14)}</div>
+    <div><p class="tag">Geheimes Trainingslager</p><h1>Englisch-Camp</h1>
+      <p class="sub">${ret ? `Schön, dass du da bist, ${esc(playerName())}!` : 'Dein geheimes Training. Nur für dich.'}</p></div>
+    <div class="hero">${ART.nuvi(ret ? 'cheer' : 'happy', ret ? 'cheer' : '')}</div>
+    <div class="stack" style="width:100%">
+      <button class="btn pri big block" data-go>${res ? 'Weiter, wo du aufgehört hast' : 'Los geht\'s'}</button>
+      ${res ? '<button class="btn ghost block" data-map>Zur Karte</button>' : ''}
+    </div></div>`);
+  $('[data-go]', node).onclick = () => { if (!S.onboarded) go('onb', 1); else if (res) resumeLevel(); else go('map'); };
+  const m = $('[data-map]', node); if (m) m.onclick = () => go('map');
+  return node;
+};
+
+SCREENS.onb = step => {
+  const dots = `<div class="steps" aria-label="Schritt ${step} von 3">${[1, 2, 3].map(i => `<i class="${i === step ? 'on' : ''}"></i>`).join('')}</div>`;
+  let node;
+  if (step === 1) {
+    node = el(`<div class="screen onb">${dots}
+      <div class="stack center"><div style="width:150px;margin:auto">${ART.nuvi('happy')}</div><h2 style="margin:0">Wie heißt du?</h2></div>
+      <input class="namein" maxlength="16" value="${esc(S.profile.name)}" placeholder="Dein Name" aria-label="Dein Name" autocomplete="off">
+      <button class="btn pri big block" data-n ${S.profile.name ? '' : 'disabled'}>Weiter</button></div>`);
+    const inp = $('.namein', node);
+    const btn = $('[data-n]', node);
+    inp.addEventListener('input', () => { btn.disabled = !inp.value.trim(); });
+    const next = () => { const v = inp.value.trim().slice(0, 16); if (!v) { inp.focus(); return; } S.profile.name = v; save(); go('onb', 2); };
+    $('[data-n]', node).onclick = next;
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') next(); });
+  } else if (step === 2) {
+    node = el(`<div class="screen onb">${dots}<h2 class="center" style="margin:0">Such dir deinen Look aus!</h2>
+      <div class="avgrid">${ART.avatars.map((_, i) => `<button class="avbtn" data-i="${i}" aria-pressed="${S.profile.avatar === i}" aria-label="Avatar ${i + 1}">${ART.avatar(i)}</button>`).join('')}</div>
+      <button class="btn pri big block" data-n>Weiter</button></div>`);
+    $('.avgrid', node).onclick = e => { const b = e.target.closest('.avbtn'); if (!b) return; S.profile.avatar = +b.dataset.i; $$('.avbtn', node).forEach(x => x.setAttribute('aria-pressed', x === b)); Sfx.play('pop'); };
+    $('[data-n]', node).onclick = () => { save(); go('onb', 3); };
+  } else {
+    node = el(`<div class="screen onb">${dots}
+      <div class="hero" style="width:200px">${ART.nuvi('cheer', 'cheer')}</div>
+      <div class="bubble" style="flex:none"><span class="txt">${fmt('Ich bin Nuvi, dein Trainingspartner! [[Hello]], ' + playerName() + '!')}</span><button class="ibtn" data-say aria-label="Anhören">${IC('speaker')}</button></div>
+      <button class="btn pri big block" data-n>Zum ersten Level!</button></div>`);
+    $('[data-say]', node).onclick = () => sayEn('Hello, ' + playerName() + '!');
+    setTimeout(() => sayEn('Hello, ' + playerName() + '!'), 300);
+    $('[data-n]', node).onclick = () => { S.onboarded = true; save(); startLevel(CONTENT.levels[0].id); };
+  }
+  return node;
+};
+
+/* ---------------- map ---------------- */
+const NODE_GAP = 118;
+function unitSection(u) {
+  const lvls = unitLevels(u.id), secrets = unitSecrets(u.id).filter(l => levelState(l) !== 'hidden');
+  const xs = [50, 74, 50, 26];
+  const pts = lvls.map((l, i) => ({ l, x: xs[i % 4], y: 70 + i * NODE_GAP }));
+  secrets.forEach((l, i) => pts.push({ l, x: 82, y: pts[pts.length - 1].y + 40 + i * 90, secret: true }));
+  const H = (pts.length ? pts[pts.length - 1].y : 0) + 90;
+  const main = pts.filter(p => !p.secret);
+  const d = main.map((p, i) => i ? `C ${main[i - 1].x} ${main[i - 1].y + NODE_GAP / 2} ${p.x} ${p.y - NODE_GAP / 2} ${p.x} ${p.y}` : `M ${p.x} ${p.y}`).join(' ');
+  const nxt = nextLevel();
+  const stage = monsterStage(u.id);
+  const sec = CONTENT.secrets.find(s => s.unit === u.id && !S.secrets.includes(s.id));
+  const nodes = pts.map(p => {
+    const st = levelState(p.l), rec = S.levels[p.l.id];
+    const isNext = nxt && nxt.id === p.l.id;
+    const icon = p.l.type === 'boss' ? `<div style="width:70px">${ART.crab(isDone(p.l.id) ? 'happy' : 'grumpy')}</div>` : p.secret ? IC('sparkle') : IC(p.l.type);
+    return `<button class="node ${st} ${isNext ? 'next' : ''} ${p.l.type === 'boss' ? 'boss' : ''} ${p.secret ? 'secret' : ''}" style="left:${p.x}%;top:${p.y}px" data-l="${p.l.id}" aria-label="${esc(p.l.title)}${st === 'locked' ? ', gesperrt' : st === 'done' ? ', ' + rec.stars + ' Sterne' : ''}">
+      ${p.l.type === 'boss' ? icon : `<span class="ic" style="width:40px;height:40px;display:grid">${icon}</span>`}
+      ${st === 'done' ? `<span class="stars">${[1, 2, 3].map(k => ART.star(k <= rec.stars)).join('')}</span>` : ''}
+      ${st === 'locked' ? `<span class="lock">${IC('lock')}</span>` : ''}
+      <span class="lbl">${esc(p.l.title)}</span></button>`;
+  }).join('');
+  const nxtPt = nxt && pts.find(p => p.l.id === nxt.id);
+  return `<section class="unit" style="--accent:${u.accent}">
+    <div class="unit-scene">${ART.scene(u.scene, H + 90)}</div>
+    <div class="unit-head"><div class="mon">${ART.monster(stage ? u.monster[stage - 1] : 'locked', '', stage ? u.monsterNames[stage - 1] : 'Unbekanntes Monster')}</div>
+      <div class="grow"><span class="tag">Route ${u.num}</span><h2>${esc(u.title)}</h2><small class="muted" style="font-weight:800">${esc(u.subtitle)} · ${unitStars(u.id)}/${lvls.length * 3} ${ART.star(true).replace('<svg', '<svg style="width:14px;height:14px;display:inline;vertical-align:-2px"')}</small></div></div>
+    <div class="path" style="height:${H}px">
+      <svg class="trail" viewBox="0 0 100 ${H}" preserveAspectRatio="none"><path d="${d}" fill="none" stroke="#fff" stroke-width="14" stroke-linecap="round" vector-effect="non-scaling-stroke" opacity=".85"/><path d="${d}" fill="none" stroke="${u.accent}" stroke-width="4" stroke-dasharray="2 12" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg>
+      ${nodes}
+      ${nxtPt ? `<div class="nuvi-pin" style="left:calc(${nxtPt.x}% + ${nxtPt.x > 50 ? -66 : 66}px);top:${nxtPt.y}px">${ART.nuvi('happy')}</div>` : ''}
+      ${sec ? `<button class="spark-btn" style="left:${sec.x}%;top:${sec.y}px" data-secret="${sec.id}" aria-label="Etwas glitzert hier">${IC('sparkle')}</button>` : ''}
+    </div></section>`;
+}
+function soonCard(u) {
+  return `<div class="soon" style="--accent:${u.accent}"><span class="ribbon">COMING SOON</span><div class="mon">${ART.monster('locked')}</div>
+    <div><span class="tag">Route ${u.num}</span><h3>${esc(u.title)}</h3><small class="muted" style="font-weight:800">${esc(u.subtitle)}</small></div>
+    <span style="margin-left:auto;width:28px;color:var(--ink2)">${IC('lock', 'Gesperrt')}</span></div>`;
+}
+function topBar() {
+  const r = rankOf(S.xp), nr = nextRank(S.xp), st = streakNow(), goal = levelsToday() >= 1;
+  return `<div class="topbar">
+      <button class="me" data-nav="room" aria-label="Mein Zimmer"><span class="av">${ART.avatar(S.profile.avatar, S.equip)}</span><span style="min-width:0"><b>${esc(playerName())}</b><small>${r.name} · ${S.xp} XP</small></span></button>
+      <span class="chip" aria-label="${S.coins} Münzen">${ART.coin()} ${S.coins}</span>
+      <button class="ibtn" data-nav="settings" aria-label="Einstellungen">${IC('sliders')}</button>
+      <button class="ibtn hold" data-parent aria-label="Elternbereich: gedrückt halten"><span class="ring"></span>${IC('gear')}${backupDue() ? '<span class="dot"></span>' : ''}</button>
+    </div>
+    <div class="stats"><span class="chip">${ART.flame()} ${st} ${st === 1 ? 'Tag' : 'Tage'}</span>
+      <span class="chip">${goal ? IC('check') + ' Tagesziel geschafft!' : '🎯 Tagesziel: 1 Level'}</span></div>`;
+}
+function navBar(cur) {
+  const items = [['map', 'Karte'], ['album', 'Album'], ['shop', 'Shop'], ['room', 'Zimmer']];
+  return `<nav class="nav">${items.map(([k, l]) => `<button data-nav="${k}" ${cur === k ? 'aria-current="page"' : ''}>${IC(k === 'room' ? 'home' : k)}${l}</button>`).join('')}</nav>`;
+}
+function wireCommon(node) {
+  node.addEventListener('click', e => {
+    const n = e.target.closest('[data-nav]'); if (n) go(n.dataset.nav);
+  });
+  const g = $('[data-parent]', node);
+  if (g) {
+    holdButton(g, 1400, () => go('parent'));
+    g.addEventListener('click', () => toast('Für Eltern: Zahnrad gedrückt halten. 🔒', [], 'happy', 2500));
+  }
+}
+SCREENS.map = () => {
+  const open = CONTENT.units.filter(u => u.status === 'open'), soon = CONTENT.units.filter(u => u.status !== 'open');
+  const due = dueIds();
+  const node = el(`<div class="screen">${topBar()}
+    <div class="scroll"><div class="mapwrap">
+      ${DEBUG ? `<div class="debugbox">${esc(validationText())}</div>` : ''}
+      ${due.length >= 5 ? `<div class="banner">${IC('review')}<div class="grow"><b>Review Challenge</b><br><small class="muted" style="font-weight:700">${due.length} Wörter wollen dich wiedersehen.</small></div><button class="btn small pri" data-review>Los!</button></div>` : ''}
+      ${S.settings.turbo && learnedIds().length >= 4 ? `<div class="banner">${IC('bolt')}<div class="grow"><b>Turbo-Challenge</b><br><small class="muted" style="font-weight:700">60 Sek. · Rekord: ${S.stats.turboBest}</small></div><button class="btn small" data-turbo>Start</button></div>` : ''}
+      ${open.map(unitSection).join('')}${soon.map(soonCard).join('')}
+    </div></div>${navBar('map')}</div>`);
+  const nv = $('.nav', node);
+  const dk = dock('happy', '');
+  node.insertBefore(dk, nv);
+  const say = () => {
+    if (!S.levels[CONTENT.levels[0].id]) return 'Tippe auf den leuchtenden Punkt! ✨';
+    if (S.resume && L(S.resume.levelId)) return `Mach weiter mit „${L(S.resume.levelId).title}“!`;
+    if (!levelsToday()) return 'Tagesziel: [[1 Level]] heute. Du schaffst das! 🎯';
+    if (due.length >= 5) return 'Ein paar Wörter wollen wiederholt werden. 🔁';
+    const nx = nextLevel();
+    return nx ? `Tagesziel geschafft! Lust auf „${nx.title}“?` : rnd(CONTENT.lines.idle);
+  };
+  setDock(dk, levelsToday() ? 'proud' : 'happy', say());
+  wireCommon(node);
+  node.addEventListener('click', e => {
+    const b = e.target.closest('[data-l]');
+    if (b) {
+      const lv = L(b.dataset.l), st = levelState(lv);
+      if (st === 'locked') { setDock(dk, 'thinking', 'Erst das Level davor – dann geht\'s hier weiter! 🙂'); vib(10); return; }
+      levelSheet(lv);
+    }
+    const s = e.target.closest('[data-secret]');
+    if (s) findSecret(s.dataset.secret);
+    if (e.target.closest('[data-review]')) startReview();
+    if (e.target.closest('[data-turbo]')) startTurbo();
+  });
+  setTimeout(() => {
+    const n = $('.node.next', node) || $$('.node.done', node).pop();
+    if (n) n.scrollIntoView({ block: 'center', behavior: 'auto' });
+  }, 30);
+  return node;
+};
+function levelSheet(lv) {
+  const rec = S.levels[lv.id], done = rec && rec.done;
+  const resumeHere = S.resume && S.resume.levelId === lv.id;
+  const it = lv.reward && ITEM(lv.reward);
+  sheet(`<div class="row"><span style="width:44px;color:var(--pri)">${IC(lv.type)}</span><div><span class="tag">${{ catch:'Fangen', listen:'Hören', memory:'Memory', dialogue:'Gespräch', spell:'Schreiben', codelab:'Code Lab', bughunt:'Bug-Jagd', boss:'Boss', falling:'Mini-Game' }[lv.type] || ''} · ca. ${esc(lv.minutes || '3')} Min.</span><h2 style="margin:0">${esc(lv.title)}</h2></div></div>
+    <div class="dock" style="padding:6px 0"><div class="mini">${ART.nuvi(lv.type === 'boss' ? 'surprised' : 'happy')}</div><div class="bubble"><span class="txt">${fmt(lv.story ? lv.story.before : '')}</span><button class="ibtn" data-sd aria-label="Vorlesen">${IC('speaker')}</button></div></div>
+    <div class="row wrap" style="margin:6px 0 14px">${done ? `<span class="chip">${[1, 2, 3].map(k => ART.star(k <= rec.stars)).join('')}</span>` : ''}
+      <span class="chip">${it && !S.owned.includes(it.id) ? '🎁 Überraschung' : ART.coin() + ' Bonus-Münzen'}</span></div>
+    <div class="stack"><button class="btn pri big block" data-start>${resumeHere ? 'Weitermachen' : done ? 'Nochmal spielen' : 'Start!'}</button>
+    ${resumeHere ? '<button class="btn ghost block" data-fresh>Von vorne beginnen</button>' : ''}</div>`, sh => {
+    sh.querySelector('[data-sd]').onclick = () => sayDe(plain(lv.story ? lv.story.before : ''));
+    sh.querySelector('[data-start]').onclick = () => { closeSheet(); resumeHere ? resumeLevel() : startLevel(lv.id); };
+    const f = sh.querySelector('[data-fresh]'); if (f) f.onclick = () => { closeSheet(); startLevel(lv.id); };
+  });
+}
+function findSecret(id) {
+  const s = CONTENT.secrets.find(x => x.id === id);
+  if (!s || S.secrets.includes(id)) return;
+  S.secrets.push(id);
+  if (!S.owned.includes(s.item)) S.owned.push(s.item);
+  const fresh = checkBadges(); save();
+  Sfx.play('reward'); vib(40);
+  go('map');
+  toast(s.text + (fresh.length ? ` Neuer Sticker: „${fresh.map(b => b.name).join(', ')}“!` : ''), [{ label: 'Ins Zimmer', pri: true, fn: () => go('room') }], 'surprised');
+}
+
+/* ---------------- result ---------------- */
+SCREENS.result = r => {
+  const lv = r.lv;
+  const title = r.turbo != null ? (r.best ? 'Neuer Rekord!' : 'Turbo geschafft!') : r.stars === 3 ? 'Perfekt!' : r.stars === 2 ? 'Super gemacht!' : 'Geschafft!';
+  const node = el(`<div class="screen result"><div class="sparkles">${sparkleField(10)}</div>
+    <div><p class="tag">${esc(lv.title)}</p><h1 style="margin:2px 0;font-size:2rem">${title}</h1></div>
+    ${r.turbo != null ? `<div class="bigword"><span style="font-size:3rem;font-weight:900">${r.turbo}</span><br><span class="muted" style="font-size:1rem">richtige Antworten</span></div>`
+      : `<div class="bigstars" aria-label="${r.stars} von 3 Sternen">${[1, 2, 3].map(k => ART.star(k <= r.stars, k <= r.stars ? 'on' : '')).join('')}</div>`}
+    <div class="gains"><span class="chip">+${r.xp} XP</span><span class="chip">${ART.coin()} +${r.coins}</span></div>
+    ${r.story ? `<div class="bubble" style="flex:none;width:100%"><span class="txt">${fmt(r.story)}</span><button class="ibtn" data-sd aria-label="Vorlesen">${IC('speaker')}</button></div>` : ''}
+    <div class="reveal-area stack" style="width:100%;align-items:center">
+      ${r.prize ? `<button class="gift" data-gift aria-label="Geschenk öffnen">${ART.gift(false)}</button><b>Tipp aufs Geschenk!</b>` : ''}
+    </div>
+    <div class="stack" style="width:100%"><button class="btn pri big block" data-next ${r.prize ? 'hidden' : ''}>Weiter</button>
+      ${lv.pseudo ? '' : '<button class="btn ghost block" data-again>Nochmal spielen</button>'}</div></div>`);
+  Sfx.play('reward'); vib([30, 40, 30]);
+  if (r.stars === 3 || r.best) setTimeout(() => burst(innerWidth / 2, innerHeight * .3, 18), 400);
+  const area = $('.reveal-area', node);
+  const sd = $('[data-sd]', node); if (sd) sd.onclick = () => sayDe(plain(r.story));
+  const gift = $('[data-gift]', node);
+  if (gift) gift.onclick = async () => {
+    gift.style.animation = 'none'; gift.innerHTML = ART.gift(true); Sfx.play('pop');
+    await sleep(reducedMotion() ? 0 : 350);
+    const parts = [];
+    if (r.prize.item) { const it = ITEM(r.prize.item); parts.push(`<div class="prize glowdisc">${ART.item(it.id, '', it.name)}</div><b>Neu: ${esc(it.name)}!</b><small class="muted" style="font-weight:700">${it.kind === 'acc' ? 'Probier es im Zimmer an!' : 'Stell es in dein Zimmer!'}</small>`); }
+    else parts.push(`<div class="prize" style="width:90px">${ART.coin()}</div><b>+${r.prize.coins} Bonus-Münzen!</b>`);
+    area.innerHTML = parts.join('');
+    Sfx.play('coin'); burst(innerWidth / 2, innerHeight * .55, 14);
+    await sleep(900);
+    const extra = [];
+    (r.badges || []).forEach(b => extra.push(`<div class="row" style="justify-content:center"><div class="evo" style="width:56px">${ART.badge(b, true, '')}</div><b>Neuer Sticker: ${esc(b.name)}</b></div>`));
+    if (r.evolve) { const u = U(r.evolve.unit); extra.push(`<div class="row" style="justify-content:center"><div class="evo">${ART.monster(u.monster[r.evolve.stage - 1])}</div><b>${r.evolve.stage === 1 ? `${u.monsterNames[0]} ist geschlüpft!` : `${u.monsterNames[r.evolve.stage - 2]} entwickelt sich zu ${u.monsterNames[r.evolve.stage - 1]}!`}</b></div>`); }
+    if (r.rankUp) extra.push(`<div class="chip" style="font-size:1rem">🏅 Neuer Rang: ${esc(r.rankUp)}!</div>`);
+    if (extra.length) { area.insertAdjacentHTML('beforeend', extra.join('')); Sfx.play('reward'); }
+    $('[data-next]', node).hidden = false; $('[data-next]', node).focus();
+  };
+  if (!r.prize && ((r.badges || []).length)) area.innerHTML = r.badges.map(b => `<div class="row" style="justify-content:center"><div style="width:56px">${ART.badge(b, true, '')}</div><b>Neuer Sticker: ${esc(b.name)}</b></div>`).join('');
+  $('[data-next]', node).onclick = () => go('map');
+  const ag = $('[data-again]', node); if (ag) ag.onclick = () => startLevel(lv.id);
+  return node;
+};
+
+/* ---------------- album ---------------- */
+SCREENS.album = (tab = 'mon') => {
+  const tabs = [['mon', 'Monster'], ['st', 'Sticker'], ['w', 'Wörter']];
+  let body = '';
+  if (tab === 'mon') {
+    body = CONTENT.units.map(u => {
+      const stg = u.status === 'open' ? monsterStage(u.id) : 0;
+      const lv = unitLevels(u.id);
+      return `<div class="card stack center" style="margin-bottom:12px">
+        <div class="mon-big">${ART.monster(stg ? u.monster[stg - 1] : 'locked', '', stg ? u.monsterNames[stg - 1] : 'Unbekannt')}</div>
+        <b style="font-size:1.2rem">${stg ? esc(u.monsterNames[stg - 1]) : '???'}</b>
+        ${u.status === 'open' ? `<div class="row" style="justify-content:center">${[1, 2, 3].map(k => `<span class="chip" style="${k <= stg ? '' : 'opacity:.4'}">Stufe ${k}</span>`).join('')}</div>
+        <small class="muted" style="font-weight:700">${stg === 3 ? 'Voll entwickelt! 🌟' : stg ? `Sammle Sterne in ${esc(u.title)}, damit es sich entwickelt (${unitStars(u.id)}/${lv.length * 3}).` : 'Spiel das erste Level, dann schlüpft es!'}</small>`
+        : `<small class="muted" style="font-weight:700">${esc(u.title)} – coming soon</small>`}</div>`;
+    }).join('');
+  } else if (tab === 'st') {
+    body = `<div class="grid3">${CONTENT.badges.map(b => { const own = S.badges.includes(b.id); return `<div class="slotcard ${own ? '' : 'locked'}">${ART.badge(b, own)}<b>${esc(b.name)}</b><small class="muted">${esc(b.desc)}</small></div>`; }).join('')}</div>`;
+  } else {
+    const ids = learnedIds();
+    body = ids.length ? `<div class="stack">${ids.map(id => { const w = W(id), r = S.words[id]; return `<div class="wordrow">${ART.pic(w, 'pic', false)}<div class="grow">${enSpan(w.en)}<br><small class="muted" style="font-weight:700">${esc(sub(w.de))}</small></div>
+      <div class="boxes" aria-label="Lernstufe ${r.box} von 4">${[1, 2, 3, 4].map(k => `<i class="${k <= r.box ? 'on' : ''}"></i>`).join('')}</div>
+      <button class="ibtn" data-say-en="${esc(sub(w.en))}" aria-label="Anhören">${IC('speaker')}</button></div>`; }).join('')}
+      <p class="center muted" style="font-weight:700">Noch ${CONTENT.words.length - ids.length} Wörter zu entdecken.</p></div>`
+      : `<p class="center muted" style="font-weight:700">Spiel ein Level – dann landen hier deine Wörter!</p>`;
+  }
+  const node = el(`<div class="screen">${topBar()}
+    <div class="tabs" role="tablist">${tabs.map(([k, l]) => `<button role="tab" aria-selected="${k === tab}" data-tab="${k}">${l}</button>`).join('')}</div>
+    <div class="scroll pad">${body}</div>${navBar('album')}</div>`);
+  wireCommon(node);
+  node.addEventListener('click', e => {
+    const t = e.target.closest('[data-tab]'); if (t) go('album', t.dataset.tab);
+    const s = e.target.closest('[data-say-en]'); if (s) sayEn(s.dataset.sayEn);
+  });
+  return node;
+};
+
+/* ---------------- shop ---------------- */
+SCREENS.shop = () => {
+  const items = CONTENT.items.filter(i => i.price != null);
+  const node = el(`<div class="screen">${topBar()}
+    <div class="scroll pad"><div class="dock" style="padding:0 0 10px"><div class="mini">${ART.nuvi('proud')}</div><div class="bubble"><span class="txt">Willkommen im Shop! Münzen gibt's für jedes Level. 🪙</span></div></div>
+    <div class="grid2">${items.map(it => { const own = S.owned.includes(it.id), can = S.coins >= it.price; return `<div class="slotcard"><div class="inv" style="width:100%;padding:6px">${ART.item(it.id, 'it', it.name)}</div><b>${esc(it.name)}</b>
+      ${own ? `<span class="chip">${IC('check')} Gehört dir</span>` : `<button class="btn small block ${can ? 'pri' : ''}" data-buy="${it.id}" ${can ? '' : 'disabled'} aria-label="${esc(it.name)} kaufen für ${it.price} Münzen"><span class="price">${ART.coin()} ${it.price}</span></button>${can ? '' : `<small class="muted">Noch ${it.price - S.coins} Münzen</small>`}`}</div>`; }).join('')}</div></div>${navBar('shop')}</div>`);
+  wireCommon(node);
+  node.addEventListener('click', e => {
+    const b = e.target.closest('[data-buy]'); if (!b) return;
+    const it = ITEM(b.dataset.buy);
+    if (S.owned.includes(it.id) || S.coins < it.price) return;
+    S.coins -= it.price; S.owned.push(it.id); save();
+    Sfx.play('coin'); burst(...center(b));
+    go('shop');
+    toast(`${it.name} gehört jetzt dir! ✨`, [{ label: 'Ins Zimmer', pri: true, fn: () => go('room') }], 'cheer');
+  });
+  return node;
+};
+
+/* ---------------- room + avatar ---------------- */
+SCREENS.room = () => {
+  const accs = CONTENT.items.filter(i => i.kind === 'acc' && S.owned.includes(i.id));
+  const rooms = CONTENT.items.filter(i => i.kind === 'room' && S.owned.includes(i.id));
+  const placed = rooms.filter(i => S.room.includes(i.id));
+  const node = el(`<div class="screen">${topBar()}
+    <div class="scroll pad stack">
+      <div class="room" aria-label="Dein Zimmer">${ART.roomBg()}
+        ${placed.map(i => `<div class="ri" style="left:${i.pos.x}%;top:${i.pos.y}%;width:${i.pos.w}%">${ART.item(i.id, '', i.name)}</div>`).join('')}
+        <div class="ra">${ART.avatar(S.profile.avatar, S.equip)}</div></div>
+      <h2 style="margin:4px 0 0;font-size:1.1rem">Dein Look</h2>
+      <div class="grid3">${ART.avatars.map((_, i) => `<button class="slotcard inv" style="border:0;${S.profile.avatar === i ? 'outline:3px solid var(--pri)' : ''}" data-av="${i}" aria-label="Avatar ${i + 1}" aria-pressed="${S.profile.avatar === i}">${ART.avatar(i)}</button>`).join('').replace(/<svg viewBox="0 0 100 100" class="avatar"/g, '<svg viewBox="0 0 100 100" class="avatar it"')}</div>
+      <h2 style="margin:4px 0 0;font-size:1.1rem">Accessoires</h2>
+      ${accs.length ? `<div class="grid3">${accs.map(i => { const on = S.equip[i.slot] === i.id; return `<button class="slotcard inv" style="border:0;${on ? 'outline:3px solid var(--pri)' : ''}" data-acc="${i.id}" aria-pressed="${on}">${ART.item(i.id, 'it', '')}<b>${esc(i.name)}</b><small class="muted">${on ? 'An ✓' : 'Anziehen'}</small></button>`; }).join('')}</div>` : '<p class="muted" style="font-weight:700">Noch keine – spiel Level oder schau in den Shop!</p>'}
+      <h2 style="margin:4px 0 0;font-size:1.1rem">Zimmer-Sachen</h2>
+      ${rooms.length ? `<div class="grid3">${rooms.map(i => { const on = S.room.includes(i.id); return `<button class="slotcard inv" style="border:0;${on ? 'outline:3px solid var(--pri)' : ''}" data-room="${i.id}" aria-pressed="${on}">${ART.item(i.id, 'it', '')}<b>${esc(i.name)}</b><small class="muted">${on ? 'Steht ✓' : 'Aufstellen'}</small></button>`; }).join('')}</div>` : '<p class="muted" style="font-weight:700">Noch leer – Belohnungen landen hier!</p>'}
+    </div>${navBar('room')}</div>`);
+  wireCommon(node);
+  node.addEventListener('click', e => {
+    const a = e.target.closest('[data-acc]'), r = e.target.closest('[data-room]'), v = e.target.closest('[data-av]');
+    if (a) { const it = ITEM(a.dataset.acc); S.equip[it.slot] = S.equip[it.slot] === it.id ? null : it.id; }
+    else if (r) { const id = r.dataset.room; S.room = S.room.includes(id) ? S.room.filter(x => x !== id) : S.room.concat(id); }
+    else if (v) S.profile.avatar = +v.dataset.av;
+    else return;
+    Sfx.play('pop'); save();
+    const sc = $('.scroll', node).scrollTop; go('room'); $('.scroll', app()).scrollTop = sc;
+  });
+  return node;
+};
+
+/* ---------------- settings (child) ---------------- */
+function sw(key, label, sub2) { return `<div class="set"><div class="grow"><b>${label}</b>${sub2 ? `<small>${sub2}</small>` : ''}</div><button class="switch" role="switch" aria-checked="${!!S.settings[key]}" data-sw="${key}" aria-label="${label}"></button></div>`; }
+SCREENS.settings = () => {
+  const voice = typeof AUDIO !== 'undefined' && Object.keys(AUDIO).length ? 'Britische Aufnahmen (Cori)' + (Speech.en ? ' · Ersatz: ' + Speech.en.name : '') : Speech.en ? `${Speech.en.name} (${Speech.en.lang})` : Speech.ok ? (Speech.loaded ? 'keine englische Stimme gefunden' : 'Standard-Stimme') : 'Sprachausgabe nicht verfügbar';
+  const node = el(`<div class="screen"><div class="topbar"><button class="ibtn" data-nav="map" aria-label="Zurück">${IC('back')}</button><h2 style="margin:0;flex:1">Einstellungen</h2></div>
+    <div class="scroll pad stack">
+      <div class="set"><div class="grow"><b>Dein Name</b></div><input class="namein" style="max-width:180px;min-height:48px;font-size:1.1rem" maxlength="16" value="${esc(S.profile.name)}" aria-label="Dein Name" data-name></div>
+      <b>Farbwelt</b>
+      <div class="themes">${[['sylveon', 'Sylveon'], ['umbreon', 'Umbreon'], ['mew', 'Mew']].map(([k, l]) => `<button class="th-${k}" data-theme="${k}" aria-pressed="${S.settings.theme === k}">${l}</button>`).join('')}</div>
+      ${sw('dys', 'Lese-Schrift', 'Besser lesbare Schrift mit mehr Abstand')}
+      ${sw('sfx', 'Soundeffekte')}${sw('music', 'Musik', 'Leise Hintergrundmusik')}${sw('haptics', 'Vibration', 'Kurzes Brummen bei Antworten')}
+      ${sw('turbo', 'Turbo-Challenge zeigen', 'Freiwillig auf Zeit – ohne Verlieren')}
+      <div class="set"><div class="grow"><b>Stimme testen</b><small>${esc(voice)}</small></div><button class="btn small pri" data-test>${IC('speaker')} Test</button></div>
+      ${Speech.noEn ? '<div class="warn">Keine englische Stimme gefunden. Manche Handys brauchen eine installierte Stimme – frag deine Eltern (Anleitung im Elternbereich).</div>' : ''}
+    </div></div>`);
+  wireCommon(node);
+  $('[data-name]', node).addEventListener('change', e => { S.profile.name = e.target.value.trim().slice(0, 16) || S.profile.name; e.target.value = S.profile.name; save(); });
+  $('[data-test]', node).onclick = () => sayEn("Hello! I'm Nuvi. How are you?");
+  node.addEventListener('click', e => {
+    const t = e.target.closest('[data-theme]');
+    if (t) { S.settings.theme = t.dataset.theme; save(); applyLook(); go('settings'); return; }
+    const s = e.target.closest('[data-sw]');
+    if (s) {
+      const k = s.dataset.sw; S.settings[k] = !S.settings[k]; save(); applyLook();
+      s.setAttribute('aria-checked', S.settings[k]);
+      if (k === 'music') { if (S.settings.music) { Sfx.unlock(); Sfx.startMusic(); } else Sfx.stopMusic(); }
+      if (k === 'haptics' && S.settings.haptics) vib(40);
+    }
+  });
+  return node;
+};
+
+/* ---------------- parent area ---------------- */
+SCREENS.parent = (mode) => {
+  if (mode !== 'open') return pinScreen();
+  return parentPanel();
+};
+function pinScreen() {
+  const setting = !S.parent.pin;
+  let first = null, val = '';
+  const node = el(`<div class="screen onb"><div class="topbar" style="padding:0"><button class="ibtn" data-nav="map" aria-label="Zurück">${IC('back')}</button><h2 style="margin:0;flex:1">Elternbereich</h2></div>
+    <p class="center msg" style="font-weight:800">${setting ? 'Lege eine 4-stellige Eltern-PIN fest.' : 'Bitte Eltern-PIN eingeben.'}</p>
+    <div class="pins">${'<i></i>'.repeat(4)}</div>
+    <div class="keypad">${[1, 2, 3, 4, 5, 6, 7, 8, 9].map(n => `<button class="btn" data-k="${n}">${n}</button>`).join('')}<button class="btn ghost" data-k="del" aria-label="Löschen">⌫</button><button class="btn" data-k="0">0</button><span></span></div>
+    <p class="center muted" style="font-size:.85rem;font-weight:700">${setting ? 'Die PIN wird nur auf diesem Gerät gespeichert.' : 'PIN vergessen? Siehe README (#pinreset).'}</p></div>`);
+  const msg = $('.msg', node);
+  const paint = () => $$('.pins i', node).forEach((p, i) => p.classList.toggle('on', i < val.length));
+  wireCommon(node);
+  $('.keypad', node).onclick = e => {
+    const b = e.target.closest('[data-k]'); if (!b) return;
+    if (b.dataset.k === 'del') val = val.slice(0, -1); else if (val.length < 4) val += b.dataset.k;
+    paint();
+    if (val.length < 4) return;
+    setTimeout(() => {
+      if (setting) {
+        if (!first) { first = val; val = ''; msg.textContent = 'Bitte PIN zur Bestätigung wiederholen.'; }
+        else if (first === val) { S.parent.pin = val; save(); go('parent', 'open'); return; }
+        else { first = null; val = ''; msg.textContent = 'Die PINs waren unterschiedlich. Bitte neu festlegen.'; }
+      } else if (val === S.parent.pin) { go('parent', 'open'); return; }
+      else { val = ''; msg.textContent = 'Diese PIN stimmt nicht. Bitte nochmal.'; vib(60); }
+      paint();
+    }, 150);
+  };
+  return node;
+}
+function parentPanel() {
+  const days = Array.from({ length: 7 }, (_, i) => today() - 6 + i);
+  const mins = days.map(d => Math.round((S.stats.playSec[dayKey(d)] || 0) / 60));
+  const maxM = Math.max(10, ...mins);
+  const weak = learnedIds().map(id => ({ id, r: S.words[id] })).filter(x => x.r.wrong > 0)
+    .sort((a, b) => (b.r.wrong / (b.r.right + b.r.wrong)) - (a.r.wrong / (a.r.right + a.r.wrong)) || a.r.box - b.r.box).slice(0, 8);
+  const opt = (vals, cur, fmtFn) => vals.map(v => `<option value="${v}" ${+cur === v ? 'selected' : ''}>${fmtFn(v)}</option>`).join('');
+  const node = el(`<div class="screen"><div class="topbar"><button class="ibtn" data-nav="map" aria-label="Zurück zur Karte">${IC('back')}</button><h2 style="margin:0;flex:1">Elternbereich</h2></div>
+    <div class="scroll pad stack">
+      ${!Store.ok ? '<div class="warn">⚠ Speichern ist in diesem Browser nicht möglich (z. B. privater Modus oder Datei-Modus). Der Fortschritt geht beim Schließen verloren. Bitte die App über eine https-Adresse öffnen oder regelmäßig exportieren.</div>' : ''}
+      ${backupDue() ? '<div class="warn">💾 Zeit für ein Backup! Unten auf „Exportieren“ tippen.</div>' : ''}
+      ${Speech.noEn || !Speech.ok ? '<div class="warn">Keine englische Stimme gefunden. Android: Einstellungen › System › Sprachen › Sprachausgabe › „Englisch (Vereinigtes Königreich)“ installieren. iOS: Einstellungen › Bedienungshilfen › Gesprochene Inhalte › Stimmen › Englisch (UK). Ohne Stimme zeigt die App Text an.</div>' : ''}
+      <div class="card stack"><b>Spielzeit (Minuten, letzte 7 Tage)</b>
+        <div class="bars">${mins.map((m, i) => `<div><span>${m}</span><i style="height:${Math.round(m / maxM * 64) + 2}px"></i><span>${['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'][new Date(days[i] * 864e5).getUTCDay()]}</span></div>`).join('')}</div>
+        <small class="muted">Level gesamt: ${S.stats.levelsDone} · Wörter gelernt: ${learnedIds().length}/${CONTENT.words.length} · Serie: ${streakNow()} · Fällig: ${dueIds().length}</small></div>
+      <div class="card stack"><b>Wörter, die noch schwerfallen</b>
+        ${weak.length ? `<table class="tbl"><tr><th>Englisch</th><th>Deutsch</th><th>✓/✗</th><th>Box</th></tr>${weak.map(x => { const w = W(x.id); return `<tr><td lang="en-GB">${esc(sub(w.en))}</td><td>${esc(sub(w.de))}</td><td>${x.r.right}/${x.r.wrong}</td><td>${x.r.box}</td></tr>`; }).join('')}</table>` : '<small class="muted">Noch keine – super!</small>'}</div>
+      <div class="card stack"><b>Einstellungen</b>
+        <div class="set"><div class="grow"><b>Pausen-Hinweis nach</b><small>Nuvi schlägt eine Pause vor (nicht blockierend)</small></div><select class="sel" data-sel="breakMin">${opt([0, 10, 15, 20, 30], S.settings.breakMin, v => v ? v + ' Min.' : 'aus')}</select></div>
+        <div class="set"><div class="grow"><b>Backup-Erinnerung</b></div><select class="sel" data-sel="backupDays">${opt([0, 3, 7, 14, 30], S.settings.backupDays, v => v ? 'alle ' + v + ' Tage' : 'aus')}</select></div>
+        <div class="set"><div class="grow"><b>Farbwelt</b></div><select class="sel" data-theme-sel>${['sylveon', 'umbreon', 'mew'].map(t => `<option value="${t}" ${S.settings.theme === t ? 'selected' : ''}>${t[0].toUpperCase() + t.slice(1)}</option>`).join('')}</select></div>
+        ${sw('sfx', 'Soundeffekte')}${sw('music', 'Musik')}
+        <div class="set"><div class="grow"><b>Alle Level freischalten</b></div><button class="switch" role="switch" aria-checked="${S.parent.unlockAll}" data-unlock aria-label="Alle Level freischalten"></button></div></div>
+      <div class="card stack"><b>Backup</b>
+        <button class="btn block" data-export>${IC('download')} Fortschritt exportieren</button>
+        <textarea class="ta" data-ta aria-label="Backup-Daten (JSON)" placeholder="Hier erscheint das Backup zum Kopieren – oder füge ein Backup ein und tippe auf „Importieren“."></textarea>
+        <div class="row"><label class="btn grow" style="cursor:pointer">${IC('upload')} Datei wählen<input type="file" accept="application/json,.json" data-file hidden></label><button class="btn grow" data-import>Importieren</button></div>
+        <small class="muted">Letztes Backup: ${S.lastBackupDay != null ? dayKey(S.lastBackupDay) : 'noch nie'}</small></div>
+      <div class="card stack"><b>PIN</b><button class="btn block" data-pin>PIN ändern</button></div>
+      <div class="card stack"><b>Gefahrenzone</b><button class="btn block" data-reset>Fortschritt zurücksetzen</button><div data-resetbox></div></div>
+      <div class="card stack"><b>Inhalts-Check</b><div class="debugbox">${esc(validationText())}</div>
+        ${DEBUG ? '<button class="btn block" data-due>Debug: alle gelernten Wörter fällig machen</button>' : ''}<small class="muted">Version 1 · Debug-Modus: „#debug“ an die Adresse hängen.</small></div>
+    </div></div>`);
+  wireCommon(node);
+  const ta = $('[data-ta]', node);
+  node.addEventListener('change', e => {
+    const s = e.target.closest('[data-sel]'); if (s) { S.settings[s.dataset.sel] = +s.value; save(); }
+    if (e.target.matches('[data-theme-sel]')) { S.settings.theme = e.target.value; save(); applyLook(); }
+    if (e.target.matches('[data-file]')) {
+      const f = e.target.files[0]; if (!f) return;
+      const rd = new FileReader(); rd.onload = () => { ta.value = rd.result; doImport(ta.value); }; rd.onerror = () => toast('Datei konnte nicht gelesen werden.'); rd.readAsText(f);
+    }
+  });
+  node.addEventListener('click', e => {
+    const t = e.target;
+    const swb = t.closest('[data-sw]');
+    if (swb) { const k = swb.dataset.sw; S.settings[k] = !S.settings[k]; swb.setAttribute('aria-checked', S.settings[k]); save(); if (k === 'music') S.settings.music ? Sfx.startMusic() : Sfx.stopMusic(); }
+    if (t.closest('[data-unlock]')) { S.parent.unlockAll = !S.parent.unlockAll; t.closest('[data-unlock]').setAttribute('aria-checked', S.parent.unlockAll); save(); }
+    if (t.closest('[data-export]')) {
+      const json = JSON.stringify(S, null, 1);
+      ta.value = json;
+      try {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
+        a.download = `englisch-camp-backup-${dayKey(today())}.json`;
+        document.body.append(a); a.click(); a.remove();
+        setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+      } catch (err) { console.warn('download failed', err); }
+      S.lastBackupDay = today(); save();
+      toast('Backup erstellt. Falls kein Download startet: Text im Feld kopieren.', [], 'proud', 4000);
+    }
+    if (t.closest('[data-import]')) doImport(ta.value);
+    if (t.closest('[data-pin]')) { S.parent.pin = null; save(); go('parent'); }
+    if (t.closest('[data-due]')) { learnedIds().forEach(id => { S.words[id].due = today(); }); save(); toast('Alle gelernten Wörter sind jetzt fällig.', [], 'happy', 2500); }
+    if (t.closest('[data-reset]')) {
+      const box = $('[data-resetbox]', node);
+      box.innerHTML = `<div class="warn">Wirklich ALLES löschen? Sterne, Münzen, Sammlung. Zum Bestätigen <b>LÖSCHEN</b> eintippen.</div><div class="row"><input class="namein grow" style="min-height:48px;font-size:1rem" data-confirm aria-label="Bestätigung"><button class="btn" data-doreset>Löschen</button></div>`;
+    }
+    if (t.closest('[data-doreset]')) {
+      if (($('[data-confirm]', node).value || '').trim().toUpperCase() !== 'LÖSCHEN') { toast('Bitte genau LÖSCHEN eintippen.', [], 'thinking', 2500); return; }
+      const keep = { pin: S.parent.pin, settings: S.settings };
+      S = defaults(); S.parent.pin = keep.pin; S.settings = keep.settings; save(); applyLook();
+      go('start');
+    }
+  });
+  return node;
+}
+function doImport(text) {
+  let d;
+  try { d = JSON.parse(text); } catch (e) { toast('Das ist kein gültiges Backup (JSON-Fehler).', [], 'thinking', 3500); return; }
+  if (!d || typeof d !== 'object' || d.v !== 1 || !d.profile) { toast('Das sieht nicht wie ein Englisch-Camp-Backup aus.', [], 'thinking', 3500); return; }
+  const pin = S.parent.pin;
+  S = migrate(d); if (!S.parent.pin) S.parent.pin = pin;
+  save(); applyLook();
+  go('parent', 'open');
+  toast('Backup importiert! ✓', [], 'cheer', 3000);
+}
+SCREENS.pinreset = () => {
+  const node = el(`<div class="screen onb"><h2 class="center">PIN zurücksetzen</h2>
+    <p style="font-weight:700">Damit wird nur die Eltern-PIN gelöscht – der Fortschritt bleibt. Zum Bestätigen <b>PIN LÖSCHEN</b> eintippen.</p>
+    <input class="namein" data-c aria-label="Bestätigung">
+    <div class="stack"><button class="btn pri big block" data-ok>PIN löschen</button><button class="btn ghost block" data-nav="start">Abbrechen</button></div></div>`);
+  wireCommon(node);
+  $('[data-ok]', node).onclick = () => {
+    if ($('[data-c]', node).value.trim().toUpperCase() !== 'PIN LÖSCHEN') { toast('Bitte genau PIN LÖSCHEN eintippen.', [], 'thinking', 2500); return; }
+    S.parent.pin = null; save();
+    try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { console.debug('history', e); }
+    toast('PIN gelöscht. Im Elternbereich neu festlegen.', [], 'happy', 3000);
+    go('start');
+  };
+  return node;
+};
+</script>

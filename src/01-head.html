@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffd6ea">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Englisch-Camp">
+<title>Geheimes Englisch-Camp</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23ffd6ea' stroke='%234a3b5c' stroke-width='4'/%3E%3Cpath d='M32 14l5 11 12 1-9 8 3 12-11-6-11 6 3-12-9-8 12-1z' fill='%23ffcf4a' stroke='%234a3b5c' stroke-width='3' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=Lexend:wght@400;600;700&display=swap" rel="stylesheet">
+<!--
+==========================================================================================
+ README – Geheimes Englisch-Camp (one self-contained HTML file)
+==========================================================================================
+ OPEN ON A PHONE
+  - Best: host it (https) and open the URL in Chrome (Android) or Safari (iOS).
+  - Local file also works (copy to the phone, open with the browser), but some browsers
+    block saving (localStorage) and the microphone on file://. The parent area shows a
+    hint when saving is unavailable.
+
+ HOST IT FOR FREE
+  - Netlify Drop: go to https://app.netlify.com/drop, drag the folder containing this file
+    (rename it to index.html first). You get an https URL in seconds.
+  - GitHub Pages: new public repo, upload index.html, Settings > Pages > Deploy from branch
+    (main, /root). URL: https://<user>.github.io/<repo>/
+
+ ADD TO THE HOME SCREEN
+  - Android/Chrome: menu (three dots) > "Zum Startbildschirm hinzufügen".
+  - iOS/Safari: Share button > "Zum Home-Bildschirm".
+
+ VOICES
+  - English audio is pre-recorded and embedded (AUDIO block): Piper TTS, voice
+    en_GB-cori-high (public domain, trained on LibriVox recordings). Generated offline by
+    tts/export-lines.js + tts/make_audio.py; every line has a normal and a slow clip.
+  - Lines containing the player's name ("I'm <name>.") have no clip on purpose and use
+    the phone's built-in speech voice (speechSynthesis). If nothing
+    is heard: Android: Settings > System > Languages > Text-to-speech > install
+    "English (United Kingdom)". iOS: Settings > Accessibility > Spoken Content > Voices >
+    English > choose a UK voice. Without a voice the app shows the text instead.
+
+ BACKUP PROGRESS
+  - Parent area (gear icon, press and hold ~1.5 s, then PIN) > "Backup" >
+    "Fortschritt exportieren" downloads a JSON file (and shows it for copying).
+    "Importieren" restores it, also on another device. A reminder appears in the parent
+    area every 7 days (configurable or off).
+  - Progress lives in this browser's localStorage. Clearing browser data deletes it.
+
+ PARENT PIN
+  - Set the first time the parent area is opened (4 digits, stored locally).
+  - FORGOTTEN PIN: open the app URL with "#pinreset" at the end
+    (e.g. https://example.netlify.app/#pinreset), type the confirmation word shown on
+    screen; the PIN is removed (progress stays). Then set a new PIN.
+  - HONEST NOTE: this is client-side only and NOT real security. It keeps an 11-year-old
+    from tapping into settings by accident; anyone with browser dev tools can bypass it.
+
+ DEBUG / CONTENT CHECK
+  - Append "#debug" to the URL: shows the startup content validation report on the map
+    and extra tools in the parent area (e.g. make all words due for review).
+  - The validation always runs at startup; problems are logged to the console.
+
+ ADDING CONTENT
+  - See the CONTENT block at the top of the <script>. Add a word = add an object to
+    CONTENT.words. Add a level = add an object to CONTENT.levels. New unit = add to
+    CONTENT.units and set status:'open'. The validation tells you what is missing.
+==========================================================================================
+
+==========================================================================================
+ STORY BIBLE
+==========================================================================================
+ World: the "Sternbucht-Inseln", an original island region. Trainers travel from town to
+ town, help the locals and befriend "Wortmonster" – little creatures made of words that
+ grow stronger the more words their trainer knows.
+
+ Player: the trainer (name entered in onboarding). New in the region, a bit
+ nervous, secretly very clever. Training happens in a "geheimes Trainingslager" – nobody
+ watches, mistakes are just bugs you find and fix.
+
+ Nuvi (companion): round, lavender, fluffy, two big pointy ears, star-tipped tail, a small
+ gold star on the forehead. Curious, warm, slightly clumsy, never judgy.
+   Voice: short German sentences, "du", lots of encouragement, one emoji max.
+   Running jokes: Nuvi always miscounts its biscuits ("Ich hab drei Kekse… nein, vier…
+   wo ist der dritte?!"); Nuvi thinks every bug is a real little beetle and wants to
+   adopt it. Nuvi is a big fan of Umbreon, Sylveon and Mew and argues with itself which
+   one is the best.
+ Juno: friendly rival trainer, also new, very chatty, a bit of a show-off but kind. Learns
+   alongside the player and sometimes makes the same mistakes. Always hungry.
+ Prof. Pixel: runs the Code Lab in a lighthouse. Speaks in short "computer" sentences,
+   loves when things "compilen". Explains that computers speak English.
+ Brummkrabbe Knarz (Unit 1 boss): grumpy harbour crab who stopped greeting anyone because
+   nobody greeted him. Secretly lonely. Becomes friendly after a proper "Hello!".
+
+ Unit 1 – Hallohafen (harbour town, sea breeze, teal accent): the harbour bell is silent
+   because nobody greets anymore. Problem: bring back "Hello". Payoff: Knarz says hello,
+   the bell rings again.
+ Unit 2 – Farbenfeld (meadow route, butter-yellow accent): the flowers lost their colours
+   (colours, school things; Code Lab if/else).
+ Unit 3 – Familienfelsen (cliff village, rose accent): a lost pet needs its family
+   (family, pets; Code Lab lists).
+ Unit 4 – Blockdorf (blocky village, grass-green accent): build and decorate a home
+   (rooms, furniture; Code Lab loops).
+
+ Tone: funny, short, never babyish. English bits inside German text are marked [[like this]].
+ Mistake language: "Fast!", "Bug gefunden! Jetzt weißt du's.", "Probier's nochmal 💪".
+ Never: "falsch", red alarms, lost lives, guilt ("Du hast gestern nicht geübt").
+
+==========================================================================================
+ STYLE GUIDE
+==========================================================================================
+ Fonts: Nunito (UI, rounded) with fallbacks Varela Round / Arial Rounded / system-ui.
+        Dyslexia toggle: Lexend (fallback Verdana) with extra letter spacing.
+ English text: class .en + lang="en-GB", larger, weight 800, colour var(--en).
+ Outline: all SVG art uses stroke #4a3b5c, width 3 (icons 24px: currentColor, width 2),
+          round joins, big eyes with white highlights, pink blush cheeks, soft disc behind
+          word pictures.
+ Themes (CSS variables on <html data-theme>):
+   sylveon: bg #ffe1ef > #d6ecff, primary #f2559c, secondary #6cbcf5, en #b0246a
+   umbreon: bg #1b1937 > #2f2b63, primary gold #f2c14e (dark text), en #ffd76a
+   mew:     bg #ffe4ef > #d3f7f0, primary #e85d9f, secondary #34bfae, en #0b7a6e
+ Unit accents: u1 teal #2fb3c6, u2 butter #f2b33d, u3 rose #f07aa0, u4 grass #6cc070.
+ Pastel palette for art: lavender #cdb8f5, mint #b9efd9, peach #ffd2b8, rose #ffc2d6,
+   sky #bfe3ff, butter #ffe7a0.
+ Components: .btn (chunky, 52px+, 3D bottom shadow, press squash), .card (rounded 22px,
+   soft shadow), .chip, .opt (picture option), .sheet (bottom sheet, never blocking),
+   .dock (companion + bubble, max 2 lines), .bar (progress), .code (editor look).
+ Motion: CSS transforms/opacity only; all loops disabled with prefers-reduced-motion.
+==========================================================================================
+-->

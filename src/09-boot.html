@@ -1,0 +1,36 @@
+<script>
+/* ==========================================================================================
+   BOOT – load save, validate content, session timer (playtime + break reminder)
+   ========================================================================================== */
+(function boot() {
+  Store.probe();
+  S = Store.load();
+  applyLook();
+  Speech.init();
+  VALIDATION = validateContent();
+  if (VALIDATION.errs.length) console.error('Content validation errors:\n' + VALIDATION.errs.join('\n'));
+  if (VALIDATION.warns.length) console.warn('Content validation warnings:\n' + VALIDATION.warns.join('\n'));
+  if (!VALIDATION.errs.length && !VALIDATION.warns.length) console.info(validationText());
+
+  let sessionSec = 0, snoozeUntil = 0;
+  setInterval(() => {
+    if (document.hidden) return;
+    const k = dayKey(today());
+    S.stats.playSec[k] = (S.stats.playSec[k] || 0) + 10;
+    sessionSec += 10;
+    if (sessionSec % 30 === 0) save();
+    const lim = (S.settings.breakMin || 0) * 60;
+    if (lim && sessionSec >= lim && sessionSec >= snoozeUntil && !$('.toast', app())) {
+      snoozeUntil = sessionSec + 10 * 60;
+      toast(rnd(CONTENT.lines.brk), [{ label: 'Okay, Pause!', pri: true, fn: () => { if (currentScreen === 'level') { stopRunTimers(); persistResume(); } go('start'); } }, { label: 'Noch kurz', fn: () => {} }], 'sleepy');
+    }
+  }, 10000);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) { save(); Speech.stop(); } });
+  window.addEventListener('pagehide', save);
+
+  if (/pinreset/i.test(location.hash)) go('pinreset');
+  else go('start');
+})();
+</script>
+</body>
+</html>

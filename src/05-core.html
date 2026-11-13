@@ -1,0 +1,415 @@
+<script>
+/* ==========================================================================================
+   CORE – utilities, storage, sound, speech, microphone, learning model
+   ========================================================================================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const rnd = a => a[Math.floor(Math.random() * a.length)];
+const shuffle = a => { const b = [...a]; for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const el = html => { const t = document.createElement('template'); t.innerHTML = html.trim(); return t.content.firstElementChild; };
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const reducedMotion = () => window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const DEBUG = /debug/i.test(location.hash + location.search);
+
+const playerName = () => (S && S.profile && S.profile.name ? S.profile.name : 'Sam');
+const sub = s => String(s == null ? '' : s).replace(/\{name\}/g, playerName());
+/* German text with [[English]] parts -> safe HTML */
+const fmt = s => esc(sub(s)).replace(/\[\[(.+?)\]\]/g, (_, e) => `<span class="en" lang="en-GB">${e}</span>`);
+const enSpan = (s, cls = 'en') => `<span class="${cls}" lang="en-GB">${esc(sub(s))}</span>`;
+const plain = s => sub(s).replace(/\[\[(.+?)\]\]/g, '$1');
+
+/* Calendar days in LOCAL time (index = days since epoch of the local calendar date). */
+const dayIndex = (d = new Date()) => Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
+const today = () => dayIndex();
+const dayKey = i => new Date(i * 864e5).toISOString().slice(0, 10);
+
+const W = id => CONTENT.words.find(w => w.id === id);
+const L = id => CONTENT.levels.find(l => l.id === id);
+const U = id => CONTENT.units.find(u => u.id === id);
+const ITEM = id => CONTENT.items.find(i => i.id === id);
+
+function live(msg) { const n = $('#live'); if (n) { n.textContent = ''; setTimeout(() => { n.textContent = msg; }, 30); } }
+
+/* ---------------- storage (localStorage with in-memory fallback) ---------------- */
+const KEY = 'englishCamp.v1';
+let S = null;
+const Store = {
+  ok: true,
+  probe() {
+    try { localStorage.setItem('__ec_probe', '1'); localStorage.removeItem('__ec_probe'); this.ok = true; }
+    catch (e) { this.ok = false; console.warn('localStorage unavailable – using memory only.', e); }
+  },
+  load() {
+    let raw = null;
+    if (this.ok) { try { raw = localStorage.getItem(KEY); } catch (e) { this.ok = false; console.warn('Read failed', e); } }
+    let data = null;
+    if (raw) {
+      try { data = JSON.parse(raw); }
+      catch (e) {
+        console.error('Save data corrupt – starting fresh, copy kept under ' + KEY + '.corrupt', e);
+        try { localStorage.setItem(KEY + '.corrupt', raw); } catch (e2) { console.warn('Could not keep corrupt copy', e2); }
+      }
+    }
+    return migrate(data);
+  },
+  save() {
+    if (!S || !this.ok) return;
+    try { localStorage.setItem(KEY, JSON.stringify(S)); }
+    catch (e) { this.ok = false; console.warn('Save failed – memory only from now on.', e); }
+  },
+  wipe() { try { localStorage.removeItem(KEY); } catch (e) { console.warn('Wipe failed', e); } }
+};
+function defaults() {
+  return {
+    v: 1, onboarded: false,
+    profile: { name: '', avatar: 0 },
+    settings: { theme: 'sylveon', dys: false, sfx: true, music: false, haptics: false, turbo: false, breakMin: 15, backupDays: 7 },
+    parent: { pin: null, unlockAll: false },
+    coins: 0, xp: 0, hintsFree: 3,
+    levels: {}, words: {}, owned: [], equip: { head: null, face: null }, room: [], badges: [], flags: {}, secrets: [],
+    stats: { playSec: {}, levelsByDay: {}, levelsDone: 0, listenFirst: 0, speaks: 0, reviews: 0, turboBest: 0 },
+    streak: { count: 0, lastDay: null },
+    resume: null, lastBackupDay: null, firstDay: today()
+  };
+}
+function deepMerge(base, d) {
+  if (!d || typeof d !== 'object' || Array.isArray(d)) return base;
+  for (const k of Object.keys(d)) {
+    const bv = base[k], dv = d[k];
+    base[k] = (bv && typeof bv === 'object' && !Array.isArray(bv) && dv && typeof dv === 'object' && !Array.isArray(dv)) ? deepMerge(bv, dv) : dv;
+  }
+  return base;
+}
+function migrate(d) { return deepMerge(defaults(), d && typeof d === 'object' ? d : null); }
+const save = () => Store.save();
+
+/* ---------------- sound effects & music (Web Audio, created after first tap) ---------------- */
+const Sfx = {
+  ctx: null, master: null, mus: null, musTimer: null, step: 0,
+  unlock() {
+    if (this.ctx) { if (this.ctx.state === 'suspended') this.ctx.resume().catch(e => console.warn('resume', e)); return; }
+    const AC = window.AudioContext || window.webkitAudioContext;
+    if (!AC) return;
+    try {
+      this.ctx = new AC();
+      this.master = this.ctx.createGain(); this.master.gain.value = .5; this.master.connect(this.ctx.destination);
+      if (S.settings.music) this.startMusic();
+    } catch (e) { console.warn('AudioContext unavailable', e); this.ctx = null; }
+  },
+  tone(f, dur, o = {}) {
+    if (!this.ctx) return;
+    const t = this.ctx.currentTime + (o.delay || 0);
+    const osc = this.ctx.createOscillator(), g = this.ctx.createGain();
+    osc.type = o.type || 'sine';
+    osc.frequency.setValueAtTime(f, t);
+    if (o.slide) osc.frequency.exponentialRampToValueAtTime(Math.max(40, f + o.slide), t + dur);
+    g.gain.setValueAtTime(.0001, t);
+    g.gain.exponentialRampToValueAtTime(o.vol || .2, t + .015);
+    g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    osc.connect(g); g.connect(o.out || this.master);
+    osc.start(t); osc.stop(t + dur + .05);
+  },
+  play(n) {
+    if (!this.ctx || !S.settings.sfx) return;
+    const T = (f, d, o) => this.tone(f, d, o);
+    switch (n) {
+      case 'tap': T(660, .06, { type:'triangle', vol:.1 }); break;
+      case 'good': T(784, .12, { type:'triangle' }); T(1175, .2, { type:'triangle', delay:.09 }); break;
+      case 'soft': T(392, .18, { vol:.12, slide:-80 }); break;
+      case 'coin': T(988, .08, { type:'square', vol:.06 }); T(1319, .16, { type:'square', vol:.06, delay:.07 }); break;
+      case 'whoosh': T(260, .3, { vol:.1, slide:700 }); break;
+      case 'pop': T(480, .09, { vol:.14, slide:420 }); break;
+      case 'reward': [523, 659, 784, 1047, 1319].forEach((f, i) => T(f, .25, { type:'triangle', delay:i * .09 })); break;
+      case 'flip': T(700, .05, { type:'triangle', vol:.08, slide:200 }); break;
+      case 'hit': T(220, .12, { type:'square', vol:.06, slide:-60 }); T(660, .1, { type:'triangle', delay:.08 }); break;
+    }
+  },
+  startMusic() {
+    if (!this.ctx || this.musTimer) return;
+    this.mus = this.ctx.createGain(); this.mus.gain.value = .035; this.mus.connect(this.master);
+    const scale = [392, 440, 523, 587, 659, 784];
+    const seq = [0, 2, 4, 2, 3, 1, 4, 5, 2, 4, 3, 1];
+    this.musTimer = setInterval(() => {
+      if (document.hidden) return;
+      const i = seq[this.step % seq.length];
+      this.tone(scale[i], .5, { type:'sine', vol:.6, out:this.mus });
+      if (this.step % 4 === 0) this.tone(scale[i] / 2, 1.2, { type:'triangle', vol:.4, out:this.mus });
+      this.step++;
+    }, 460);
+  },
+  stopMusic() { clearInterval(this.musTimer); this.musTimer = null; if (this.mus) { this.mus.disconnect(); this.mus = null; } }
+};
+const vib = ms => { if (S.settings.haptics && navigator.vibrate) { try { navigator.vibrate(ms); } catch (e) { console.debug('vibrate', e); } } };
+
+/* ---------------- speech synthesis ---------------- */
+const Speech = {
+  ok: typeof window.speechSynthesis !== 'undefined' && typeof window.SpeechSynthesisUtterance !== 'undefined',
+  en: null, de: null, loaded: false, noEn: false,
+  init() {
+    if (!this.ok) { this.noEn = true; return; }
+    const pick = () => {
+      let vs = [];
+      try { vs = speechSynthesis.getVoices() || []; } catch (e) { console.warn('getVoices', e); }
+      if (!vs.length) return;
+      this.loaded = true;
+      this.en = this.best(vs, 'en'); this.de = this.best(vs, 'de');
+      this.noEn = !this.en;
+    };
+    pick();
+    try { speechSynthesis.addEventListener('voiceschanged', pick); } catch (e) { speechSynthesis.onvoiceschanged = pick; }
+    setTimeout(pick, 1500);
+  },
+  best(vs, lang) {
+    const n = v => (v.lang || '').toLowerCase().replace('_', '-');
+    const all = vs.filter(v => n(v).startsWith(lang));
+    if (!all.length) return null;
+    if (lang === 'en') {
+      const gb = all.filter(v => n(v) === 'en-gb');
+      const pool = gb.length ? gb : all;
+      const pref = [/Google UK English Female/i, /(Libby|Sonia|Maisie|Hollie|Bella).*(Natural|Online)/i, /Serena|Kate|Stephanie|Martha|Arthur/i, /Natural|Neural|Enhanced|Premium/i, /Google/i, /Hazel|Susan|Daniel/i];
+      for (const re of pref) { const v = pool.find(x => re.test(x.name)); if (v) return v; }
+      return pool.find(v => v.localService) || pool[0];
+    }
+    const pref = [/(Katja|Amala|Seraphina).*(Natural|Online)/i, /Natural|Neural|Enhanced|Premium/i, /Google/i, /Anna|Petra|Helena|Hedda|Katja/i];
+    for (const re of pref) { const v = all.find(x => re.test(x.name)); if (v) return v; }
+    return all[0];
+  },
+  clean(t) {
+    let s = plain(t).replace(/…/g, ' ').replace(/\s+–\s+/g, ' ');
+    try { s = s.replace(/\p{Extended_Pictographic}/gu, ''); } catch (e) { console.debug('no unicode props', e); }
+    return s.trim();
+  },
+  /* Pre-recorded clip (AUDIO block) first; device speech synthesis only as fallback. */
+  clip(text, slow) {
+    const c = typeof AUDIO !== 'undefined' && AUDIO[audioKey(text)];
+    return c ? (slow && c.s) || c.n : null;
+  },
+  playClip(src) {
+    return new Promise(res => {
+      this.stop();
+      const a = this.audio || (this.audio = new Audio());
+      let done = false;
+      const fin = ok => { if (!done) { done = true; a.onended = a.onerror = null; res(ok); } };
+      a.onended = () => fin(true);
+      a.onerror = () => { console.warn('clip failed'); fin(false); };
+      a.src = src;
+      const p = a.play();
+      if (p && p.catch) p.catch(e => { console.debug('clip play blocked', e); fin(false); });
+      setTimeout(() => fin(true), 12000);
+    });
+  },
+  speak(text, o = {}) {
+    if (o.lang !== 'de') { const c = this.clip(text, o.rate && o.rate < .8); if (c) return this.playClip(c); }
+    return new Promise(res => {
+      if (!this.ok || !text) { res(false); return; }
+      try {
+        speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance(this.clean(text));
+        const de = o.lang === 'de', v = de ? this.de : this.en;
+        if (v) { u.voice = v; u.lang = v.lang; } else u.lang = de ? 'de-DE' : 'en-GB';
+        u.rate = o.rate || (de ? 1 : .9); u.pitch = 1.05;
+        let done = false;
+        const fin = ok => { if (!done) { done = true; res(ok); } };
+        u.onend = () => fin(true);
+        u.onerror = e => { console.debug('TTS error', e.error); fin(false); };
+        setTimeout(() => fin(true), 2000 + text.length * 140 / u.rate);
+        speechSynthesis.speak(u);
+      } catch (e) { console.warn('TTS failed', e); res(false); }
+    });
+  },
+  stop() { if (this.audio) { try { this.audio.pause(); } catch (e) { console.debug('pause', e); } } if (this.ok) { try { speechSynthesis.cancel(); } catch (e) { console.debug('cancel', e); } } },
+  prime() { if (this.ok && !this.primed) { this.primed = true; try { const u = new SpeechSynthesisUtterance(' '); u.volume = 0; speechSynthesis.speak(u); } catch (e) { console.debug('prime', e); } } }
+};
+const sayEn = (t, slow) => Speech.speak(t, { rate: slow ? .7 : .9 });
+/* Clip lookup key: text as spoken, lower case, letters/digits/apostrophes only. */
+const audioKey = t => Speech.clean(t).toLowerCase().replace(/[’‘]/g, "'").replace(/[^a-z0-9' ]/g, ' ').replace(/\s+/g, ' ').trim();
+const hasVoiceFor = t => !!Speech.clip(t) || !Speech.noEn;
+/* Every English line the app can speak – single source for the audio generator and the validation. */
+function englishLines() {
+  /* Lines with {name} are skipped: they are spoken by the device voice with the real name. */
+  const set = new Set(), add = s => { if (s && !s.includes('{name}')) set.add(sub(s)); };
+  CONTENT.words.forEach(w => { add(w.en); add(w.exampleEn); });
+  Object.values(CONTENT.dialogues).forEach(d => d.nodes.forEach(n => { add(n.say); (n.options || []).forEach(o => add(o.en)); }));
+  CONTENT.levels.forEach(l => l.plan.forEach(s => {
+    if (s.k === 'build' && !s.code) add(s.parts.join(' '));
+    if (s.k === 'bug') add(s.tokens.map((t, i) => i === s.bug ? s.fix : t).join(' '));
+    if (s.k === 'predict') add(s.options[s.answer]);
+  }));
+  add("Hello! I'm Nuvi. How are you?");
+  return [...set];
+}
+const sayDe = t => Speech.speak(t, { lang: 'de' });
+
+/* ---------------- microphone: speech recognition + recorder (optional) ---------------- */
+const Mic = {
+  SR: window.SpeechRecognition || window.webkitSpeechRecognition || null,
+  url: null,
+  canRecord() { return !!(window.isSecureContext && navigator.mediaDevices && navigator.mediaDevices.getUserMedia && window.MediaRecorder); },
+  recognize() {
+    return new Promise(res => {
+      if (!this.SR) { res({ ok:false, error:'unsupported' }); return; }
+      let r;
+      try { r = new this.SR(); } catch (e) { res({ ok:false, error:'unsupported' }); return; }
+      r.lang = 'en-GB'; r.interimResults = false; r.maxAlternatives = 4;
+      let done = false;
+      const fin = v => { if (!done) { done = true; res(v); } };
+      r.onresult = e => fin({ ok:true, alts:[...e.results[0]].map(a => a.transcript) });
+      r.onerror = e => fin({ ok:false, error:e.error || 'error' });
+      r.onend = () => fin({ ok:false, error:'no-speech' });
+      try { r.start(); } catch (e) { fin({ ok:false, error:'start' }); }
+      setTimeout(() => { try { r.stop(); } catch (e) { console.debug('SR stop', e); } }, 6000);
+    });
+  },
+  async record(ms = 3000) {
+    if (!this.canRecord()) return { ok:false, error:'unsupported' };
+    let stream;
+    try { stream = await navigator.mediaDevices.getUserMedia({ audio:true }); }
+    catch (e) { return { ok:false, error:e.name || 'denied' }; }
+    return new Promise(res => {
+      let rec;
+      try { rec = new MediaRecorder(stream); }
+      catch (e) { stream.getTracks().forEach(t => t.stop()); res({ ok:false, error:'recorder' }); return; }
+      const chunks = [];
+      rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+      rec.onstop = () => {
+        stream.getTracks().forEach(t => t.stop());
+        if (!chunks.length) { res({ ok:false, error:'empty' }); return; }
+        if (this.url) URL.revokeObjectURL(this.url);
+        this.url = URL.createObjectURL(new Blob(chunks, { type: rec.mimeType || 'audio/webm' }));
+        res({ ok:true, url:this.url });
+      };
+      rec.start();
+      setTimeout(() => { if (rec.state !== 'inactive') rec.stop(); }, ms);
+    });
+  }
+};
+
+/* ---------------- text comparison (forgiving spelling) ---------------- */
+const norm = s => sub(s).toLowerCase().replace(/[’‘`´]/g, "'").replace(/[^a-z' ]/g, '').replace(/\s+/g, ' ').trim();
+function osa(a, b) { /* Damerau-Levenshtein (optimal string alignment): swap counts as 1 */
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i, ...Array(b.length).fill(0)]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) for (let j = 1; j <= b.length; j++) {
+    const c = a[i - 1] === b[j - 1] ? 0 : 1;
+    d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + c);
+    if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+  }
+  return d[a.length][b.length];
+}
+function judgeTyped(input, target) {
+  const a = norm(input), b = norm(target);
+  if (!a) return 'empty';
+  if (a === b) return 'exact';
+  if (b.length >= 3 && osa(a, b) <= 1) return 'near';
+  return 'wrong';
+}
+function similar(heard, target) {
+  const t = norm(target).replace(norm(playerName()), '').trim();
+  const h = norm(heard).replace(norm(playerName()), '').trim();
+  if (!h) return 0;
+  if (h.includes(t) || t.includes(h) && h.length >= t.length * .6) return 1;
+  return 1 - osa(h, t) / Math.max(h.length, t.length);
+}
+
+/* ---------------- learning model: Leitner boxes ---------------- */
+const INTERVAL_DAYS = { 1: 1, 2: 3, 3: 7, 4: 14 };
+function wordRec(id) { return S.words[id] || (S.words[id] = { box: 0, due: null, right: 0, wrong: 0 }); }
+function introduce(id) { const r = wordRec(id); if (!r.box) { r.box = 1; r.due = today() + INTERVAL_DAYS[1]; } }
+function reviewResult(id, ok) {
+  const r = wordRec(id); if (!r.box) r.box = 1;
+  r.box = ok ? Math.min(4, r.box + 1) : Math.max(1, r.box - 1);
+  r.due = today() + INTERVAL_DAYS[r.box];
+}
+const learnedIds = () => CONTENT.words.filter(w => S.words[w.id] && S.words[w.id].box > 0).map(w => w.id);
+const dueIds = () => learnedIds().filter(id => S.words[id].due != null && S.words[id].due <= today())
+  .sort((a, b) => S.words[a].box - S.words[b].box || S.words[a].due - S.words[b].due);
+
+/* ---------------- progress helpers ---------------- */
+const unitLevels = uid => CONTENT.levels.filter(l => l.unit === uid && !l.secret);
+const unitSecrets = uid => CONTENT.levels.filter(l => l.unit === uid && l.secret);
+const isDone = id => !!(S.levels[id] && S.levels[id].done);
+function levelState(lv) {
+  if (isDone(lv.id)) return 'done';
+  if (lv.secret) {
+    const last = unitLevels(lv.unit).slice(-1)[0];
+    return (last && isDone(last.id)) || S.parent.unlockAll ? 'open' : 'hidden';
+  }
+  if (S.parent.unlockAll) return 'open';
+  const list = unitLevels(lv.unit), i = list.indexOf(lv);
+  return i <= 0 || isDone(list[i - 1].id) ? 'open' : 'locked';
+}
+const nextLevel = () => CONTENT.levels.find(l => U(l.unit).status === 'open' && !l.secret && levelState(l) === 'open');
+function rankOf(xp) { let r = CONTENT.ranks[0]; for (const k of CONTENT.ranks) if (xp >= k.xp) r = k; return r; }
+function nextRank(xp) { return CONTENT.ranks.find(k => k.xp > xp) || null; }
+function unitStars(uid) { return unitLevels(uid).reduce((s, l) => s + ((S.levels[l.id] && S.levels[l.id].stars) || 0), 0); }
+function monsterStage(uid) {
+  const list = unitLevels(uid); if (!list.some(l => isDone(l.id))) return 0;
+  const boss = list[list.length - 1], ratio = unitStars(uid) / (list.length * 3);
+  if (isDone(boss.id) && ratio >= .85) return 3;
+  if (isDone(boss.id) || ratio >= .5) return 2;
+  return 1;
+}
+function streakNow() { const s = S.streak; return s.lastDay != null && today() - s.lastDay <= 2 ? s.count : 0; }
+function bumpStreak() {
+  const t = today(), s = S.streak;
+  if (s.lastDay === t) return;
+  s.count = s.lastDay != null && t - s.lastDay <= 2 ? s.count + 1 : 1; /* one free grace day */
+  s.lastDay = t;
+}
+const levelsToday = () => S.stats.levelsByDay[dayKey(today())] || 0;
+function statVal(k) {
+  if (k === 'streak') return streakNow();
+  if (k === 'secrets') return S.secrets.length;
+  return S.stats[k] || 0;
+}
+function checkBadges() {
+  const fresh = [];
+  for (const b of CONTENT.badges) {
+    if (S.badges.includes(b.id)) continue;
+    const w = b.when;
+    const ok = (w.stat && statVal(w.stat) >= w.min) || (w.level && isDone(w.level)) ||
+               (w.type && CONTENT.levels.some(l => l.type === w.type && isDone(l.id)));
+    if (ok) { S.badges.push(b.id); fresh.push(b); }
+  }
+  return fresh;
+}
+const backupDue = () => S.settings.backupDays > 0 && today() - (S.lastBackupDay != null ? S.lastBackupDay : S.firstDay) >= S.settings.backupDays;
+
+/* ---------------- plan expansion: level data -> list of tasks ---------------- */
+const SINGLE_KINDS = ['memory', 'falling', 'dialogue', 'build', 'predict', 'bug', 'card'];
+function expandPlan(level) {
+  const tasks = [];
+  for (const seg of level.plan) {
+    if (seg.intro) { seg.intro.forEach(w => tasks.push({ k: 'intro', w })); continue; }
+    if (SINGLE_KINDS.includes(seg.k)) { tasks.push({ ...seg }); continue; }
+    const reps = seg.reps || 1;
+    let list = [];
+    for (let r = 0; r < reps; r++) {
+      let round = shuffle(seg.words);
+      if (list.length && round.length > 1 && round[0] === list[list.length - 1]) round.push(round.shift());
+      list = list.concat(round);
+    }
+    list.forEach(w => tasks.push({ k: seg.k, w, opts: seg.opts, mode: seg.mode }));
+  }
+  tasks.forEach((t, i) => { t.uid = level.id + ':' + i; });
+  return tasks;
+}
+/* words a task touches + modality (used for exposure check and word stats) */
+const MODALITY = { intro:['see','hear'], catch:['see','hear'], listen:['hear'], memory:['see','hear'], spell:['type'], speak:['say','hear'],
+  build:['build','see'], bug:['see'], dialogue:['hear','see'], predict:['see'], falling:['see','hear'], card:[] };
+function taskWords(t) {
+  if (t.w) return [t.w];
+  if (t.words) return t.words;
+  if (t.uses) return t.uses;
+  if (t.k === 'dialogue') {
+    const d = CONTENT.dialogues[t.id]; const ids = new Set();
+    if (d) d.nodes.forEach(n => (n.options || []).concat(n.say ? [{ en: n.say }] : []).forEach(o => {
+      if (!o.en) return;
+      CONTENT.words.forEach(w => { if (norm(o.en).includes(norm(w.en)) && norm(w.en).length > 2) ids.add(w.id); });
+    }));
+    return [...ids];
+  }
+  return [];
+}
+</script>

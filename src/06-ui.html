@@ -1,0 +1,194 @@
+<script>
+/* ==========================================================================================
+   UI FRAMEWORK – navigation, dock (companion), sheets, toasts, particles
+   ========================================================================================== */
+const SCREENS = {};
+let cleanups = [];
+let currentScreen = null;
+const app = () => $('#app');
+function go(name, arg) {
+  cleanups.forEach(f => { try { f(); } catch (e) { console.warn('cleanup failed', e); } });
+  cleanups = [];
+  Speech.stop();
+  currentScreen = name;
+  const node = SCREENS[name](arg);
+  app().replaceChildren(node);
+  const h = node.querySelector('h1,h2,[data-autofocus]');
+  if (h && h.hasAttribute('data-autofocus')) h.focus();
+}
+function applyLook() {
+  document.documentElement.dataset.theme = S.settings.theme;
+  document.body.classList.toggle('dys', !!S.settings.dys);
+  const m = document.querySelector('meta[name=theme-color]');
+  if (m) m.content = { sylveon:'#ffd6ea', umbreon:'#1b1937', mew:'#ffd9ea' }[S.settings.theme] || '#ffd6ea';
+}
+
+/* companion dock: Nuvi + speech bubble (max 2 lines) + read-aloud for German */
+function dock(mood = 'happy', text = '') {
+  const d = el(`<div class="dock"><button class="mini" style="border:0;background:none;padding:0" aria-label="Nuvi">${ART.nuvi(mood)}</button><div class="bubble"><span class="txt"></span><button class="ibtn" aria-label="Vorlesen">${IC('speaker')}</button></div></div>`);
+  let taps = 0;
+  d.querySelector('.mini').onclick = () => {
+    taps++; Sfx.play('pop');
+    if (taps === 7) { taps = 0; setDock(d, 'cheer', 'Psst: Mein Lieblings-Pokémon ist … Umbreon! Nein, Sylveon! Nein, Mew! 😵‍💫'); return; }
+    setDock(d, 'cheer', rnd(CONTENT.lines.idle));
+  };
+  d.querySelector('.bubble .ibtn').onclick = () => sayDe(d.dataset.say || '');
+  setDock(d, mood, text);
+  return d;
+}
+function setDock(d, mood, text, soft = false) {
+  if (!d) return;
+  d.querySelector('.mini').innerHTML = ART.nuvi(mood, mood === 'cheer' ? 'cheer' : '');
+  const b = d.querySelector('.bubble');
+  b.classList.toggle('soft', soft);
+  b.style.visibility = text ? 'visible' : 'hidden';
+  b.querySelector('.txt').innerHTML = fmt(text);
+  d.dataset.say = plain(text);
+  b.style.animation = 'none'; void b.offsetWidth; b.style.animation = '';
+  if (text) live(plain(text));
+}
+
+function sheet(html, mount) {
+  closeSheet();
+  const back = el('<div class="sheet-back"></div>');
+  const sh = el(`<div class="sheet" role="dialog" aria-label="Info"><div class="grab"></div>${html}</div>`);
+  back.onclick = closeSheet;
+  app().append(back, sh);
+  if (mount) mount(sh);
+  const f = sh.querySelector('.btn.pri, .btn'); if (f) f.focus();
+  return sh;
+}
+function closeSheet() { $$('.sheet,.sheet-back', app()).forEach(n => n.remove()); }
+
+function toast(text, actions = [], mood = 'happy', ms = 0) {
+  $$('.toast', app()).forEach(n => n.remove());
+  const t = el(`<div class="toast"><div style="width:56px;flex:none">${ART.nuvi(mood)}</div><div class="bubble"><span class="txt">${fmt(text)}</span></div></div>`);
+  const b = t.querySelector('.bubble');
+  actions.forEach(a => {
+    const btn = el(`<button class="btn small ${a.pri ? 'pri' : ''}">${esc(a.label)}</button>`);
+    btn.onclick = () => { t.remove(); a.fn && a.fn(); };
+    b.append(btn);
+  });
+  if (!actions.length) { const x = el(`<button class="ibtn" aria-label="Schließen">${IC('close')}</button>`); x.onclick = () => t.remove(); b.append(x); }
+  app().append(t);
+  live(plain(text));
+  if (ms) setTimeout(() => t.remove(), ms);
+  return t;
+}
+
+function burst(x, y, n = 10) {
+  if (reducedMotion()) return;
+  for (let i = 0; i < n; i++) {
+    const f = el(`<div class="fx">${ART.fx(i % 3 ? 'star' : 'heart')}</div>`);
+    const a = Math.random() * Math.PI * 2, d = 50 + Math.random() * 70;
+    f.style.setProperty('--x0', (x - 9) + 'px'); f.style.setProperty('--y0', (y - 9) + 'px');
+    f.style.setProperty('--x1', (x - 9 + Math.cos(a) * d) + 'px'); f.style.setProperty('--y1', (y - 9 + Math.sin(a) * d) + 'px');
+    document.body.append(f);
+    setTimeout(() => f.remove(), 850);
+  }
+}
+const center = n => { const r = n.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; };
+
+/* global tap feedback + audio unlock (AudioContext only after the first user gesture) */
+document.addEventListener('pointerdown', () => { Sfx.unlock(); Speech.prime(); }, { capture: true });
+document.addEventListener('keydown', () => { Sfx.unlock(); }, { capture: true });
+document.addEventListener('click', e => { if (e.target.closest('button')) Sfx.play('tap'); }, { capture: true });
+
+/* press-and-hold helper (parent gate) – pointer and keyboard */
+function holdButton(btn, ms, fn) {
+  let t = null;
+  const start = e => { if (e.type === 'keydown' && !['Enter', ' '].includes(e.key)) return; if (e.type === 'keydown') e.preventDefault(); if (t) return; btn.classList.add('holding'); t = setTimeout(() => { t = null; btn.classList.remove('holding'); vib(30); fn(); }, ms); };
+  const stop = () => { clearTimeout(t); t = null; btn.classList.remove('holding'); };
+  btn.addEventListener('pointerdown', start); btn.addEventListener('keydown', start);
+  ['pointerup', 'pointerleave', 'pointercancel', 'keyup', 'blur'].forEach(ev => btn.addEventListener(ev, stop));
+  btn.addEventListener('contextmenu', e => e.preventDefault());
+}
+
+/* ==========================================================================================
+   CONTENT VALIDATION (runs at startup; report visible with #debug and in the parent area)
+   ========================================================================================== */
+const KINDS = ['intro','catch','listen','spell','speak','memory','falling','dialogue','build','predict','bug','card'];
+function validateContent() {
+  const errs = [], warns = [];
+  const ids = new Map();
+  const reg = (id, what) => { if (!id) errs.push(`${what}: missing id`); else if (ids.has(id)) errs.push(`Duplicate id "${id}" (${what} / ${ids.get(id)})`); else ids.set(id, what); };
+  CONTENT.units.forEach(u => reg(u.id, 'unit'));
+  CONTENT.words.forEach(w => reg(w.id, 'word'));
+  CONTENT.levels.forEach(l => reg(l.id, 'level'));
+  CONTENT.items.forEach(i => reg(i.id, 'item'));
+  CONTENT.badges.forEach(b => reg(b.id, 'badge'));
+  Object.keys(CONTENT.dialogues).forEach(d => reg(d, 'dialogue'));
+
+  for (const w of CONTENT.words) {
+    ['unit', 'cat', 'en', 'de', 'exampleEn', 'exampleDe'].forEach(f => { if (!w[f] || !String(w[f]).trim()) errs.push(`Word ${w.id}: empty "${f}"`); });
+    if (!U(w.unit)) errs.push(`Word ${w.id}: unknown unit ${w.unit}`);
+    if (!(/^num:\d+$/.test(w.icon) || ART.icons[w.icon])) errs.push(`Word ${w.id}: no picture "${w.icon}"`);
+    if ('pron' in w && !String(w.pron).trim()) errs.push(`Word ${w.id}: pron empty – remove the field instead`);
+  }
+  const introduced = {};
+  for (const lv of CONTENT.levels) {
+    const u = U(lv.unit);
+    if (!u) { errs.push(`Level ${lv.id}: unknown unit`); continue; }
+    ['title', 'type', 'plan'].forEach(f => { if (!lv[f]) errs.push(`Level ${lv.id}: missing ${f}`); });
+    if (lv.reward && !ITEM(lv.reward)) errs.push(`Level ${lv.id}: reward item ${lv.reward} missing`);
+    introduced[lv.unit] = introduced[lv.unit] || new Set();
+    const pool = introduced[lv.unit];
+    (lv.plan || []).forEach((seg, si) => {
+      const where = `Level ${lv.id} seg ${si}`;
+      if (seg.intro) { seg.intro.forEach(id => { if (!W(id)) errs.push(`${where}: unknown word ${id}`); pool.add(id); }); return; }
+      if (!KINDS.includes(seg.k)) { errs.push(`${where}: unknown kind ${seg.k}`); return; }
+      (seg.words || []).concat(seg.uses || []).forEach(id => { if (!W(id)) errs.push(`${where}: unknown word ${id}`); });
+      (seg.words || []).forEach(id => pool.add(id));
+      if (seg.opts) {
+        const unitPool = CONTENT.words.filter(w => w.unit === lv.unit && (pool.has(w.id) || lv.type === 'boss'));
+        if (unitPool.length < seg.opts) errs.push(`${where}: needs ${seg.opts} options but only ${unitPool.length} words available`);
+      }
+      if (seg.k === 'spell') (seg.words || []).forEach(id => { const w = W(id); if (w && !/^[a-z]+$/.test(w.en)) errs.push(`${where}: "${w.en}" cannot be spelled with tiles`); });
+      if (seg.k === 'memory' && (seg.words || []).length > 6) warns.push(`${where}: memory with more than 6 pairs is too big for phones`);
+      if (seg.k === 'bug') {
+        if (!(seg.bug >= 0 && seg.bug < seg.tokens.length)) errs.push(`${where}: bug index out of range`);
+        if (!seg.options.includes(seg.fix)) errs.push(`${where}: fix not among options`);
+        if (!seg.explain) errs.push(`${where}: explain missing`);
+      }
+      if (seg.k === 'build' && (!seg.parts || seg.parts.length < 2)) errs.push(`${where}: build needs >= 2 parts`);
+      if (seg.k === 'predict' && !(seg.answer >= 0 && seg.answer < seg.options.length)) errs.push(`${where}: predict answer index invalid`);
+      if (seg.k === 'dialogue') {
+        const d = CONTENT.dialogues[seg.id];
+        if (!d) errs.push(`${where}: dialogue ${seg.id} missing`);
+        else d.nodes.forEach((n, ni) => {
+          if (n.ask && !n.options.some(o => o.ok)) errs.push(`Dialogue ${seg.id} node ${ni}: no correct option`);
+          if (n.ask) n.options.filter(o => !o.ok).forEach(o => { if (!o.hint) warns.push(`Dialogue ${seg.id} node ${ni}: wrong option without hint`); });
+          if (n.say && !n.de) errs.push(`Dialogue ${seg.id} node ${ni}: German translation missing`);
+        });
+      }
+      if (seg.k === 'falling' && (seg.words || []).length < (seg.opts || 3)) errs.push(`${where}: falling needs at least ${seg.opts || 3} words`);
+    });
+  }
+  /* exposure: each word >= 5 times in >= 3 modalities inside its unit (secret levels not counted) */
+  for (const u of CONTENT.units.filter(x => x.status === 'open')) {
+    const count = {}, mods = {};
+    CONTENT.levels.filter(l => l.unit === u.id && !l.secret).forEach(lv => {
+      expandPlan(lv).forEach(t => {
+        const n = t.k === 'dialogue' ? 1 : 1;
+        taskWords(t).forEach(id => { count[id] = (count[id] || 0) + n; (mods[id] = mods[id] || new Set()); (MODALITY[t.k] || []).forEach(m => mods[id].add(m)); });
+      });
+    });
+    CONTENT.words.filter(w => w.unit === u.id).forEach(w => {
+      if ((count[w.id] || 0) < 5) warns.push(`Word ${w.id}: only ${count[w.id] || 0} exposures in ${u.id} (want >= 5)`);
+      if (!mods[w.id] || mods[w.id].size < 3) warns.push(`Word ${w.id}: only ${mods[w.id] ? [...mods[w.id]].join('/') : 'no'} modalities (want >= 3)`);
+    });
+  }
+  CONTENT.items.filter(i => i.kind === 'room' && !i.pos).forEach(i => errs.push(`Item ${i.id}: room item without pos`));
+  CONTENT.secrets.forEach(s => { if (!ITEM(s.item)) errs.push(`Secret ${s.id}: item missing`); });
+  /* every English line should have a recorded clip (else device voice is used) */
+  if (typeof AUDIO !== 'undefined') englishLines().forEach(t => { if (!AUDIO[audioKey(t)]) warns.push(`No audio clip for "${t}" – run tts/make_audio.py`); });
+  else warns.push('AUDIO block missing – device voice only');
+  /* every level must expand without throwing */
+  CONTENT.levels.forEach(lv => { try { if (!expandPlan(lv).length) errs.push(`Level ${lv.id}: no tasks`); } catch (e) { errs.push(`Level ${lv.id}: expand failed ${e.message}`); } });
+  return { errs, warns };
+}
+let VALIDATION = { errs: [], warns: [] };
+const validationText = () => VALIDATION.errs.length || VALIDATION.warns.length
+  ? [...VALIDATION.errs.map(e => '✗ ' + e), ...VALIDATION.warns.map(w => '! ' + w)].join('\n')
+  : '✓ Content validation passed (' + CONTENT.words.length + ' words, ' + CONTENT.levels.length + ' levels).';
+</script>
