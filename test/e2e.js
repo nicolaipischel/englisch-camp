@@ -187,6 +187,8 @@ const note = m => { problems.push(m); console.log('PROBLEM:', m); };
   }
 
   // first level started from onboarding
+  // the full run takes longer than the default 15-min break reminder, whose toast would cover the taps
+  await page.evaluate(() => { S.settings.breakMin = 0; save(); });
   let s = await playLevel(); await finishResult('u1l1');
   // --units=u2,u3 plays only these units (earlier units are marked done); default: all open units
   const ONLY = (process.argv.find(a => a.startsWith('--units=')) || '').slice(8).split(',').filter(Boolean);
@@ -250,6 +252,22 @@ const note = m => { problems.push(m); console.log('PROBLEM:', m); };
   if (await page.evaluate(() => currentScreen) !== 'parent') note('parent panel not reached');
   // themes
   for (const th of ['umbreon', 'mew']) { await page.evaluate(t => { S.settings.theme = t; applyLook(); go('map'); }, th); await page.waitForTimeout(200); await shot('theme-' + th); }
+  // Python offline: CDN blocked -> German hint + skip works (u11 only)
+  if (play.includes('u11')) {
+    const octx = await browser.newContext({ viewport: { width: 360, height: 740 }, hasTouch: true, isMobile: true });
+    await octx.route(/cdn\.jsdelivr\.net/, r => r.abort());
+    const op = await octx.newPage();
+    op.on('pageerror', e => note('offline pageerror: ' + e.message));
+    await op.goto(FILE);
+    await op.evaluate(() => { S.onboarded = true; S.profile.name = 'Mia'; S.parent.unlockAll = true; startLevel('u11l1'); Run.idx = Run.tasks.findIndex(t => t.k === 'py'); showTask(); });
+    await op.waitForSelector('[data-skip]', { timeout: 30000 }).catch(() => note('offline: no skip button'));
+    const warnText = await op.locator('.out .warn').innerText().catch(() => '');
+    if (!/Internet/.test(warnText)) note('offline: German internet hint missing');
+    await op.screenshot({ path: path.join(SHOTS, 'py-offline.png') });
+    await op.locator('[data-skip]').click();
+    if (!(await op.locator('.foot .btn').count())) note('offline: skip did not offer "Weiter"');
+    await octx.close();
+  }
   // landscape + level
   await page.setViewportSize({ width: 740, height: 360 });
   await page.evaluate(() => startLevel('u1l3')); await page.waitForTimeout(400);
