@@ -1,0 +1,149 @@
+<script>
+/* ==========================================================================================
+   WORLD u4 – Familienfelsen (cliff village, rose). Family; 's, my/your/his/her.
+   Code Lab: lists. Boss: Hoppel, a shy lost rabbit looking for his family.
+   ========================================================================================== */
+addWorld({
+  unit: { id:'u4', num:4, title:'Familienfelsen', subtitle:'Meine Familie', accent:'#f07aa0', scene:'cliffs', status:'open', after:'u3',
+    monster:['bunny-1','bunny-2','bunny-3'], monsterNames:['Kuschli','Kuschelin','Kuschelotta'],
+    intro:'Auf den Familienfelsen sucht ein kleiner Hase seine Familie. Hilf ihm! 💗' },
+
+  words: [
+    { id:'mum',      unit:'u4', cat:'family', en:'mum',      de:'Mama',     icon:'mum',      emoji:'👩', pron:'mamm',     exampleEn:'This is my mum.',          exampleDe:'Das ist meine Mama.' },
+    { id:'dad',      unit:'u4', cat:'family', en:'dad',      de:'Papa',     icon:'dad',      emoji:'👨', pron:'däd',      exampleEn:'My dad is funny.',         exampleDe:'Mein Papa ist lustig.' },
+    { id:'brother',  unit:'u4', cat:'family', en:'brother',  de:'Bruder',   icon:'brother',  emoji:'👦',                  exampleEn:"I've got a brother.",      exampleDe:'Ich habe einen Bruder.' },
+    { id:'sister',   unit:'u4', cat:'family', en:'sister',   de:'Schwester', icon:'sister',  emoji:'👧', pron:'SIS-ter',  exampleEn:'Her sister is ten.',       exampleDe:'Ihre Schwester ist zehn.' },
+    { id:'grandma',  unit:'u4', cat:'family', en:'grandma',  de:'Oma',      icon:'grandma',  emoji:'👵', pron:'GRÄN-ma',  exampleEn:'My grandma is nice.',      exampleDe:'Meine Oma ist nett.' },
+    { id:'grandpa',  unit:'u4', cat:'family', en:'grandpa',  de:'Opa',      icon:'grandpa',  emoji:'👴', pron:'GRÄN-pa',  exampleEn:"Grandpa's cat is black.",  exampleDe:'Opas Katze ist schwarz.' },
+    { id:'baby',     unit:'u4', cat:'family', en:'baby',     de:'Baby',     icon:'baby',     emoji:'👶', pron:'BÄI-bi',   exampleEn:'The baby is happy.',       exampleDe:'Das Baby ist fröhlich.' },
+    { id:'family',   unit:'u4', cat:'family', en:'family',   de:'Familie',  icon:'family',   emoji:'👪', pron:'FÄ-mi-li', exampleEn:'This is my family.',       exampleDe:'Das ist meine Familie.' },
+    { id:'parents',  unit:'u4', cat:'family', en:'parents',  de:'Eltern',   icon:'parents',  emoji:'👫', pron:'PÄ-rents', exampleEn:'My parents are at home.',  exampleDe:'Meine Eltern sind zu Hause.' },
+    { id:'aunt',     unit:'u4', cat:'family', en:'aunt',     de:'Tante',    icon:'aunt',     emoji:'👩‍🦰', pron:'aant',    exampleEn:'My aunt is a teacher.',    exampleDe:'Meine Tante ist Lehrerin.' },
+    { id:'uncle',    unit:'u4', cat:'family', en:'uncle',    de:'Onkel',    icon:'uncle',    emoji:'🧔', pron:'ANG-kl',   exampleEn:'Uncle Tom is tall.',       exampleDe:'Onkel Tom ist groß.' },
+    { id:'cousin',   unit:'u4', cat:'family', en:'cousin',   de:'Cousin / Cousine', icon:'cousin', emoji:'🧒', pron:'KA-sn', exampleEn:'My cousin is nine.',   exampleDe:'Mein Cousin ist neun.' },
+    { id:'friend',   unit:'u4', cat:'family', en:'friend',   de:'Freund / Freundin', icon:'friend', emoji:'🧑‍🤝‍🧑', pron:'fränd', exampleEn:'Juno is my friend.', exampleDe:'Juno ist meine Freundin.' },
+    { id:'thisis',   unit:'u4', cat:'phrase', en:'This is my brother.', de:'Das ist mein Bruder.', icon:'thisis', emoji:'👉', exampleEn:'This is my brother. His name is Leo.', exampleDe:'Das ist mein Bruder. Er heißt Leo.' },
+    { id:'whoisthis',unit:'u4', cat:'phrase', en:'Who is this?', de:'Wer ist das?', icon:'whoisthis', emoji:'❓', exampleEn:"Who is this? – It's my aunt.", exampleDe:'Wer ist das? – Das ist meine Tante.' }
+  ],
+
+  levels: [
+    { id:'u4l1', unit:'u4', type:'catch', title:'Familienfoto', minutes:'2–3',
+      story:{ before:'Der Wind hat Familienfotos über die Felsen geweht. Fang sie ein!', after:'Die ersten Fotos sind wieder da! 📸' },
+      plan:[ {intro:['mum','dad','brother','sister']},
+             {k:'catch', words:['mum','dad','brother','sister'], reps:2, opts:3} ] },
+
+    { id:'u4l2', unit:'u4', type:'listen', title:'Oma & Opa', minutes:'3',
+      story:{ before:'Oma und Opa rufen von oben. Hör genau hin! 👂', after:'Oma winkt dir zu. Stark gehört!' },
+      plan:[ {intro:['grandma','grandpa','baby','family']},
+             {k:'listen', words:['grandma','grandpa','baby','family'], reps:2, opts:3},
+             {k:'speak', words:['grandma','family']} ] },
+
+    { id:'u4l3', unit:'u4', type:'memory', title:'Familien-Memory', minutes:'3–4',
+      story:{ before:'Beim Familienfest liegen Karten auf dem Tisch. Finde die Paare!', after:'Alle Paare gefunden – die ganze Familie ist da! 🎉' },
+      plan:[ {intro:['parents','aunt','uncle','cousin','friend']},
+             {k:'memory', words:['parents','aunt','uncle','cousin','friend','baby']},
+             {k:'listen', words:['parents','aunt','uncle','cousin','friend'], reps:1, opts:3} ] },
+
+    { id:'u4l4', unit:'u4', type:'dialogue', title:'Wer ist das?', minutes:'3–4',
+      story:{ before:'Juno zeigt dir ihr Familienfoto.', after:'Jetzt kennst du Junos ganze Familie! 💛' },
+      plan:[ {intro:['thisis','whoisthis']},
+             {k:'dialogue', id:'d_u4_juno'},
+             {k:'speak', words:['whoisthis','thisis','friend']} ] },
+
+    { id:'u4l5', unit:'u4', type:'spell', title:'Das Familienbuch', minutes:'3–4',
+      story:{ before:'Im Familienbuch fehlen Wörter. Schreibst du sie hinein?', after:'Das Familienbuch ist komplett! ✨' },
+      plan:[ {k:'spell', words:['mum','dad','baby','aunt','uncle','sister','friend','family'], mode:'tiles'},
+             {k:'spell', words:['brother','grandma','grandpa','parents','cousin'], mode:'first'} ] },
+
+    { id:'u4l6', unit:'u4', type:'codelab', title:'Code Lab: Listen', minutes:'4–5', reward:'room_photo',
+      story:{ before:'Prof. Pixel will eine Familienliste programmieren. Hilfst du?', after:'Die Familienliste läuft. Compile successful! 💻' },
+      plan:[
+        {k:'card', title:'Listen 📋', text:'Eine Liste ist eine Box mit vielen Fächern. Sie steht in eckigen Klammern [ ], die Teile trennt ein Komma.', code:'family = ["mum", "dad", "Leo"]\nprint(family)', out:"['mum', 'dad', 'Leo']"},
+        {k:'card', title:'Fächer zählen 0️⃣', text:'Achtung: Python zählt ab 0! Fach 0 ist das erste Fach.', code:'family = ["mum", "dad", "Leo"]\nprint(family[0])', out:'mum'},
+        {k:'predict', code:'family = ["mum", "dad", "baby"]\nprint(family[1])', options:['dad','mum','baby'], answer:0, explain:'Fach 0 ist [[mum]], Fach 1 ist [[dad]]. Python zählt ab 0!', uses:['dad','mum','baby']},
+        {k:'predict', code:'family = ["grandma", "grandpa"]\nprint(len(family))', options:['2','1','grandma'], answer:0, explain:'[[len]] zählt, wie viele Teile in der Liste sind: 2.', uses:['grandma','grandpa']},
+        {k:'card', title:'append ➕', text:'[[append]] heißt „anhängen“. Es hängt etwas hinten an die Liste an.', code:'family = ["mum"]\nfamily.append("aunt")\nprint(family)', out:"['mum', 'aunt']"},
+        {k:'order', de:'Bau das Programm: Leg die Liste an, häng [[uncle]] an und zeig sie an.', lines:['family = ["aunt"]','family.append("uncle")','print(family)'], extra:['print("family")'], out:"['aunt', 'uncle']", explain:'Mit Anführungszeichen wäre nur das Wort [[family]] angezeigt worden – nicht die Liste.', uses:['aunt','uncle']},
+        {k:'trace', code:'family = []\nfamily.append("mum")\nfamily.append("dad")\nfamily[0] = "grandma"', var:'family', steps:[{v:'[]', alt:["['mum']",'0']},{v:"['mum']", alt:["['dad']",'[]']},{v:"['mum', 'dad']", alt:["['dad', 'mum']","['dad']"]},{v:"['grandma', 'dad']", alt:["['mum', 'grandma']","['grandma', 'mum', 'dad']"]}], explain:'In der letzten Zeile wird Fach 0 überschrieben: aus [[mum]] wird [[grandma]].', uses:['mum','dad','grandma']},
+        {k:'build', parts:['This','is','my','cousin.'], de:'Das ist mein Cousin.', py:'print("This is my cousin.")', uses:['cousin','thisis']},
+        {k:'build', code:true, parts:['family.append(','"baby"',')'], de:'Häng [[baby]] an die Liste an!', py:'family.append("baby")\nprint(family)', uses:['baby']},
+        {k:'predict', code:'family = ["sister", "brother"]\nprint(family[0])\nprint(family[1])', options:['sister\nbrother','brother\nsister','sister'], answer:0, explain:'Erst Fach 0, dann Fach 1 – jedes [[print]] schreibt eine neue Zeile.', uses:['sister','brother']}
+      ] },
+
+    { id:'u4l7', unit:'u4', type:'bughunt', title:"Bug-Jagd: 's und my/his/her", minutes:'3–4',
+      story:{ before:'Im Familienbuch krabbeln Bugs! 🐞', after:'Alle Bugs gefangen! Nuvi nennt einen davon „Onkel Krabbel“.' },
+      plan:[
+        {k:'card', title:'Bug-Jagd 🐞', text:"Wem gehört's? [[mum's bag]] = Mamas Tasche. [[my]] = mein, [[your]] = dein, [[his]] = sein (Junge), [[her]] = ihr (Mädchen)."},
+        {k:'bug', tokens:['My','mums','name','is','Anna.'], bug:1, options:["mum's","mums'",'mumm'], fix:"mum's", explain:"Der Name von Mama: [[my mum's name]].", uses:['mum']},
+        {k:'bug', tokens:['Juno','and','his','sister.'], bug:2, options:['her','he','she'], fix:'her', explain:'Juno ist ein Mädchen – also [[her sister]].', uses:['sister']},
+        {k:'bug', tokens:['Tom','and','her','dad.'], bug:2, options:['his','he','him'], fix:'his', explain:'Tom ist ein Junge – also [[his dad]].', uses:['dad']},
+        {k:'bug', tokens:['This','is','I','grandma.'], bug:2, options:['my','me','mine'], fix:'my', explain:'Mein, meine = [[my]]: [[my grandma]].', uses:['grandma']},
+        {k:'bug', tokens:['Is','this','you','uncle?'], bug:2, options:['your','yours',"your's"], fix:'your', explain:'Dein = [[your]]: [[your uncle]].', uses:['uncle']},
+        {k:'bug', tokens:['My','grandpa','name','is','Max.'], bug:1, options:["grandpa's",'grandpas','grandpaz'], fix:"grandpa's", explain:"Opas Name = [[my grandpa's name]].", uses:['grandpa']},
+        {k:'bug', tokens:['Two','sister','and','a','brother.'], bug:1, options:['sisters','sisteres','sisterz'], fix:'sisters', explain:'Zwei Schwestern: [[sisters]].', uses:['sister','brother']},
+        {k:'bug', tokens:['My','parent','are','nice.'], bug:1, options:['parents','parentes',"parent's"], fix:'parents', explain:'Eltern sind zwei: [[parents]].', uses:['parents']},
+        {k:'bug', tokens:['Who','are','this?'], bug:1, options:['is','am','be'], fix:'is', explain:'Es heißt [[Who is this?]]', uses:['whoisthis']},
+        {k:'bug', tokens:['The','babby','is','happy.'], bug:1, options:['baby','bebi','babie'], fix:'baby', explain:'Baby = [[baby]] – mit einem b in der Mitte.', uses:['baby']}
+      ] },
+
+    { id:'u4boss', unit:'u4', type:'boss', title:'Boss: Hoppel sucht seine Familie', minutes:'6–8', reward:'acc_heart',
+      boss:{ name:'Hoppel', art:'rabbit' },
+      story:{ before:'Hoppel versteckt sich hinter den Felsen. Er ist schüchtern und ganz allein. Hilf ihm!',
+              after:{ flag:'u4guest', grandma:'Oma backt einen Möhrenkuchen für Hoppels Familie. Und Prof. Pixel ruft dich in seinen Leuchtturm! 💻',
+                      brother:'Dein Bruder baut mit Hoppels Familie eine Höhle. Und Prof. Pixel ruft dich in seinen Leuchtturm! 💻',
+                      default:'Hoppel ist wieder bei seiner Familie. Und Prof. Pixel ruft dich in seinen Leuchtturm! 💻' } },
+      plan:[
+        {k:'catch', words:['mum'], opts:3},
+        {k:'listen', words:['brother'], opts:3},
+        {k:'spell', words:['aunt'], mode:'tiles'},
+        {k:'listen', words:['grandpa','grandma'], opts:4},
+        {k:'speak', words:['family']},
+        {k:'bug', tokens:['Is','this','you','mum?'], bug:2, options:['your','yours',"your's"], fix:'your', explain:'Dein = [[your]]: [[Is this your mum?]]', uses:['mum']},
+        {k:'catch', words:['baby','parents'], opts:4},
+        {k:'build', parts:['This','is','my','family.'], de:'Das ist meine Familie.', py:'print("This is my family.")', uses:['family','thisis']},
+        {k:'predict', code:'rabbits = ["mum", "dad", "sister"]\nprint(rabbits[2])', options:['sister','dad','mum'], answer:0, explain:'Fach 2 ist das dritte: [[sister]] – Hoppels Schwester!', uses:['sister']},
+        {k:'listen', words:['cousin','friend'], opts:4},
+        {k:'catch', words:['uncle','dad'], opts:4},
+        {k:'spell', words:['sister'], mode:'tiles'},
+        {k:'listen', words:['whoisthis'], opts:3},
+        {k:'dialogue', id:'d_hoppel'}
+      ] },
+
+    { id:'u4secret', unit:'u4', type:'falling', secret:true, title:'Geheim: Familienregen', minutes:'3', reward:'room_carrot',
+      story:{ before:'Psst … hinter dem Felsen regnet es Familienwörter! ☔', after:'Du hast den Familienregen gemeistert! 🥕' },
+      plan:[ {k:'falling', words:['mum','dad','brother','sister','grandma','grandpa','baby','aunt','uncle'], rounds:8, opts:3} ] }
+  ],
+
+  dialogues: {
+    d_u4_juno: { npc:'juno', nodes:[
+      { say:'Look! This is my family photo.', de:'Schau! Das ist mein Familienfoto.' },
+      { ask:'Frag, wer das ist!', options:[ {en:'Who is this?', ok:true}, {en:'How are you?', hint:'Frag nach der Person auf dem Foto 👀'} ] },
+      { say:'This is my brother. His name is Leo.', de:'Das ist mein Bruder. Er heißt Leo.' },
+      { ask:'Frag nach der Frau daneben!', options:[ {en:'Goodbye!', hint:'Frag weiter: Wer ist das?'}, {en:'And who is this?', ok:true} ] },
+      { say:"That's my aunt. Her name is Rosa.", de:'Das ist meine Tante. Sie heißt Rosa.' },
+      { ask:'Zeig Juno dein Foto: Da ist deine Schwester.', options:[ {en:'This is my sister.', ok:true}, {en:'This is my uncle.', hint:'Auf deinem Foto ist deine Schwester 👧'} ] },
+      { story:'Juno fragt, wen du zum Familienfest mitbringst.', flag:'u4guest', options:[ {de:'👵 Meine Oma', value:'grandma'}, {de:'👦 Meinen Bruder', value:'brother'} ] },
+      { say:'Great! My grandpa is coming too.', de:'Super! Mein Opa kommt auch.' },
+      { ask:'Freu dich!', options:[ {en:'Great! See you!', ok:true}, {en:'Sorry!', hint:'Das ist doch eine gute Nachricht 🎉'} ] }
+    ]},
+    d_hoppel: { npc:'rabbit', nodes:[
+      { say:"I'm lost. Where is my family?", de:'Ich habe mich verlaufen. Wo ist meine Familie?' },
+      { ask:'Sei lieb zu ihm!', options:[ {en:"Hello! Don't be sad.", ok:true}, {en:'Go away!', hint:'Hoppel ist traurig – sei lieb zu ihm 💗'} ] },
+      { say:'My mum is white. My dad is brown.', de:'Meine Mama ist weiß. Mein Papa ist braun.' },
+      { ask:'Da hinten hoppelt ein weißer Hase. Frag Hoppel!', options:[ {en:'Is this your chair?', hint:'Frag nach seiner Mama 🐰'}, {en:'Is this your mum?', ok:true} ] },
+      { say:"Yes! That's my mum! And my sister!", de:'Ja! Das ist meine Mama! Und meine Schwester!' },
+      { ask:'Freu dich mit ihm!', options:[ {en:'Hooray! Your family is here!', ok:true}, {en:'Your family is a bag.', hint:'Hoppel hat seine Familie gefunden 🎉'} ] },
+      { say:'Thank you! You are my friend now!', de:'Danke! Jetzt sind wir Freunde!' }
+    ]}
+  },
+
+  items: [
+    { id:'acc_heart',   kind:'acc', slot:'head', name:'Herzspange', price:null },
+    { id:'room_photo',  kind:'room', name:'Familienfoto', price:null, pos:{x:22,y:36,w:16} },
+    { id:'room_carrot', kind:'room', name:'Möhrenkissen', price:null, pos:{x:56,y:92,w:16} },
+    { id:'room_teddy',  kind:'room', name:'Teddy',        price:null, pos:{x:10,y:94,w:12} }
+  ],
+  badges: [ { id:'b_boss_u4', name:'Familienheldin', desc:'Hoppel hat seine Familie wieder', emblem:'heart', when:{level:'u4boss'} } ],
+  secrets: [ { id:'s_u4_teddy', unit:'u4', item:'room_teddy', x:84, y:30, text:'Du hast einen Teddy in einer Felsspalte gefunden! 🧸' } ]
+});
+</script>
