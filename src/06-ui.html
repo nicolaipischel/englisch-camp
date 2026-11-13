@@ -105,7 +105,7 @@ function holdButton(btn, ms, fn) {
 /* ==========================================================================================
    CONTENT VALIDATION (runs at startup; report visible with #debug and in the parent area)
    ========================================================================================== */
-const KINDS = ['intro','catch','listen','spell','speak','memory','falling','dialogue','build','predict','bug','card'];
+const KINDS = ['intro','catch','listen','spell','speak','memory','falling','dialogue','build','predict','bug','card','order','trace','py'];
 function validateContent() {
   const errs = [], warns = [];
   const ids = new Map();
@@ -120,8 +120,16 @@ function validateContent() {
   for (const w of CONTENT.words) {
     ['unit', 'cat', 'en', 'de', 'exampleEn', 'exampleDe'].forEach(f => { if (!w[f] || !String(w[f]).trim()) errs.push(`Word ${w.id}: empty "${f}"`); });
     if (!U(w.unit)) errs.push(`Word ${w.id}: unknown unit ${w.unit}`);
-    if (!(/^num:\d+$/.test(w.icon) || ART.icons[w.icon])) errs.push(`Word ${w.id}: no picture "${w.icon}"`);
+    if (!ART.hasPic(w)) errs.push(`Word ${w.id}: no picture "${w.icon}"`);
     if ('pron' in w && !String(w.pron).trim()) errs.push(`Word ${w.id}: pron empty – remove the field instead`);
+  }
+  for (const u of CONTENT.units.filter(x => x.status === 'open')) {
+    if (u.scene !== 'harbour' && !ART.scenes[u.scene]) errs.push(`Unit ${u.id}: unknown scene ${u.scene}`);
+    if (u.after && !U(u.after)) errs.push(`Unit ${u.id}: unknown "after" unit ${u.after}`);
+    (u.monster || []).forEach(m => { if (!ART.monster(m).includes('<path') && !ART.monster(m).includes('<g')) errs.push(`Unit ${u.id}: no art for monster ${m}`); });
+    if (!u.monster || u.monster.length !== 3 || !u.monsterNames || u.monsterNames.length !== 3) errs.push(`Unit ${u.id}: needs 3 monsters with names`);
+    const last = unitLevels(u.id).slice(-1)[0];
+    if (!last || last.type !== 'boss') errs.push(`Unit ${u.id}: last main level must be the boss`);
   }
   const introduced = {};
   for (const lv of CONTENT.levels) {
@@ -129,6 +137,7 @@ function validateContent() {
     if (!u) { errs.push(`Level ${lv.id}: unknown unit`); continue; }
     ['title', 'type', 'plan'].forEach(f => { if (!lv[f]) errs.push(`Level ${lv.id}: missing ${f}`); });
     if (lv.reward && !ITEM(lv.reward)) errs.push(`Level ${lv.id}: reward item ${lv.reward} missing`);
+    if (lv.boss && !(lv.boss.art === 'crab' || ART.bosses[lv.boss.art])) errs.push(`Level ${lv.id}: unknown boss art ${lv.boss.art}`);
     introduced[lv.unit] = introduced[lv.unit] || new Set();
     const pool = introduced[lv.unit];
     (lv.plan || []).forEach((seg, si) => {
@@ -150,6 +159,19 @@ function validateContent() {
       }
       if (seg.k === 'build' && (!seg.parts || seg.parts.length < 2)) errs.push(`${where}: build needs >= 2 parts`);
       if (seg.k === 'predict' && !(seg.answer >= 0 && seg.answer < seg.options.length)) errs.push(`${where}: predict answer index invalid`);
+      if (seg.k === 'predict' && new Set(seg.options).size !== seg.options.length) errs.push(`${where}: predict options not unique`);
+      if (seg.k === 'order') {
+        if (!seg.lines || seg.lines.length < 2) errs.push(`${where}: order needs >= 2 lines`);
+        else if (new Set(seg.lines.concat(seg.extra || [])).size !== seg.lines.length + (seg.extra || []).length) errs.push(`${where}: order lines must be unique`);
+      }
+      if (seg.k === 'trace') {
+        if (!seg.code || !seg.var || !(seg.steps || []).length) errs.push(`${where}: trace needs code, var, steps`);
+        else seg.steps.forEach((st, k) => {
+          if (!st.alt || !st.alt.length || st.alt.includes(st.v) || new Set(st.alt).size !== st.alt.length) errs.push(`${where}: trace step ${k} needs unique wrong options`);
+          if ((st.line != null ? st.line : k) >= seg.code.split('\n').length) errs.push(`${where}: trace step ${k} line out of range`);
+        });
+      }
+      if (seg.k === 'py' && (!seg.de || !seg.solution || !seg.check || !(seg.check.out != null || seg.check.has || seg.check.test))) errs.push(`${where}: py needs de, solution and check`);
       if (seg.k === 'dialogue') {
         const d = CONTENT.dialogues[seg.id];
         if (!d) errs.push(`${where}: dialogue ${seg.id} missing`);
@@ -158,6 +180,7 @@ function validateContent() {
           if (n.ask) n.options.filter(o => !o.ok).forEach(o => { if (!o.hint) warns.push(`Dialogue ${seg.id} node ${ni}: wrong option without hint`); });
           if (n.say && !n.de) errs.push(`Dialogue ${seg.id} node ${ni}: German translation missing`);
         });
+        if (d && !['juno', 'pixel', 'crab'].includes(d.npc) && !ART.bosses[d.npc]) errs.push(`Dialogue ${seg.id}: unknown npc ${d.npc}`);
       }
       if (seg.k === 'falling' && (seg.words || []).length < (seg.opts || 3)) errs.push(`${where}: falling needs at least ${seg.opts || 3} words`);
     });
@@ -168,7 +191,7 @@ function validateContent() {
     CONTENT.levels.filter(l => l.unit === u.id && !l.secret).forEach(lv => {
       expandPlan(lv).forEach(t => {
         const n = t.k === 'dialogue' ? 1 : 1;
-        taskWords(t).forEach(id => { count[id] = (count[id] || 0) + n; (mods[id] = mods[id] || new Set()); (MODALITY[t.k] || []).forEach(m => mods[id].add(m)); });
+        taskWords(t, u.id).forEach(id => { count[id] = (count[id] || 0) + n; (mods[id] = mods[id] || new Set()); (MODALITY[t.k] || []).forEach(m => mods[id].add(m)); });
       });
     });
     CONTENT.words.filter(w => w.unit === u.id).forEach(w => {

@@ -66,7 +66,7 @@ function unitSection(u) {
   const nodes = pts.map(p => {
     const st = levelState(p.l), rec = S.levels[p.l.id];
     const isNext = nxt && nxt.id === p.l.id;
-    const icon = p.l.type === 'boss' ? `<div style="width:70px">${ART.crab(isDone(p.l.id) ? 'happy' : 'grumpy')}</div>` : p.secret ? IC('sparkle') : IC(p.l.type);
+    const icon = p.l.type === 'boss' ? `<div style="width:70px">${ART.boss(p.l.boss.art, isDone(p.l.id) ? 'happy' : 'grumpy')}</div>` : p.secret ? IC('sparkle') : IC(p.l.type);
     return `<button class="node ${st} ${isNext ? 'next' : ''} ${p.l.type === 'boss' ? 'boss' : ''} ${p.secret ? 'secret' : ''}" style="left:${p.x}%;top:${p.y}px" data-l="${p.l.id}" aria-label="${esc(p.l.title)}${st === 'locked' ? ', gesperrt' : st === 'done' ? ', ' + rec.stars + ' Sterne' : ''}">
       ${p.l.type === 'boss' ? icon : `<span class="ic" style="width:40px;height:40px;display:grid">${icon}</span>`}
       ${st === 'done' ? `<span class="stars">${[1, 2, 3].map(k => ART.star(k <= rec.stars)).join('')}</span>` : ''}
@@ -74,7 +74,7 @@ function unitSection(u) {
       <span class="lbl">${esc(p.l.title)}</span></button>`;
   }).join('');
   const nxtPt = nxt && pts.find(p => p.l.id === nxt.id);
-  return `<section class="unit" style="--accent:${u.accent}">
+  return `<section class="unit ${u.dark ? 'dark' : ''}" style="--accent:${u.accent}">
     <div class="unit-scene">${ART.scene(u.scene, H + 90)}</div>
     <div class="unit-head"><div class="mon">${ART.monster(stage ? u.monster[stage - 1] : 'locked', '', stage ? u.monsterNames[stage - 1] : 'Unbekanntes Monster')}</div>
       <div class="grow"><span class="tag">Route ${u.num}</span><h2>${esc(u.title)}</h2><small class="muted" style="font-weight:800">${esc(u.subtitle)} · ${unitStars(u.id)}/${lvls.length * 3} ${ART.star(true).replace('<svg', '<svg style="width:14px;height:14px;display:inline;vertical-align:-2px"')}</small></div></div>
@@ -86,8 +86,9 @@ function unitSection(u) {
     </div></section>`;
 }
 function soonCard(u) {
-  return `<div class="soon" style="--accent:${u.accent}"><span class="ribbon">COMING SOON</span><div class="mon">${ART.monster('locked')}</div>
-    <div><span class="tag">Route ${u.num}</span><h3>${esc(u.title)}</h3><small class="muted" style="font-weight:800">${esc(u.subtitle)}</small></div>
+  const after = u.status === 'open' && U(u.after);
+  return `<div class="soon" style="--accent:${u.accent}"><span class="ribbon">${after ? 'GESPERRT' : 'COMING SOON'}</span><div class="mon">${ART.monster('locked')}</div>
+    <div><span class="tag">Route ${u.num}</span><h3>${esc(u.title)}</h3><small class="muted" style="font-weight:800">${after ? `Öffnet sich, wenn du ${esc(after.title)} geschafft hast.` : esc(u.subtitle)}</small></div>
     <span style="margin-left:auto;width:28px;color:var(--ink2)">${IC('lock', 'Gesperrt')}</span></div>`;
 }
 function topBar() {
@@ -116,7 +117,7 @@ function wireCommon(node) {
   }
 }
 SCREENS.map = () => {
-  const open = CONTENT.units.filter(u => u.status === 'open'), soon = CONTENT.units.filter(u => u.status !== 'open');
+  const open = CONTENT.units.filter(u => unitOpen(u.id)), soon = CONTENT.units.filter(u => !unitOpen(u.id));
   const due = dueIds();
   const node = el(`<div class="screen">${topBar()}
     <div class="scroll"><div class="mapwrap">

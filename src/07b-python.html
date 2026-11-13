@@ -1,0 +1,150 @@
+<script>
+/* ==========================================================================================
+   PYTHON (Pyodide) – real Python for Pixels Leuchtturm (u11). Loaded lazily from the CDN only
+   when a 'py' task needs it; everything else in the app stays offline.
+   Task: {k:'py', de, start, check:{out?, has?, test?}, inputs?, hint, solution, explain, uses}
+     check.out  = expected print output (exact, trailing spaces ignored)
+     check.has  = strings that must appear in the output
+     check.test = Python expression, evaluated after the run in the program's namespace
+   ========================================================================================== */
+const PY = {
+  base: 'https://cdn.jsdelivr.net/pyodide/v0.29.5/full/',
+  STEP_LIMIT: 200000,
+  py: null, pending: null,
+  load() {
+    if (this.py) return Promise.resolve(this.py);
+    if (!this.pending) this.pending = this.fetchRuntime().then(py => { this.py = py; return py; }, e => { this.pending = null; throw e; });
+    return this.pending;
+  },
+  fetchRuntime() {
+    const timeout = (p, ms, what) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(what + ' timeout')), ms))]);
+    const script = window.loadPyodide ? Promise.resolve() : new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = this.base + 'pyodide.js'; s.crossOrigin = 'anonymous';
+      s.onload = res; s.onerror = () => { s.remove(); rej(new Error('pyodide.js could not be loaded')); };
+      document.head.append(s);
+    });
+    return timeout(script, 45000, 'script').then(() => timeout(loadPyodide({ indexURL: this.base }), 120000, 'runtime'));
+  },
+  /* Runs code in a fresh namespace. Returns {ok, out, shown, err, passed}. out = printed text only,
+     shown = printed text with the typed inputs echoed (like a terminal). */
+  async run(code, check = {}, inputs = []) {
+    const py = await this.load();
+    let out = '', shown = '';
+    const dec = new TextDecoder();
+    const queue = inputs.map(String);
+    py.setStdout({ write: buf => { const s = dec.decode(buf, { stream: true }); out += s; shown += s; return buf.length; } });
+    py.setStderr({ write: buf => buf.length });
+    py.setStdin({ stdin: () => { if (!queue.length) return null; const v = queue.shift(); shown += v + '\n'; return v + '\n'; } });
+    const ns = py.globals.get('dict')();
+    py.runPython(`import sys\n_ec_n = [0]\ndef _ec_t(f, e, a):\n    _ec_n[0] += 1\n    if _ec_n[0] > ${this.STEP_LIMIT}:\n        raise RuntimeError("EC_STEP_LIMIT")\n    return _ec_t\n`, { globals: ns });
+    let err = null;
+    try {
+      py.runPython('sys.settrace(_ec_t)', { globals: ns });
+      await py.runPythonAsync(code, { globals: ns });
+    } catch (e) {
+      err = PY.explain(e);
+    } finally {
+      py.runPython('sys.settrace(None)', { globals: ns });
+    }
+    let passed = !err;
+    if (passed && check.out != null) passed = PY.same(out, sub(check.out));
+    if (passed && check.has) passed = check.has.every(h => out.includes(sub(h)));
+    if (passed && check.test) passed = !!py.runPython(sub(check.test), { globals: ns });
+    ns.destroy();
+    return { ok: !err, out, shown, err, passed };
+  },
+  same(a, b) { const n = s => s.replace(/\r/g, '').split('\n').map(l => l.replace(/\s+$/, '')).join('\n').replace(/\n+$/, ''); return n(a) === n(b); },
+  /* PythonError -> short German explanation + the original last line */
+  explain(e) {
+    const msg = String(e && e.message || e);
+    const last = msg.trim().split('\n').filter(Boolean).pop() || msg;
+    if (/EC_STEP_LIMIT/.test(msg)) return { de: 'Dein Programm läuft und läuft … Ist da eine Endlosschleife? 🔁', line: 'Gestoppt nach zu vielen Schritten' };
+    const map = [
+      [/IndentationError/, 'Die Einrückung stimmt nicht. Unter einem Doppelpunkt brauchst du 4 Leerzeichen.'],
+      [/SyntaxError/, 'Python versteht die Schreibweise nicht. Fehlt eine Klammer, ein Doppelpunkt oder ein Anführungszeichen?'],
+      [/NameError/, 'Python kennt ein Wort nicht. Tippfehler? Oder fehlen Anführungszeichen?'],
+      [/TypeError/, 'Da passen zwei Sachen nicht zusammen – zum Beispiel Text und Zahl.'],
+      [/ValueError/, 'Ein Wert passt nicht – zum Beispiel Text, wo eine Zahl stehen soll.'],
+      [/ZeroDivisionError/, 'Durch 0 teilen geht nicht!'],
+      [/IndexError/, 'So viele Elemente hat die Liste nicht. Zählen beginnt bei 0!'],
+      [/KeyError/, 'Diesen Schlüssel gibt es im Wörterbuch nicht.'],
+      [/EOFError/, 'Das Programm wollte mehr Eingaben, als es gibt.']
+    ];
+    const hit = map.find(([re]) => re.test(last));
+    return { de: hit ? hit[1] : 'Python hat einen Fehler gemeldet.', line: last };
+  }
+};
+
+/* Code editor + run button. Offline: a German hint, retry and skip (skip counts as a demo). */
+TASKS.py = (t, api) => {
+  const keys = ['⇥', '"', '(', ')', ':', '=', '+', '[', ']'];
+  const box = el(`<div class="task">${qRow(t.de, 'codelab')}
+    ${t.inputs && t.inputs.length ? `<div class="chip" style="align-self:center">⌨️ Eingabe beim Test: <b lang="en-GB">${t.inputs.map(x => esc(sub(x))).join(', ')}</b></div>` : ''}
+    <textarea class="pyed" spellcheck="false" autocapitalize="none" autocorrect="off" autocomplete="off" lang="en" aria-label="Python-Code"></textarea>
+    <div class="pykeys">${keys.map(k => `<button class="btn small" data-key="${esc(k)}" aria-label="${k === '⇥' ? 'Einrücken (4 Leerzeichen)' : 'Zeichen ' + esc(k)}">${esc(k)}</button>`).join('')}</div>
+    <button class="btn pri block" data-run>${IC('play')} Ausführen</button>
+    <div class="out stack"></div></div>`);
+  Run.stage.append(box);
+  const ed = $('.pyed', box), out = $('.out', box), runBtn = $('[data-run]', box);
+  ed.value = sub(t.start || '');
+  ed.rows = Math.max(4, ed.value.split('\n').length + 1);
+  let done = false, busy = false;
+  const insert = s => {
+    const a = ed.selectionStart, b = ed.selectionEnd;
+    ed.setRangeText(s, a, b, 'end'); ed.focus();
+  };
+  ed.addEventListener('keydown', e => {
+    if (e.key === 'Tab') { e.preventDefault(); insert('    '); }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const before = ed.value.slice(0, ed.selectionStart), line = before.split('\n').pop();
+      insert('\n' + /^ */.exec(line)[0] + (/:\s*$/.test(line) ? '    ' : ''));
+    }
+  });
+  $('.pykeys', box).onclick = e => { const k = e.target.closest('[data-key]'); if (k) insert(k.dataset.key === '⇥' ? '    ' : k.dataset.key); };
+  const offline = () => {
+    out.innerHTML = `<div class="warn">📡 Für echtes Python brauchst du Internet. Python wird aus dem Netz geladen – verbinde dich und probier's nochmal.</div>
+      <div class="row"><button class="btn grow" data-retry>${IC('replay')} Nochmal versuchen</button><button class="btn grow" data-skip>Überspringen</button></div>`;
+    $('[data-retry]', out).onclick = () => { out.innerHTML = ''; warm(); };
+    $('[data-skip]', out).onclick = () => { if (done) return; done = true; ed.value = sub(t.solution); out.innerHTML = `<div class="ex">So hätte die Lösung ausgesehen. ${fmt(t.explain || '')}</div>`; api.demo(t.uses || []); footBtn('Weiter', () => api.next()); };
+  };
+  const warm = () => {
+    if (PY.py) return;
+    if (navigator.onLine === false) { offline(); return; }
+    out.innerHTML = '<div class="console">⏳ Python wird geladen …</div>';
+    runBtn.disabled = true;
+    PY.load().then(() => { runBtn.disabled = false; if (!done) out.innerHTML = '<div class="console">✓ Python ist bereit!</div>'; },
+      e => { console.warn('Python could not be loaded', e); runBtn.disabled = false; if (!done) offline(); });
+  };
+  const finish = (r, demo) => {
+    done = true; runBtn.disabled = true; ed.readOnly = true;
+    out.innerHTML = `${r ? consoleOut(r.shown.replace(/\n+$/, '') || '(keine Ausgabe)') : ''}<div class="console">✓ Geschafft!</div>${t.explain ? `<div class="ex">${fmt(t.explain)}</div>` : ''}`;
+    if (demo) api.demo(t.uses || []); else api.right(t.uses || [], out);
+    footBtn('Weiter', () => api.next());
+    setTimeout(() => out.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 50);
+  };
+  const run = async demo => {
+    if (busy || done) return;
+    busy = true; runBtn.disabled = true;
+    out.innerHTML = '<div class="console">▶ läuft …</div>';
+    const loaded = await PY.load().then(() => true, e => { console.warn('Python unavailable', e); return false; });
+    if (!loaded) { busy = false; runBtn.disabled = false; offline(); return; }
+    const r = await PY.run(ed.value, t.check || {}, (t.inputs || []).map(sub));
+    busy = false; runBtn.disabled = false;
+    if (r.passed) { finish(r, demo); return; }
+    if (r.err) out.innerHTML = `${r.shown ? consoleOut(r.shown.replace(/\n+$/, '')) : ''}<div class="console meh">🐞 ${esc(r.err.line)}</div><div class="ex">${esc(r.err.de)}</div>`;
+    else out.innerHTML = `${consoleOut(r.shown.replace(/\n+$/, '') || '(keine Ausgabe)')}<div class="ex">Das Programm läuft – aber das Ergebnis passt noch nicht ganz.${t.check && t.check.out != null ? ` Gesucht ist: ${consoleOut(sub(t.check.out))}` : ''}</div>`;
+    api.miss(t.uses || [], 'Fast! Der Bug ist bestimmt klein. 🐞');
+  };
+  runBtn.onclick = () => run(false);
+  api.setHelp(lvl => {
+    if (done) return;
+    if (lvl === 1) api.say('thinking', t.hint || 'Lies die Aufgabe nochmal Wort für Wort.');
+    if (lvl === 2) { const first = sub(t.solution).split('\n').find(l => l.trim()); api.say('thinking', 'Tipp: Die Lösung beginnt so: ' + first); }
+    if (lvl === 3) { ed.value = sub(t.solution); if (PY.py) run(true); else { out.innerHTML = ''; finish(null, true); } }
+  });
+  api.say('happy', 'Echtes Python! Schreib den Code und tippe auf [[Ausführen]].');
+  warm();
+};
+</script>

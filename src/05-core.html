@@ -234,7 +234,7 @@ function englishLines() {
   CONTENT.levels.forEach(l => l.plan.forEach(s => {
     if (s.k === 'build' && !s.code) add(s.parts.join(' '));
     if (s.k === 'bug') add(s.tokens.map((t, i) => i === s.bug ? s.fix : t).join(' '));
-    if (s.k === 'predict') add(s.options[s.answer]);
+    if (s.k === 'predict' && predictSpoken(s)) add(s.options[s.answer]);
   }));
   add("Hello! I'm Nuvi. How are you?");
   return [...set];
@@ -329,8 +329,17 @@ const dueIds = () => learnedIds().filter(id => S.words[id].due != null && S.word
 const unitLevels = uid => CONTENT.levels.filter(l => l.unit === uid && !l.secret);
 const unitSecrets = uid => CONTENT.levels.filter(l => l.unit === uid && l.secret);
 const isDone = id => !!(S.levels[id] && S.levels[id].done);
+/* A unit opens once the boss (last main level) of its "after" unit is done. */
+function unitOpen(uid) {
+  const u = U(uid);
+  if (!u || u.status !== 'open') return false;
+  if (!u.after || S.parent.unlockAll) return true;
+  const boss = unitLevels(u.after).slice(-1)[0];
+  return !boss || isDone(boss.id);
+}
 function levelState(lv) {
   if (isDone(lv.id)) return 'done';
+  if (!unitOpen(lv.unit)) return lv.secret ? 'hidden' : 'locked';
   if (lv.secret) {
     const last = unitLevels(lv.unit).slice(-1)[0];
     return (last && isDone(last.id)) || S.parent.unlockAll ? 'open' : 'hidden';
@@ -377,7 +386,7 @@ function checkBadges() {
 const backupDue = () => S.settings.backupDays > 0 && today() - (S.lastBackupDay != null ? S.lastBackupDay : S.firstDay) >= S.settings.backupDays;
 
 /* ---------------- plan expansion: level data -> list of tasks ---------------- */
-const SINGLE_KINDS = ['memory', 'falling', 'dialogue', 'build', 'predict', 'bug', 'card'];
+const SINGLE_KINDS = ['memory', 'falling', 'dialogue', 'build', 'predict', 'bug', 'card', 'order', 'trace', 'py'];
 function expandPlan(level) {
   const tasks = [];
   for (const seg of level.plan) {
@@ -397,8 +406,10 @@ function expandPlan(level) {
 }
 /* words a task touches + modality (used for exposure check and word stats) */
 const MODALITY = { intro:['see','hear'], catch:['see','hear'], listen:['hear'], memory:['see','hear'], spell:['type'], speak:['say','hear'],
-  build:['build','see'], bug:['see'], dialogue:['hear','see'], predict:['see'], falling:['see','hear'], card:[] };
-function taskWords(t) {
+  build:['build','see'], bug:['see'], dialogue:['hear','see'], predict:['see'], falling:['see','hear'], card:[],
+  order:['build','see'], trace:['see'], py:['type','see'] };
+/* unit: only words of that unit count (a dialogue in one unit must not "teach" words of another) */
+function taskWords(t, unit) {
   if (t.w) return [t.w];
   if (t.words) return t.words;
   if (t.uses) return t.uses;
@@ -406,10 +417,16 @@ function taskWords(t) {
     const d = CONTENT.dialogues[t.id]; const ids = new Set();
     if (d) d.nodes.forEach(n => (n.options || []).concat(n.say ? [{ en: n.say }] : []).forEach(o => {
       if (!o.en) return;
-      CONTENT.words.forEach(w => { if (norm(o.en).includes(norm(w.en)) && norm(w.en).length > 2) ids.add(w.id); });
+      wordsIn(o.en, unit).forEach(id => ids.add(id));
     }));
     return [...ids];
   }
   return [];
 }
+function wordsIn(text, unit) {
+  const t = norm(text);
+  return CONTENT.words.filter(w => (!unit || w.unit === unit) && norm(w.en).length > 1 && (t === norm(w.en) || (norm(w.en).length > 2 && t.includes(norm(w.en))))).map(w => w.id);
+}
+/* predict answers are spoken (and get a clip) only when they contain words and say !== false */
+const predictSpoken = s => s.say !== false && /[a-z]/i.test(s.options[s.answer]);
 </script>

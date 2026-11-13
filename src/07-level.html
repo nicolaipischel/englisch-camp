@@ -7,7 +7,7 @@ const REQUEUE_KINDS = ['catch', 'listen', 'spell'];
 
 function newRun(level, tasks) {
   const words = new Set();
-  tasks.forEach(t => taskWords(t).forEach(id => words.add(id)));
+  tasks.forEach(t => taskWords(t, level.unit).forEach(id => words.add(id)));
   return { level, tasks, idx: 0, total: 0, first: 0, itemWrong: 0, helpLevel: 0, onHelp: null, perWord: {},
            levelWords: words, timed: level.timed || 0, turboScore: 0, timers: [], raf: null };
 }
@@ -69,16 +69,14 @@ function distractors(wid, n, poolIds) {
   const same = shuffle(pool.filter(x => x.cat === w.cat)), other = shuffle(pool.filter(x => x.cat !== w.cat));
   return same.concat(other).slice(0, n).map(x => x.id);
 }
+const PY_KW = 'print|if|elif|else|for|in|range|repeat|while|def|return|and|or|not|True|False|input|len|str|int|append';
 function hl(line) {
-  return esc(sub(line)).replace(/(&quot;.*?&quot;)|\b(print|if|else|for|in|range|repeat|while)\b|([=+()])/g,
-    (m, s, k, o) => s ? `<span class="st">${s}</span>` : k ? `<span class="kw">${k}</span>` : `<span class="op">${o}</span>`);
+  return esc(sub(line)).replace(new RegExp(`(&quot;.*?&quot;|&#39;.*?&#39;)|((?<!&)#.*$)|\\b(${PY_KW})\\b|([=+\\-*/<>()\\[\\]:])`, 'g'),
+    (m, s, c, k, o) => s ? `<span class="st">${s}</span>` : c ? `<span class="cm">${c}</span>` : k ? `<span class="kw">${k}</span>` : `<span class="op">${o}</span>`);
 }
-const codeBlock = code => `<div class="code" lang="en">${sub(code).split('\n').map((l, i) => `<div class="ln"><span class="num">${i + 1}</span><span>${hl(l)}</span></div>`).join('')}</div>`;
-const tokClass = p => /^".*"$/.test(p) ? 'st' : /^[=+()]$/.test(p) ? 'op' : /^(print|if|else|for|in)$/.test(p) ? 'kw' : 'va';
-function wordsIn(text) {
-  const t = norm(text);
-  return CONTENT.words.filter(w => norm(w.en).length > 1 && (t === norm(w.en) || (norm(w.en).length > 2 && t.includes(norm(w.en))))).map(w => w.id);
-}
+/* hi = 0-based line index to highlight (trace) */
+const codeBlock = (code, hi = -1) => `<div class="code" lang="en">${sub(code).split('\n').map((l, i) => `<div class="ln ${i === hi ? 'hi' : ''}"><span class="num">${i + 1}</span><span class="src">${hl(l)}</span></div>`).join('')}</div>`;
+const tokClass = p => /^".*"$/.test(p) ? 'st' : /^[=+()\-*/<>:]$|^==$/.test(p) ? 'op' : new RegExp(`^(${PY_KW})$`).test(p) ? 'kw' : 'va';
 function throwBall(from, to) {
   return new Promise(res => {
     if (reducedMotion()) { res(); return; }
@@ -105,7 +103,7 @@ SCREENS.level = () => {
       ${Run.timed ? `<span class="chip timer" aria-label="Sekunden übrig">${Run.timed}</span>` : ''}
       <button class="ibtn hintbtn" data-a="hint" aria-label="Tipp holen">${IC('bulb')}<small></small></button>
     </div>
-    ${lv.boss ? `<div class="boss" aria-label="Boss ${esc(lv.boss.name)}">${ART.crab('grumpy')}<div class="grow"><b>${esc(lv.boss.name)}</b><div class="hp"><i></i></div></div></div>` : ''}
+    ${lv.boss ? `<div class="boss" aria-label="Boss ${esc(lv.boss.name)}">${ART.boss(lv.boss.art, 'grumpy')}<div class="grow"><b>${esc(lv.boss.name)}</b><div class="hp"><i></i></div></div></div>` : ''}
     <div class="stage"></div>
     <div class="foot"></div>
   </div>`);
@@ -531,7 +529,8 @@ TASKS.memory = (t, api) => {
 
 TASKS.dialogue = (t, api) => {
   const d = CONTENT.dialogues[t.id];
-  const npcArt = d.npc === 'crab' ? ART.crab('happy') : ART.juno();
+  const npcArt = ART.npc(d.npc);
+  const unit = Run.level.unit;
   const meArt = ART.avatar(S.profile.avatar, S.equip);
   const box = el(`<div class="task"><div class="chat"></div></div>`);
   Run.stage.append(box);
@@ -567,9 +566,9 @@ TASKS.dialogue = (t, api) => {
         const o = n.options[+b.dataset.k];
         if (o.ok) {
           busy = true; add('me', enSpan(o.en));
-          if (demo) api.demo(wordsIn(o.en)); else api.right(wordsIn(o.en), b);
+          if (demo) api.demo(wordsIn(o.en, unit)); else api.right(wordsIn(o.en, unit), b);
           Run.foot.replaceChildren(); await sayEn(o.en); await sleep(300); i++; step();
-        } else { b.classList.add('miss'); api.miss(wordsIn(n.options.find(x => x.ok).en), o.hint); }
+        } else { b.classList.add('miss'); api.miss(wordsIn(n.options.find(x => x.ok).en, unit), o.hint); }
       };
       wrap.onclick = e => { const b = e.target.closest('[data-k]'); if (b && !busy) pick(b); };
       api.setHelp(lvl => {
@@ -643,15 +642,15 @@ TASKS.build = (t, api) => {
 TASKS.predict = (t, api) => {
   const opts = shuffle(t.options.map((o, k) => ({ o, k })));
   const box = el(`<div class="task">${qRow('Was zeigt der Computer an?', 'codelab')}${codeBlock(t.code)}
-    <div class="stack popts">${opts.map(x => `<button class="btn block ctile" data-k="${x.k}" lang="en-GB" style="font-family:var(--mono)">${esc(sub(x.o))}</button>`).join('')}</div><div class="out stack"></div></div>`);
+    <div class="stack popts">${opts.map(x => `<button class="btn block ctile multi" data-k="${x.k}" lang="en-GB" style="font-family:var(--mono)">${esc(sub(x.o))}</button>`).join('')}</div><div class="out stack"></div></div>`);
   Run.stage.append(box);
   let done = false;
   const finish = (demo) => {
     done = true;
     const ans = sub(t.options[t.answer]);
     $('.popts', box).hidden = true;
-    $('.out', box).innerHTML = `<div class="console">&gt; ${esc(ans)}</div><div class="ex">${fmt(t.explain || '')}</div>`;
-    sayEn(ans);
+    $('.out', box).innerHTML = `${consoleOut(ans)}<div class="ex">${fmt(t.explain || '')}</div>`;
+    if (predictSpoken(t)) sayEn(ans);
     if (demo) api.demo(t.uses || []); else api.right(t.uses || [], $('.out', box));
     footBtn('Weiter', () => api.next());
   };
@@ -663,9 +662,111 @@ TASKS.predict = (t, api) => {
   api.setHelp(lvl => {
     if (done) return;
     if (lvl === 1) { const b = $$('.popts [data-k]', box).find(x => +x.dataset.k !== t.answer && !x.disabled); if (b) b.disabled = true; }
-    if (lvl === 2) api.say('thinking', 'Tipp: [[print]] zeigt den Inhalt an – nicht den Namen der Box.');
+    if (lvl === 2) api.say('thinking', t.tip || 'Tipp: [[print]] zeigt den Inhalt an – nicht den Namen der Box.');
     if (lvl === 3) finish(true);
   });
+};
+/* console lines: one "> " per output line */
+const consoleOut = (text, cls = '') => `<div class="console ${cls}">${String(text).split('\n').map(l => `<div>&gt; ${esc(l)}</div>`).join('')}</div>`;
+
+/* Parsons puzzle: tap the code lines in the right order (indentation is part of each line). */
+TASKS.order = (t, api) => {
+  const lines = t.lines.map(sub);
+  let tiles = shuffle(lines.concat((t.extra || []).map(sub)).map((p, i) => ({ p, i })));
+  if (tiles.length > 1 && tiles.map(x => x.p).join('\u0001') === lines.join('\u0001')) tiles.push(tiles.shift());
+  const box = el(`<div class="task">
+    ${qRow(t.de || 'Bring die Zeilen in die richtige Reihenfolge!', 'codelab')}
+    <div class="code prog"></div>
+    <div class="stack otiles"></div><div class="out stack"></div></div>`);
+  Run.stage.append(box);
+  const prog = $('.prog', box), tray = $('.otiles', box), out = $('.out', box);
+  let placed = [], lockedN = 0, done = false;
+  const indentOf = p => (/^ */.exec(p)[0].length / 4) | 0;
+  const render = () => {
+    prog.innerHTML = placed.map((ti, k) => `<div class="ln"><span class="num">${k + 1}</span><button class="oline ${k < lockedN ? 'lockd' : ''}" data-k="${k}" style="margin-left:${indentOf(tiles[ti].p) * 1.6}em">${hl(tiles[ti].p.trim())}</button></div>`).join('') +
+      (done ? '' : `<div class="ln"><span class="num">${placed.length + 1}</span><span class="cur"></span></div>`);
+    tray.innerHTML = tiles.map((x, i) => `<button class="btn block otile ${placed.includes(i) ? 'used' : ''}" data-i="${i}" data-p="${esc(x.p)}"><span class="ind">${'·&nbsp;&nbsp;&nbsp;'.repeat(indentOf(x.p))}</span>${hl(x.p.trim())}</button>`).join('');
+  };
+  const finish = demo => {
+    done = true; render(); tray.hidden = true;
+    out.innerHTML = (t.out != null ? consoleOut(sub(t.out)) : '<div class="console">✓ Compile successful</div>') + (t.explain ? `<div class="ex">${fmt(t.explain)}</div>` : '');
+    if (demo) api.demo(t.uses || []); else api.right(t.uses || [], out);
+    footBtn('Weiter', () => api.next());
+    setTimeout(() => out.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 50);
+  };
+  const check = () => {
+    if (placed.length < lines.length) return;
+    if (placed.map(i => tiles[i].p).join('\u0001') === lines.join('\u0001')) { finish(false); return; }
+    out.innerHTML = `<div class="console meh">⚠ Hmm, fast! Die Reihenfolge stimmt noch nicht ganz.</div>`;
+    api.miss(t.uses || [], 'Fast! Lies das Programm von oben nach unten. 🔍');
+    let k = lockedN; while (k < placed.length && tiles[placed[k]].p === lines[k]) k++;
+    placed = placed.slice(0, k); render();
+  };
+  const lockN = n => {
+    placed = [];
+    for (let k = 0; k < n; k++) placed.push(tiles.findIndex((x, i) => x.p === lines[k] && !placed.includes(i)));
+    lockedN = n; render();
+  };
+  box.onclick = e => {
+    if (done) return;
+    const tl = e.target.closest('.otile'), pl = e.target.closest('.oline');
+    if (tl) { placed.push(+tl.dataset.i); Sfx.play('pop'); out.innerHTML = ''; render(); check(); }
+    if (pl && +pl.dataset.k >= lockedN) { placed.splice(+pl.dataset.k, 1); render(); }
+  };
+  api.setHelp(lvl => {
+    if (done) return;
+    if (lvl === 1) lockN(Math.max(lockedN, 1));
+    if (lvl === 2) lockN(Math.max(lockedN, Math.ceil(lines.length / 2)));
+    if (lvl === 3) { lockN(lines.length); finish(true); }
+  });
+  render();
+  api.say('happy', t.extra && t.extra.length ? 'Achtung: Eine Zeile gehört nicht dazu! 🕵️' : 'Tippe die Zeilen von oben nach unten an.');
+};
+
+/* Trace: the computer runs line by line – what is in the box after each line? */
+TASKS.trace = (t, api) => {
+  const n = t.steps.length;
+  const box = el(`<div class="task">${qRow(t.de || `Spiel Computer! Was ist nach jeder Zeile in [[${t.var}]]?`, 'codelab')}
+    <div class="tcode"></div>
+    <div class="row" style="justify-content:center"><div class="varbox"><small>${esc(t.var)}</small><b class="vv">?</b></div></div>
+    <div class="story tq center"></div><div class="stack topts"></div><div class="out stack"></div></div>`);
+  Run.stage.append(box);
+  let s = 0, done = false, misses = 0;
+  const lineOf = k => t.steps[k].line != null ? t.steps[k].line : k;
+  const show = () => {
+    $('.tcode', box).innerHTML = codeBlock(t.code, lineOf(s));
+    $('.tq', box).innerHTML = fmt(`Nach Zeile ${lineOf(s) + 1}: Was ist in [[${t.var}]]?`);
+    const st = t.steps[s];
+    $('.topts', box).innerHTML = shuffle([st.v, ...st.alt]).map(o => `<button class="btn block ctile" data-o="${esc(o)}" style="font-family:var(--mono)">${esc(o)}</button>`).join('');
+  };
+  const finish = demo => {
+    done = true;
+    $('.topts', box).hidden = true; $('.tq', box).hidden = true;
+    $('.tcode', box).innerHTML = codeBlock(t.code);
+    $('.out', box).innerHTML = `${t.out != null ? consoleOut(sub(t.out)) : ''}<div class="ex">${fmt(t.explain || `Am Ende ist in [[${t.var}]]: [[${t.steps[n - 1].v}]]`)}</div>`;
+    if (demo) api.demo(t.uses || []); else { Run.itemWrong = misses ? 1 : 0; api.right(t.uses || [], $('.out', box)); }
+    footBtn('Weiter', () => api.next());
+  };
+  const advance = () => {
+    $('.vv', box).textContent = t.steps[s].v;
+    const vb = $('.varbox', box); vb.classList.remove('pop'); void vb.offsetWidth; vb.classList.add('pop');
+    Sfx.play('pop');
+    s++; Run.itemWrong = 0; Run.helpLevel = 0;
+    if (s >= n) finish(false); else show();
+  };
+  $('.topts', box).onclick = e => {
+    const b = e.target.closest('[data-o]'); if (!b || done) return;
+    if (b.dataset.o === t.steps[s].v) advance();
+    else { b.disabled = true; misses++; api.miss(t.uses || [], 'Fast! Schau, was in dieser Zeile mit der Box passiert. 🔍'); }
+  };
+  api.setHelp(lvl => {
+    if (done) return;
+    if (lvl === 1) { const b = $$('.topts [data-o]', box).find(x => x.dataset.o !== t.steps[s].v && !x.disabled); if (b) b.disabled = true; }
+    if (lvl === 2) api.say('thinking', t.tip || 'Rechne nur die markierte Zeile – der Rest bleibt gleich.');
+    if (lvl === 3) { misses++; $$('.topts [data-o]', box).forEach(x => { if (x.dataset.o === t.steps[s].v) x.classList.add('hintme'); }); setTimeout(() => { if (!done) advance(); }, 900); }
+  });
+  show();
+  api.say('happy', 'Du bist der Computer: Zeile für Zeile! 🤖');
 };
 
 TASKS.bug = (t, api) => {

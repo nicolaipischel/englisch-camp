@@ -351,6 +351,25 @@ html[data-theme=umbreon] .ctile.kw{color:#ff9ad5}
 html[data-theme=umbreon] .ctile.st{color:#9be7b4}
 html[data-theme=umbreon] .ctile.op{color:#ffd27a}
 html[data-theme=umbreon] .ctile.va{color:#9cd2ff}
+.code .src{white-space:pre-wrap;overflow-wrap:anywhere}
+.code .ln.hi{background:rgba(255,210,122,.18);border-radius:8px;box-shadow:inset 4px 0 0 #ffd27a}
+.ctile.multi{white-space:pre-line;text-align:left}
+.console>div{white-space:pre-wrap;overflow-wrap:anywhere}
+.code .oline{border:0;background:#3a3160;color:#efe9ff;border-radius:10px;padding:6px 10px;min-height:44px;font-family:var(--mono);font-size:1rem;text-align:left;white-space:pre-wrap}
+.code .oline.lockd{background:#2f5b4b}
+.otile{font-family:var(--mono);font-size:1rem;text-align:left;justify-content:flex-start;white-space:pre-wrap;background:#231d3a;color:#efe9ff}
+.otile .kw{color:#ff9ad5}.otile .st{color:#9be7b4}.otile .op{color:#ffd27a}.otile .cm{color:#9f93c9}
+.otile .ind{color:#7c70a8}
+.otile.used{opacity:.25;pointer-events:none}
+.varbox{min-width:96px;border-radius:16px;background:var(--card);box-shadow:0 5px 0 var(--shadow);padding:6px 14px;text-align:center;font-family:var(--mono)}
+.varbox small{display:block;font-weight:800;color:var(--ink2)}
+.varbox b{font-size:1.4rem;color:var(--en)}
+.varbox.pop{animation:joy .4s}
+.pyed{width:100%;min-height:130px;border-radius:16px;border:0;background:#231d3a;color:#efe9ff;font-family:var(--mono);font-size:1rem;line-height:1.45;padding:12px;tab-size:4;white-space:pre;overflow-x:auto;box-shadow:0 8px 20px rgba(20,10,40,.3)}
+.pykeys{display:flex;flex-wrap:wrap;gap:6px;justify-content:center}
+.pykeys .btn{min-width:48px;font-family:var(--mono)}
+.unit.dark .unit-head{color:#f6f1ff}
+.unit.dark .unit-head .muted,.unit.dark .unit-head .tag{color:#cfe9e0}
 .snip{border-radius:14px;overflow:hidden}
 .snip .tag{padding:6px 2px}
 
@@ -954,7 +973,13 @@ const ART = {
       <circle cx="50" cy="54" r="28" fill="#ffd76a" ${SW}/>
       <path d="M38 50 q4 -5 8 0 M54 50 q4 -5 8 0" fill="none" ${SW}/>${blush(36, 64, 60, 4)}
       <path d="M38 62 q12 14 24 0 z" fill="#ff7a9a" ${SW}/>
-      <path d="M78 18 c-4 -6 -14 -2 -9 6 l9 8 l9 -8 c5 -8 -5 -12 -9 -6 z" fill="#ff8fb2" ${SW}/>`
+      <path d="M78 18 c-4 -6 -14 -2 -9 6 l9 8 l9 -8 c5 -8 -5 -12 -9 -6 z" fill="#ff8fb2" ${SW}/>`,
+    rubber: () => `${disc('#ffc2d6')}<g transform="rotate(-24 50 52)"><rect x="22" y="38" width="56" height="28" rx="6" fill="#ff9fb8" ${SW}/><path d="M50 38 h22 q6 0 6 6 v16 q0 6 -6 6 h-22 z" fill="#8fd3f4" ${SW}/></g>
+      <path d="M24 82 q10 -4 20 0 q10 4 20 0" fill="none" stroke="#c9c2dc" stroke-width="3" stroke-linecap="round"/>`,
+    /* prepositions: a box and a ball */
+    in: () => `${disc('#ffe7a0')}<path d="M24 46 h52 v36 h-52 z" fill="#e0a877" ${SW}/><circle cx="50" cy="58" r="10" fill="#ff7fa8" ${SW}/><path d="M24 62 h52 v20 h-52 z" fill="#e0a877" ${SW}/><path d="M24 46 l-8 -10 M76 46 l8 -10" ${SW}/>`,
+    on: () => `${disc('#ffe7a0')}<rect x="24" y="52" width="52" height="32" rx="3" fill="#e0a877" ${SW}/><circle cx="50" cy="40" r="11" fill="#ff7fa8" ${SW}/>`,
+    under: () => `${disc('#ffe7a0')}<path d="M18 40 h64 v8 h-64 z M24 48 v30 M76 48 v30" fill="#e0a877" ${SW}/><circle cx="50" cy="70" r="11" fill="#ff7fa8" ${SW}/>`
   },
   numberPic(n) {
     const cols = ['#8fd3f4', '#f7a8c8', '#b8e986', '#ffd36e', '#c3b1f5'];
@@ -967,12 +992,28 @@ const ART = {
     }
     return `${disc('#e6f6ff')}<circle cx="50" cy="22" r="16" fill="#fff" ${SW}/><text x="50" y="29.5" font-size="${n > 9 ? 17 : 21}" font-weight="900" text-anchor="middle" fill="${O}" font-family="Nunito,sans-serif">${n}</text>${b}`;
   },
+  /* paint blob in the word's colour ('col:#rrggbb') */
+  colourPic(c) {
+    return `${disc('#f4f0fa')}<path d="M50 18 q22 -2 30 16 q10 20 -4 36 q-12 14 -30 10 q-20 -4 -26 -22 q-6 -20 8 -32 q10 -8 22 -8 z" fill="${c}" ${SW}/>
+      <path d="M36 34 q6 -8 16 -8" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".7"/>
+      <path d="M72 72 q4 10 0 14 q-6 -2 0 -14 z" fill="${c}" ${SW}/>`;
+  },
+  /* calendar page with a German label (weekday 'day:1' = Mo … 'day:7' = So, month 'month:1' = Jan …) */
+  calPic(label, top) {
+    return `${disc('#e6f6ff')}<rect x="22" y="22" width="56" height="60" rx="8" fill="#fff" ${SW}/><path d="M22 30 q0 -8 8 -8 h40 q8 0 8 8 v10 h-56 z" fill="${top}" ${SW}/>
+      <path d="M36 16 v12 M64 16 v12" ${SW}/><text x="50" y="${label.length > 3 ? 70 : 72}" font-size="${label.length > 3 ? 19 : 24}" font-weight="900" text-anchor="middle" fill="${O}" font-family="Nunito,sans-serif">${label}</text>`;
+  },
+  hasPic(w) { return !!(w.emoji || /^(num:\d+|col:#[0-9a-f]{6}|day:[1-7]|month:([1-9]|1[0-2]))$/i.test(w.icon || '') || ART.icons[w.icon]); },
   pic(word, cls = 'pic', withLabel = true) {
     if (!word) return '';
     let body = '';
+    const ic = word.icon || '';
     if (word.emoji) body = `${disc('#ffe7a0')}<text x="50" y="54" font-size="56" text-anchor="middle" dominant-baseline="central" font-family="'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif">${word.emoji}</text>`;
-    else if (/^num:\d+$/.test(word.icon)) body = ART.numberPic(+word.icon.slice(4));
-    else if (ART.icons[word.icon]) body = ART.icons[word.icon]();
+    else if (/^num:\d+$/.test(ic)) body = ART.numberPic(+ic.slice(4));
+    else if (/^col:/.test(ic)) body = ART.colourPic(ic.slice(4));
+    else if (/^day:/.test(ic)) body = ART.calPic(['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'][+ic.slice(4) - 1], +ic.slice(4) > 5 ? '#ff8fb2' : '#8fd3f4');
+    else if (/^month:/.test(ic)) { const m = +ic.slice(6); body = ART.calPic(['Jan', 'Feb', 'März', 'Apr', 'Mai', 'Juni', 'Juli', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'][m - 1], ['#8fd3f4', '#b8e986', '#ffd36e', '#ffad7a'][Math.floor((m % 12) / 3)]); }
+    else if (ART.icons[ic]) body = ART.icons[ic]();
     return svg('0 0 100 100', body, cls, withLabel ? 'Bild' : '');
   },
 
@@ -994,8 +1035,49 @@ const ART = {
         ${eyes(39, 61, 54, 6.5)}${blush(30, 70, 66, 5)}<path d="M42 68 q8 9 16 0 z" fill="#ff7a9a" ${SW}/>
         <path d="M34 82 h32" stroke="#fff" stroke-width="4" stroke-linecap="round" opacity=".6"/>`,
       locked: `<circle cx="50" cy="52" r="34" fill="#c9c2dc" ${SW}/><text x="50" y="64" font-size="34" font-weight="900" text-anchor="middle" fill="#fff" font-family="Nunito,sans-serif">?</text>`
-    }[id] || '';
-    return svg('0 0 100 100', m, cls, label);
+    }[id];
+    const g = /^([a-z]\w*)-([123])$/.exec(id);
+    return svg('0 0 100 100', m != null ? m : g && ART.monSpec[g[1]] ? ART.monGen(ART.monSpec[g[1]], +g[2]) : '', cls, label);
+  },
+  /* generated word monsters: id '<spec>-<stage>' (e.g. 'petal-2'). Stage 1 small, 2 + arms + feature, 3 + star tail + crown. */
+  monSpec: {
+    petal:  { c: '#ffe27a', c2: '#ff9fb8', shape: 'round',  feat: 'petal' },
+    bolt:   { c: '#9fd8ff', c2: '#ffd76a', shape: 'square', feat: 'antenna' },
+    bunny:  { c: '#ffc2d6', c2: '#fff4f0', shape: 'bean',   feat: 'ears' },
+    brick:  { c: '#f0b48f', c2: '#8fd3f4', shape: 'square', feat: 'cube' },
+    moss:   { c: '#a6de8f', c2: '#5fb85a', shape: 'drop',   feat: 'leaf' },
+    hop:    { c: '#ffb3a0', c2: '#8fd3f4', shape: 'bean',   feat: 'wings' },
+    bell:   { c: '#c3b1f5', c2: '#ffd76a', shape: 'round',  feat: 'hands' },
+    crumb:  { c: '#ffd2a0', c2: '#ff6b7d', shape: 'bean',   feat: 'cherry' },
+    spark:  { c: '#ffe08a', c2: '#ff8fc0', shape: 'drop',   feat: 'flame' },
+    byte:   { c: '#8fe0c8', c2: '#3a3160', shape: 'square', feat: 'pixel' }
+  },
+  monGen(sp, st) {
+    const sc = [.74, .88, 1][st - 1], c2 = sp.c2;
+    const body = {
+      round: `<ellipse cx="50" cy="60" rx="30" ry="28" fill="${sp.c}" ${SW}/>`,
+      drop: `<path d="M50 26 Q80 46 79 64 Q78 88 50 88 Q22 88 21 64 Q20 46 50 26 Z" fill="${sp.c}" ${SW}/>`,
+      square: `<rect x="22" y="34" width="56" height="54" rx="15" fill="${sp.c}" ${SW}/>`,
+      bean: `<path d="M24 62 Q20 32 50 32 Q82 30 78 62 Q80 88 50 88 Q22 90 24 62 Z" fill="${sp.c}" ${SW}/>`
+    }[sp.shape];
+    const n = st === 1 ? 1 : st === 2 ? 2 : 3;
+    const feat = {
+      petal: [[50, 28], [36, 32], [64, 32]].slice(0, n).map(([x, y]) => `<circle cx="${x}" cy="${y}" r="9" fill="${c2}" ${SW}/>`).join('') + `<circle cx="50" cy="28" r="4" fill="#ffd76a"/>`,
+      antenna: `<path d="M50 34 v-16" ${SW}/><circle cx="50" cy="14" r="5" fill="${c2}" ${SW}/>` + (n > 1 ? `<path d="M34 36 l-8 -12 M66 36 l8 -12" ${SW}/><circle cx="25" cy="22" r="4" fill="${c2}" ${SW}/><circle cx="75" cy="22" r="4" fill="${c2}" ${SW}/>` : ''),
+      ears: `<path d="M38 36 q-10 -${14 + n * 6} 2 -${18 + n * 6} q8 6 6 ${18 + n * 6} z M62 36 q10 -${14 + n * 6} -2 -${18 + n * 6} q-8 6 -6 ${18 + n * 6} z" fill="${c2}" ${SW}/>`,
+      cube: [[50, 22], [34, 26], [66, 26]].slice(0, n).map(([x, y]) => `<rect x="${x - 7}" y="${y - 7}" width="14" height="14" rx="3" fill="${c2}" ${SW}/>`).join(''),
+      leaf: `<path d="M50 30 q-4 -18 12 -22 q2 16 -12 22 z" fill="${c2}" ${SW}/>` + (n > 1 ? `<path d="M48 32 q-16 -10 -22 2 q12 8 22 -2 z" fill="${c2}" ${SW}/>` : ''),
+      wings: n > 1 ? `<path d="M24 56 q-20 -14 -18 8 q10 4 18 2 z M76 56 q20 -14 18 8 q-10 4 -18 2 z" fill="${c2}" ${SW}/>` : `<path d="M50 32 q-6 -10 2 -14" fill="none" ${SW}/>`,
+      hands: `<path d="M50 34 v-18 M50 34 l12 -10" ${SW}/><circle cx="50" cy="34" r="3" fill="${c2}" ${SW}/>` + (n > 1 ? `<path d="M30 40 q-10 -8 -4 -16 M70 40 q10 -8 4 -16" fill="none" ${SW}/>` : ''),
+      cherry: `<path d="M50 34 q2 -14 10 -18 M50 34 q-6 -10 -12 -12" fill="none" ${SW}/><circle cx="60" cy="18" r="6" fill="${c2}" ${SW}/>` + (n > 1 ? `<circle cx="37" cy="22" r="6" fill="${c2}" ${SW}/>` : ''),
+      flame: `<path d="M50 32 q-12 -10 -4 -24 q2 8 8 8 q4 -6 2 -12 q12 8 4 28 z" fill="${c2}" ${SW}/>` + (n > 1 ? `<path d="${starPath(26, 30, 5)}" fill="${c2}" ${SW}/><path d="${starPath(74, 30, 5)}" fill="${c2}" ${SW}/>` : ''),
+      pixel: `<rect x="26" y="24" width="12" height="12" fill="${c2}" ${SW}/><rect x="62" y="24" width="12" height="12" fill="${c2}" ${SW}/>` + (n > 1 ? `<rect x="44" y="14" width="12" height="12" fill="#ffd76a" ${SW}/>` : '')
+    }[sp.feat] || '';
+    const arms = st > 1 ? `<ellipse cx="20" cy="66" rx="7" ry="5" fill="${sp.c}" ${SW}/><ellipse cx="80" cy="66" rx="7" ry="5" fill="${sp.c}" ${SW}/>` : '';
+    const tail = st === 3 ? `<path d="M76 80 q16 2 14 -14" fill="none" ${SW}/><path d="${starPath(90, 62, 7)}" fill="#ffd76a" ${SW}/>` : '';
+    const mouth = st === 3 ? `<path d="M42 68 q8 9 16 0 z" fill="#ff7a9a" ${SW}/>` : `<path d="M45 68 q5 5 10 0" fill="none" ${SW}/>`;
+    return `<g transform="translate(50 60) scale(${sc}) translate(-50 -60)">${feat}${tail}${arms}${body}
+      <ellipse cx="50" cy="78" rx="14" ry="5" fill="#fff" opacity=".45"/>${eyes(40, 60, 56, 5 + st * .4)}${blush(31, 69, 66, 5)}${mouth}</g>`;
   },
 
   /* ---------- boss: Brummkrabbe Knarz ---------- */
@@ -1019,6 +1101,91 @@ const ART = {
       <circle cx="50" cy="52" r="25" fill="#f6c7a4" ${SW}/>
       <path d="M26 44 Q30 22 50 22 Q70 22 74 44 L64 36 L56 42 L48 34 L40 42 L34 36 Z" fill="#ff8a65" ${SW}/>
       ${eyes(41, 59, 55, 3.4)}${blush(35, 65, 63, 4)}<path d="M44 64 q6 6 12 0 z" fill="#ff7a9a" ${SW}/>`, '', 'Juno');
+  },
+  pixel() {
+    return svg('0 0 100 100', `<path d="M24 100 Q26 80 50 80 Q74 80 76 100 Z" fill="#fff" ${SW}/><path d="M50 80 v20" ${SW}/>
+      <circle cx="50" cy="52" r="25" fill="#ffd9c2" ${SW}/>
+      <path d="M26 46 q-8 -14 6 -20 q4 -14 18 -8 q14 -8 20 6 q14 4 6 22 q-4 -10 -12 -12 q-14 6 -30 0 q-6 4 -8 12 z" fill="#eeeaf6" ${SW}/>
+      <rect x="34" y="48" width="13" height="11" rx="2" fill="#bfe3ff" fill-opacity=".5" ${SW}/><rect x="53" y="48" width="13" height="11" rx="2" fill="#bfe3ff" fill-opacity=".5" ${SW}/><path d="M47 52 h6" ${SW}/>
+      <circle cx="41" cy="54" r="2.2" fill="${O}"/><circle cx="60" cy="54" r="2.2" fill="${O}"/>${blush(34, 66, 64, 4)}<path d="M44 67 q6 5 12 0" fill="none" ${SW}/>`, '', 'Prof. Pixel');
+  },
+  /* dialogue partner by key: 'juno' | 'pixel' | any boss art key */
+  npc(key) {
+    if (key === 'juno') return ART.juno();
+    if (key === 'pixel') return ART.pixel();
+    return ART.boss(key, 'happy');
+  },
+
+  /* ---------- bosses: ART.boss(art, mood) – moods: grumpy | happy (viewBox 160x120) ---------- */
+  boss(art, mood = 'grumpy', cls = '') {
+    if (art === 'crab') return ART.crab(mood, cls);
+    const b = ART.bosses[art];
+    return svg('0 0 160 120', b ? b.draw(mood === 'happy') : '', cls, b ? b.name : '');
+  },
+  bossFace(cx, y, gap, happy, r = 6) {
+    const brow = happy ? '' : `<path d="M${cx - gap - 8} ${y - 13} l12 5 M${cx + gap + 8} ${y - 13} l-12 5" ${SW}/>`;
+    const mouth = happy ? `<path d="M${cx - 9} ${y + 14} q9 9 18 0" fill="none" ${SW}/>` : `<path d="M${cx - 9} ${y + 18} q9 -7 18 0" fill="none" ${SW}/>`;
+    return `${eyes(cx - gap, cx + gap, y, r)}${brow}${blush(cx - gap - 6, cx + gap + 6, y + 11, 5)}${mouth}`;
+  },
+  bosses: {
+    cloud: { name: 'Nebelino', draw: h => `${h
+        ? `<path d="M14 104 a66 66 0 0 1 132 0" fill="none" stroke="#ff8fb2" stroke-width="7"/><path d="M24 104 a56 56 0 0 1 112 0" fill="none" stroke="#ffd76a" stroke-width="7"/><path d="M34 104 a46 46 0 0 1 92 0" fill="none" stroke="#8fd3f4" stroke-width="7"/>`
+        : `<path d="M50 100 l-5 12 M80 102 l-5 12 M110 100 l-5 12" stroke="#8fb3d9" stroke-width="4" stroke-linecap="round"/>`}
+      <path d="M36 94 q-24 0 -22 -22 q2 -18 22 -18 q4 -28 34 -28 q22 0 30 18 q8 -10 22 -6 q18 6 16 26 q16 4 14 18 q-2 12 -18 12 z" fill="${h ? '#ffffff' : '#c9c4d6'}" ${SW}/>
+      ${ART.bossFace(82, 60, 16, h)}` },
+    robot: { name: 'Kommandix', draw: h => `<path d="M80 18 v-10" ${SW}/><circle cx="80" cy="8" r="5" fill="${h ? '#ffd76a' : '#ff7a8a'}" ${SW}/>
+      <path d="M52 92 l-22 12 M108 92 l22 12" ${SW}/><circle cx="28" cy="105" r="6" fill="#bfe3ff" ${SW}/><circle cx="132" cy="105" r="6" fill="#bfe3ff" ${SW}/>
+      <rect x="52" y="82" width="56" height="34" rx="10" fill="#bfe3ff" ${SW}/>
+      ${h ? `<path d="M80 108 l-8 -8 a5 5 0 0 1 8 -6 a5 5 0 0 1 8 6 z" fill="#ff8fb2" ${SW}/>` : `<path d="M66 96 h28 M66 104 h20" ${SW}/>`}
+      <rect x="32" y="18" width="96" height="64" rx="16" fill="#9fd8ff" ${SW}/><rect x="44" y="28" width="72" height="44" rx="10" fill="#2f2a4a" ${SW}/>
+      ${h ? `<path d="M58 48 q6 -8 12 0 M90 48 q6 -8 12 0 M68 58 q12 8 24 0" stroke="#9be7b4" stroke-width="4" fill="none" stroke-linecap="round"/>`
+          : `<path d="M56 40 l14 6 M104 40 l-14 6 M68 62 h24" stroke="#ff8a8a" stroke-width="4" stroke-linecap="round"/><rect x="58" y="49" width="11" height="6" fill="#ff8a8a"/><rect x="91" y="49" width="11" height="6" fill="#ff8a8a"/>`}` },
+    rabbit: { name: 'Hoppel', draw: h => `<path d="M64 52 q-16 -42 -4 -48 q14 4 14 48 z M96 52 q16 -42 4 -48 q-14 4 -14 48 z" fill="#fff4f0" ${SW}/>
+      <path d="M66 44 q-8 -28 -3 -34 q6 4 6 34 z M94 44 q8 -28 3 -34 q-6 4 -6 34 z" fill="#ffc2d6"/>
+      <ellipse cx="80" cy="78" rx="40" ry="35" fill="#fff4f0" ${SW}/>
+      ${eyes(66, 94, 72, 6)}${blush(58, 102, 86, 6)}<path d="M76 82 l4 4 l4 -4 z" fill="#ff8fb2" ${SW}/>
+      ${h ? `<path d="M71 92 q9 8 18 0" fill="none" ${SW}/>` : `<path d="M73 96 q7 -5 14 0" fill="none" ${SW}/><path d="M104 80 q5 8 0 11 q-5 -3 0 -11 z" fill="#9fd8ff" ${SW.replace('3"', '2"')}/>`}` },
+    golem: { name: 'Klotz', draw: h => `<rect x="18" y="56" width="30" height="30" rx="5" fill="#e59a72" ${SW}/><rect x="112" y="56" width="30" height="30" rx="5" fill="#e59a72" ${SW}/>
+      <rect x="52" y="84" width="22" height="30" rx="4" fill="#e59a72" ${SW}/><rect x="86" y="84" width="22" height="30" rx="4" fill="#e59a72" ${SW}/>
+      <rect x="44" y="14" width="72" height="72" rx="10" fill="#f0b48f" ${SW}/><path d="M44 34 h18 M98 34 h18 M44 70 h14 M102 70 h14" stroke="#d98a63" stroke-width="3"/>
+      ${h ? `<path d="${starPath(126, 20, 7)}" fill="#ffd76a" ${SW}/>` : ''}${ART.bossFace(80, 46, 14, h)}` },
+    snake: { name: 'Zischel', draw: h => `<ellipse cx="80" cy="102" rx="58" ry="14" fill="#8fd17a" ${SW}/><ellipse cx="80" cy="86" rx="42" ry="12" fill="#a6de8f" ${SW}/>
+      <path d="M62 84 q-8 -30 12 -42 l16 0 q14 14 2 42 z" fill="#a6de8f" ${SW}/>
+      <ellipse cx="82" cy="36" rx="30" ry="22" fill="#a6de8f" ${SW}/><circle cx="56" cy="100" r="4" fill="#6cb85a"/><circle cx="104" cy="98" r="4" fill="#6cb85a"/><circle cx="70" cy="68" r="3" fill="#6cb85a"/>
+      ${eyes(70, 94, 32, 5)}${blush(64, 100, 42, 5)}
+      ${h ? `<path d="M74 46 q8 7 16 0" fill="none" ${SW}/>` : `<path d="M64 20 l10 5 M100 20 l-10 5" ${SW}/><path d="M82 52 v12 l-5 5 M82 64 l5 5" fill="none" stroke="#ff6b8a" stroke-width="3" stroke-linecap="round"/>`}` },
+    sloth: { name: 'Gähnix', draw: h => `<path d="M4 16 h152" stroke="${O}" stroke-width="12" stroke-linecap="round"/><path d="M4 16 h152" stroke="#a57850" stroke-width="7" stroke-linecap="round"/>
+      <path d="M54 16 q-10 30 4 44 M106 16 q10 30 -4 44" fill="none" stroke="${O}" stroke-width="13" stroke-linecap="round"/><path d="M54 16 q-10 30 4 44 M106 16 q10 30 -4 44" fill="none" stroke="#c9a27e" stroke-width="8" stroke-linecap="round"/>
+      <ellipse cx="80" cy="78" rx="40" ry="34" fill="#c9a27e" ${SW}/><ellipse cx="80" cy="74" rx="28" ry="21" fill="#f3e2c8" ${SW}/>
+      <ellipse cx="68" cy="72" rx="9" ry="6" fill="#7a5a44"/><ellipse cx="92" cy="72" rx="9" ry="6" fill="#7a5a44"/>
+      ${h ? `${eyes(68, 92, 72, 3.6)}<path d="M72 84 q8 8 16 0" fill="none" ${SW}/><path d="${starPath(128, 40, 7)}" fill="#ffd76a" ${SW}/>`
+          : `<path d="M62 72 h12 M86 72 h12" stroke="#fff" stroke-width="3" stroke-linecap="round"/><ellipse cx="80" cy="86" rx="5" ry="6" fill="${O}"/><text x="120" y="44" font-size="16" font-weight="900" fill="${O}" font-family="Nunito,sans-serif">z</text>`}` },
+    gnome: { name: 'Wusel', draw: h => `<circle cx="80" cy="88" r="28" fill="#ffe7a0" ${SW}/><circle cx="80" cy="88" r="20" fill="#fff" ${SW}/>
+      ${[0, 1, 2, 3].map(i => `<path d="M${80 + Math.cos(i * Math.PI / 2) * 16} ${88 + Math.sin(i * Math.PI / 2) * 16} L${80 + Math.cos(i * Math.PI / 2) * 19} ${88 + Math.sin(i * Math.PI / 2) * 19}" ${SW.replace('3"', '2"')}/>`).join('')}
+      <path d="M80 88 v-12 ${h ? 'M80 88 l9 0' : 'M80 88 l8 8'}" ${SW}/>
+      <path d="M54 82 l-18 -8 M106 82 l18 -8" ${SW}/><path d="M68 114 v4 M92 114 v4" ${SW}/>
+      <circle cx="80" cy="42" r="22" fill="#ffd9c2" ${SW}/><path d="M56 34 L80 -4 L104 34 z" fill="#7d6bd8" ${SW}/><path d="${starPath(80, 18, 5)}" fill="#ffd76a"/>
+      <path d="M62 56 q18 18 36 0 q-2 14 -18 16 q-16 -2 -18 -16 z" fill="#fff" ${SW}/>
+      ${eyes(72, 88, 42, 3.6)}${h ? `<path d="M74 52 q6 5 12 0" fill="none" ${SW}/>` : `<path d="M66 34 l8 3 M94 34 l-8 3" ${SW}/><path d="M74 54 q6 -4 12 0" fill="none" ${SW}/>`}` },
+    gull: { name: 'Schnapp', draw: h => `<path d="M42 72 q-32 -22 -36 6 q20 4 36 10 z M118 72 q32 -22 36 6 q-20 4 -36 10 z" fill="#e8eef6" ${SW}/>
+      <path d="M66 108 v8 l-6 2 M94 108 v8 l6 2" fill="none" stroke="#ff9a3c" stroke-width="4" stroke-linecap="round"/>
+      <ellipse cx="80" cy="74" rx="40" ry="36" fill="#fff" ${SW}/><path d="M48 52 q32 -20 64 0" fill="none" stroke="#c9d6e6" stroke-width="5" stroke-linecap="round"/>
+      ${eyes(66, 94, 62, 5)}${blush(58, 102, 80, 5)}<path d="M70 74 l10 -3 l10 3 l-10 14 z" fill="#ffad5c" ${SW}/>
+      ${h ? `<path d="M120 30 l-8 -8 a5 5 0 0 1 8 -6 a5 5 0 0 1 8 6 z" fill="#ff8fb2" ${SW}/>` : `<path d="M56 48 l12 6 M104 48 l-12 6" ${SW}/><path d="M86 86 l14 6 l-4 -8 l8 -2 z" fill="#8fd3f4" ${SW}/>`}` },
+    dragon: { name: 'Glimmer', draw: h => `<path d="M46 60 q-36 -30 -38 6 q16 -6 22 6 q10 -10 18 0 z M114 60 q36 -30 38 6 q-16 -6 -22 6 q-10 -10 -18 0 z" fill="#ffd76a" ${SW}/>
+      <path d="M116 96 q30 4 26 -20" fill="none" ${SW}/><path d="M138 70 l8 -6 l2 10 z" fill="#ffd76a" ${SW}/>
+      <path d="M60 34 l-8 -18 l16 12 z M100 34 l8 -18 l-16 12 z" fill="#ffd76a" ${SW}/>
+      <ellipse cx="80" cy="76" rx="40" ry="38" fill="#f7a8c8" ${SW}/><ellipse cx="80" cy="96" rx="22" ry="14" fill="#fff3d6" ${SW}/>
+      ${ART.bossFace(80, 62, 15, h)}
+      ${h ? `<path d="${starPath(26, 24, 7)}" fill="#ffd76a" ${SW}/><path d="${starPath(136, 22, 6)}" fill="#8fd3f4" ${SW}/><path d="${starPath(18, 96, 5)}" fill="#ff8fb2" ${SW}/>`
+          : `<circle cx="122" cy="40" r="6" fill="#d8d3e3" ${SW}/><circle cx="132" cy="28" r="8" fill="#d8d3e3" ${SW}/>`}` },
+    bug: { name: 'Der Große Bug', draw: h => `<path d="M48 62 l-24 -12 M46 80 l-28 0 M50 96 l-22 16 M112 62 l24 -12 M114 80 l28 0 M110 96 l22 16" ${SW}/>
+      <ellipse cx="80" cy="78" rx="40" ry="36" fill="${h ? '#8fe0b8' : '#ff6b7d'}" ${SW}/><path d="M80 44 v70" ${SW}/>
+      <text x="62" y="76" font-size="18" font-weight="900" text-anchor="middle" fill="${O}" font-family="monospace">{</text><text x="98" y="76" font-size="18" font-weight="900" text-anchor="middle" fill="${O}" font-family="monospace">}</text>
+      <text x="62" y="102" font-size="16" font-weight="900" text-anchor="middle" fill="${O}" font-family="monospace">${h ? '✓' : ';'}</text><text x="98" y="102" font-size="16" font-weight="900" text-anchor="middle" fill="${O}" font-family="monospace">#</text>
+      <path d="M70 22 q-6 -14 -16 -14 M90 22 q6 -14 16 -14" fill="none" ${SW}/>
+      <circle cx="80" cy="36" r="20" fill="#3a3160" ${SW}/><circle cx="72" cy="34" r="6" fill="#fff"/><circle cx="88" cy="34" r="6" fill="#fff"/><circle cx="73" cy="35" r="3" fill="${O}"/><circle cx="89" cy="35" r="3" fill="${O}"/>
+      ${h ? `<path d="M72 44 q8 6 16 0" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round"/>` : `<path d="M64 24 l10 5 M96 24 l-10 5 M72 46 q8 -5 16 0" fill="none" stroke="#ff8a8a" stroke-width="3" stroke-linecap="round"/>`}` }
   },
 
   /* ---------- room items & room ---------- */
@@ -1103,7 +1270,55 @@ const ART = {
       <g transform="translate(330 40)"><path d="M10 90 l6 -70 h18 l6 70 z" fill="#fff" ${SW}/><path d="M12 64 h36 M14 42 h22" stroke="#ff8fb2" stroke-width="8"/><path d="M10 90 l6 -70 h18 l6 70 z" fill="none" ${SW}/><rect x="14" y="8" width="22" height="14" rx="3" fill="#ffe08a" ${SW}/><path d="M12 8 l13 -10 l13 10 z" fill="#ff8fb2" ${SW}/></g>
       <g transform="translate(26 ${Math.max(200, h - 130)})"><path d="M0 30 h60 l-10 18 h-40 z" fill="#ffd2b8" ${SW}/><path d="M30 30 v-30 l22 26 z" fill="#fff" ${SW}/></g>
       <g transform="translate(300 ${Math.max(260, h - 60)})"><path d="M0 20 q20 -20 40 0" fill="none" ${SW}/><path d="M6 20 q14 -10 28 0" fill="#ff9e8a" opacity=".5"/></g>`, '', '', 'xMidYMin slice');
-    return svg('0 0 400 200', `<rect width="400" height="200" fill="#eee"/>`);
+    const sc = ART.scenes[kind];
+    if (!sc) return svg('0 0 400 200', `<rect width="400" height="200" fill="#eee"/>`);
+    const rows = Array.from({ length: Math.ceil(h / 120) }, (_, i) => sc.row(150 + i * 120, i)).join('');
+    return svg(`0 0 400 ${h}`, `<defs><linearGradient id="sg-${kind}" x1="0" y1="0" x2="0" y2="1">${sc.grad.map((c, i) => `<stop offset="${i / (sc.grad.length - 1)}" stop-color="${c}"/>`).join('')}</linearGradient></defs>
+      <rect width="400" height="${h}" fill="url(#sg-${kind})"/>${rows}
+      <g transform="translate(318 34)">${sc.mark}</g><g transform="translate(22 ${Math.max(200, h - 120)})">${sc.foot || ''}</g>`, '', '', 'xMidYMin slice');
+  },
+  /* map scenes per unit: gradient, a decor row repeated every 120px, a landmark (top right) and a foot decor */
+  scenes: {
+    meadow: { grad: ['#fff7d6', '#eef8cf', '#cdeeb4'],
+      row: (y, i) => [40, 150, 260, 360].map((x, k) => `<g transform="translate(${x + (i % 2) * 20} ${y + (k % 2) * 30})"><path d="M0 0 v14" stroke="#7cbf5a" stroke-width="3"/><circle cx="0" cy="-2" r="6" fill="${['#ff8fb2', '#8fd3f4', '#ffd76a', '#c3b1f5'][(k + i) % 4]}" ${SW.replace('3"', '2"')}/></g>`).join(''),
+      mark: `<path d="M30 110 v-60" stroke="#5fb85a" stroke-width="6"/>${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<ellipse cx="${30 + Math.cos(k * Math.PI / 4) * 18}" cy="${40 + Math.sin(k * Math.PI / 4) * 18}" rx="9" ry="9" fill="#ffd34d" ${SW.replace('3"', '2"')}/>`).join('')}<circle cx="30" cy="40" r="13" fill="#a5683a" ${SW}/>`,
+      foot: `<path d="M0 30 h80 M10 16 v28 M40 16 v28 M70 16 v28" stroke="#c98f63" stroke-width="5" stroke-linecap="round"/>` },
+    tower: { grad: ['#eaf5ff', '#d3eaff', '#bfe0ff'],
+      row: (y, i) => `<g transform="translate(${(i * 140) % 300 + 20} ${y})" opacity=".9"><path d="M0 20 q0 -16 18 -14 q6 -14 22 -8 q16 -4 18 12 q10 2 8 10 z" fill="#fff"/></g>`,
+      mark: `<rect x="8" y="30" width="44" height="90" fill="#ffe7a0" ${SW}/><path d="M2 32 L30 0 L58 32 z" fill="#4aa8e8" ${SW}/><circle cx="30" cy="52" r="10" fill="#fff" ${SW}/><path d="M30 46 v6 l4 3" ${SW.replace('3"', '2"')}/><rect x="20" y="78" width="20" height="24" rx="10" fill="#8fd3f4" ${SW}/>`,
+      foot: `<rect x="0" y="10" width="60" height="40" rx="6" fill="#2f5b4b" ${SW}/><path d="M10 24 h20 M10 34 h34" stroke="#fff" stroke-width="3" stroke-linecap="round"/>` },
+    cliffs: { grad: ['#ffeef4', '#fbd9e4', '#f2c3d3'],
+      row: (y, i) => `<path d="M${i % 2 ? 260 : 0} ${y + 20} q30 -26 70 -12 q30 -18 70 6 v20 h-140 z" fill="#e8b4c4" opacity=".55"/>`,
+      mark: `<path d="M0 120 l14 -60 h40 l12 60 z" fill="#d9a3b5" ${SW}/><rect x="16" y="30" width="36" height="30" fill="#fff4f0" ${SW}/><path d="M10 32 L34 10 L58 32 z" fill="#f07aa0" ${SW}/><rect x="28" y="42" width="12" height="18" fill="#c98f63" ${SW}/>`,
+      foot: `<path d="M10 40 q10 -30 20 0 M24 40 q14 -24 26 0" fill="#ffc2d6" ${SW}/>` },
+    blocks: { grad: ['#fff3ea', '#fbe0d0', '#f3c9b2'],
+      row: (y, i) => [30, 120, 230, 340].map((x, k) => (k + i) % 2 ? '' : `<rect x="${x}" y="${y + k * 8}" width="18" height="18" rx="3" fill="${['#f0b48f', '#8fd3f4', '#ffd76a', '#b8e986'][(k + i) % 4]}" opacity=".8" ${SW.replace('3"', '2"')}/>`).join(''),
+      mark: `<rect x="6" y="50" width="56" height="56" fill="#f0b48f" ${SW}/><path d="M0 52 L34 18 L68 52 z" fill="#d9774f" ${SW}/><rect x="26" y="74" width="16" height="32" fill="#8fd3f4" ${SW}/><rect x="12" y="60" width="12" height="12" fill="#fff" ${SW}/><rect x="44" y="60" width="12" height="12" fill="#fff" ${SW}/>`,
+      foot: `<rect x="0" y="20" width="22" height="22" fill="#ffd76a" ${SW}/><rect x="22" y="20" width="22" height="22" fill="#8fd3f4" ${SW}/><rect x="11" y="-2" width="22" height="22" fill="#ff9fb8" ${SW}/>` },
+    forest: { grad: ['#eef8e4', '#d7efc2', '#bfe3a0'],
+      row: (y, i) => [20, 130, 250, 350].map((x, k) => (k + i) % 3 === 1 ? '' : `<g transform="translate(${x} ${y + (k % 2) * 24})"><path d="M10 34 v10" stroke="#8a5a3c" stroke-width="5"/><path d="M10 -6 l16 40 h-32 z" fill="#7cbf5a" opacity=".8" ${SW.replace('3"', '2"')}/></g>`).join(''),
+      mark: `<path d="M24 120 v-50" stroke="#8a5a3c" stroke-width="10"/><circle cx="24" cy="44" r="30" fill="#5fb85a" ${SW}/><circle cx="12" cy="40" r="4" fill="#ff6b7d"/><circle cx="34" cy="54" r="4" fill="#ff6b7d"/>`,
+      foot: `<path d="M0 40 q8 -20 16 0 z" fill="#ff8fb2" ${SW}/><path d="M6 40 v-8" stroke="#fff" stroke-width="3"/><ellipse cx="44" cy="40" rx="16" ry="6" fill="#a6de8f" ${SW}/>` },
+    island: { grad: ['#e9f9ff', '#c7eef6', '#ffe7c4'],
+      row: (y) => `<path d="M0 ${y} q25 -10 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0" fill="none" stroke="#fff" stroke-width="3" opacity=".7"/>`,
+      mark: `<path d="M30 120 q-4 -40 8 -78" fill="none" stroke="#a57850" stroke-width="8" stroke-linecap="round"/><path d="M38 42 q-30 -14 -40 6 q20 -6 40 -6 q-10 -26 -34 -26 q22 10 34 26 q14 -24 40 -14 q-24 0 -40 14 q30 -4 36 14 q-18 -14 -36 -14 z" fill="#7cbf5a" ${SW}/>`,
+      foot: `<circle cx="20" cy="30" r="14" fill="#fff" ${SW}/><path d="M8 26 q12 6 24 0 M20 16 v28" fill="none" stroke="#ff7f6b" stroke-width="3"/>` },
+    clocktower: { grad: ['#efeeff', '#dcdcff', '#c8caf7'],
+      row: (y, i) => [50, 180, 300].map((x, k) => `<path d="${starPath(x + (i % 2) * 30, y + k * 14, 5)}" fill="#fff" opacity=".8"/>`).join(''),
+      mark: `<rect x="10" y="40" width="40" height="80" fill="#c3b1f5" ${SW}/><path d="M4 42 L30 4 L56 42 z" fill="#6a6fd8" ${SW}/><circle cx="30" cy="62" r="14" fill="#fff" ${SW}/><path d="M30 62 v-9 M30 62 l7 4" ${SW}/>`,
+      foot: `<circle cx="20" cy="26" r="16" fill="#ffd76a" ${SW}/><path d="M20 26 v-9 M20 26 l7 0" ${SW}/>` },
+    market: { grad: ['#fff6e6', '#ffe6c4', '#ffd3a1'],
+      row: (y, i) => `<path d="M0 ${y - 30} q100 26 200 0 q100 26 200 0" fill="none" stroke="#c98f63" stroke-width="2"/>${[30, 80, 130, 180, 230, 280, 330, 380].map((x, k) => `<path d="M${x - 8} ${y - 30 + (Math.abs(200 - x) < 100 ? 10 : 8)} l8 14 l8 -14 z" fill="${['#ff9a2e', '#ff8fb2', '#8fd3f4', '#ffd76a'][(k + i) % 4]}"/>`).join('')}`,
+      mark: `<rect x="4" y="54" width="60" height="50" fill="#fff4e0" ${SW}/><path d="M0 56 h68 l-6 -26 h-56 z" fill="#ff9a2e" ${SW}/><path d="M14 30 v26 M28 30 v26 M42 30 v26 M56 30 v26" stroke="#fff" stroke-width="5"/><circle cx="18" cy="74" r="7" fill="#ff6b7d" ${SW}/><circle cx="34" cy="76" r="7" fill="#ffd34d" ${SW}/><circle cx="50" cy="74" r="7" fill="#7cbf5a" ${SW}/>`,
+      foot: `<path d="M0 20 h50 l-6 26 h-38 z" fill="#c98f63" ${SW}/><circle cx="14" cy="16" r="7" fill="#ff6b7d" ${SW}/><circle cx="30" cy="14" r="7" fill="#ffd34d" ${SW}/>` },
+    bay: { grad: ['#2b2a63', '#35337a', '#26507a'],
+      row: (y, i) => `${[40, 170, 310].map((x, k) => `<path d="${starPath(x + (i % 2) * 24, y - 40 + k * 10, 4)}" fill="#ffe08a" opacity=".85"/>`).join('')}<path d="M0 ${y + 20} q25 -10 50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0 t50 0" fill="none" stroke="#8fb3ff" stroke-width="2" opacity=".5"/>`,
+      mark: `${[0, 1, 2, 3, 4, 5, 6, 7].map(k => `<path d="M30 40 l${(Math.cos(k * Math.PI / 4) * 26).toFixed(1)} ${(Math.sin(k * Math.PI / 4) * 26).toFixed(1)}" stroke="${['#ffd34d', '#ff8fc0', '#8fd3f4'][k % 3]}" stroke-width="4" stroke-linecap="round"/>`).join('')}<circle cx="30" cy="40" r="5" fill="#fff"/>`,
+      foot: `<path d="M0 30 h60 l-10 18 h-40 z" fill="#ffd2b8" ${SW}/><path d="M30 30 v-30" ${SW}/><path d="M6 6 q24 10 48 0" fill="none" stroke="#ffd34d" stroke-width="2"/><circle cx="14" cy="9" r="3" fill="#ff8fc0"/><circle cx="30" cy="11" r="3" fill="#ffd34d"/><circle cx="46" cy="9" r="3" fill="#8fd3f4"/>` },
+    lighthouse: { grad: ['#14232e', '#183238', '#1d3d3a'],
+      row: (y, i) => [40, 150, 270, 360].map((x, k) => `<text x="${x}" y="${y + k * 12}" font-size="16" font-weight="700" fill="#3cc9a0" opacity=".28" font-family="monospace">${['{ }', '01', '()', '#', '>>>', '[ ]'][(k + i) % 6]}</text>`).join(''),
+      mark: `<path d="M30 20 L-60 60 L-60 0 z" fill="#ffe08a" opacity=".25"/><path d="M14 120 l6 -90 h20 l6 90 z" fill="#fff" ${SW}/><path d="M16 96 h28 M18 64 h24" stroke="#3cc9a0" stroke-width="8"/><path d="M14 120 l6 -90 h20 l6 90 z" fill="none" ${SW}/><rect x="18" y="16" width="24" height="16" rx="3" fill="#ffe08a" ${SW}/><path d="M16 16 l14 -12 l14 12 z" fill="#3cc9a0" ${SW}/>`,
+      foot: `<rect x="0" y="8" width="56" height="36" rx="6" fill="#231d3a" ${SW}/><text x="28" y="32" font-size="13" text-anchor="middle" fill="#9be7b4" font-family="monospace" font-weight="700">&gt;&gt;&gt;</text>` }
   }
 };
 
@@ -1386,7 +1601,7 @@ function englishLines() {
   CONTENT.levels.forEach(l => l.plan.forEach(s => {
     if (s.k === 'build' && !s.code) add(s.parts.join(' '));
     if (s.k === 'bug') add(s.tokens.map((t, i) => i === s.bug ? s.fix : t).join(' '));
-    if (s.k === 'predict') add(s.options[s.answer]);
+    if (s.k === 'predict' && predictSpoken(s)) add(s.options[s.answer]);
   }));
   add("Hello! I'm Nuvi. How are you?");
   return [...set];
@@ -1481,8 +1696,17 @@ const dueIds = () => learnedIds().filter(id => S.words[id].due != null && S.word
 const unitLevels = uid => CONTENT.levels.filter(l => l.unit === uid && !l.secret);
 const unitSecrets = uid => CONTENT.levels.filter(l => l.unit === uid && l.secret);
 const isDone = id => !!(S.levels[id] && S.levels[id].done);
+/* A unit opens once the boss (last main level) of its "after" unit is done. */
+function unitOpen(uid) {
+  const u = U(uid);
+  if (!u || u.status !== 'open') return false;
+  if (!u.after || S.parent.unlockAll) return true;
+  const boss = unitLevels(u.after).slice(-1)[0];
+  return !boss || isDone(boss.id);
+}
 function levelState(lv) {
   if (isDone(lv.id)) return 'done';
+  if (!unitOpen(lv.unit)) return lv.secret ? 'hidden' : 'locked';
   if (lv.secret) {
     const last = unitLevels(lv.unit).slice(-1)[0];
     return (last && isDone(last.id)) || S.parent.unlockAll ? 'open' : 'hidden';
@@ -1529,7 +1753,7 @@ function checkBadges() {
 const backupDue = () => S.settings.backupDays > 0 && today() - (S.lastBackupDay != null ? S.lastBackupDay : S.firstDay) >= S.settings.backupDays;
 
 /* ---------------- plan expansion: level data -> list of tasks ---------------- */
-const SINGLE_KINDS = ['memory', 'falling', 'dialogue', 'build', 'predict', 'bug', 'card'];
+const SINGLE_KINDS = ['memory', 'falling', 'dialogue', 'build', 'predict', 'bug', 'card', 'order', 'trace', 'py'];
 function expandPlan(level) {
   const tasks = [];
   for (const seg of level.plan) {
@@ -1549,8 +1773,10 @@ function expandPlan(level) {
 }
 /* words a task touches + modality (used for exposure check and word stats) */
 const MODALITY = { intro:['see','hear'], catch:['see','hear'], listen:['hear'], memory:['see','hear'], spell:['type'], speak:['say','hear'],
-  build:['build','see'], bug:['see'], dialogue:['hear','see'], predict:['see'], falling:['see','hear'], card:[] };
-function taskWords(t) {
+  build:['build','see'], bug:['see'], dialogue:['hear','see'], predict:['see'], falling:['see','hear'], card:[],
+  order:['build','see'], trace:['see'], py:['type','see'] };
+/* unit: only words of that unit count (a dialogue in one unit must not "teach" words of another) */
+function taskWords(t, unit) {
   if (t.w) return [t.w];
   if (t.words) return t.words;
   if (t.uses) return t.uses;
@@ -1558,12 +1784,18 @@ function taskWords(t) {
     const d = CONTENT.dialogues[t.id]; const ids = new Set();
     if (d) d.nodes.forEach(n => (n.options || []).concat(n.say ? [{ en: n.say }] : []).forEach(o => {
       if (!o.en) return;
-      CONTENT.words.forEach(w => { if (norm(o.en).includes(norm(w.en)) && norm(w.en).length > 2) ids.add(w.id); });
+      wordsIn(o.en, unit).forEach(id => ids.add(id));
     }));
     return [...ids];
   }
   return [];
 }
+function wordsIn(text, unit) {
+  const t = norm(text);
+  return CONTENT.words.filter(w => (!unit || w.unit === unit) && norm(w.en).length > 1 && (t === norm(w.en) || (norm(w.en).length > 2 && t.includes(norm(w.en))))).map(w => w.id);
+}
+/* predict answers are spoken (and get a clip) only when they contain words and say !== false */
+const predictSpoken = s => s.say !== false && /[a-z]/i.test(s.options[s.answer]);
 </script>
 <script>
 /* ==========================================================================================
@@ -1672,7 +1904,7 @@ function holdButton(btn, ms, fn) {
 /* ==========================================================================================
    CONTENT VALIDATION (runs at startup; report visible with #debug and in the parent area)
    ========================================================================================== */
-const KINDS = ['intro','catch','listen','spell','speak','memory','falling','dialogue','build','predict','bug','card'];
+const KINDS = ['intro','catch','listen','spell','speak','memory','falling','dialogue','build','predict','bug','card','order','trace','py'];
 function validateContent() {
   const errs = [], warns = [];
   const ids = new Map();
@@ -1687,8 +1919,16 @@ function validateContent() {
   for (const w of CONTENT.words) {
     ['unit', 'cat', 'en', 'de', 'exampleEn', 'exampleDe'].forEach(f => { if (!w[f] || !String(w[f]).trim()) errs.push(`Word ${w.id}: empty "${f}"`); });
     if (!U(w.unit)) errs.push(`Word ${w.id}: unknown unit ${w.unit}`);
-    if (!(/^num:\d+$/.test(w.icon) || ART.icons[w.icon])) errs.push(`Word ${w.id}: no picture "${w.icon}"`);
+    if (!ART.hasPic(w)) errs.push(`Word ${w.id}: no picture "${w.icon}"`);
     if ('pron' in w && !String(w.pron).trim()) errs.push(`Word ${w.id}: pron empty – remove the field instead`);
+  }
+  for (const u of CONTENT.units.filter(x => x.status === 'open')) {
+    if (u.scene !== 'harbour' && !ART.scenes[u.scene]) errs.push(`Unit ${u.id}: unknown scene ${u.scene}`);
+    if (u.after && !U(u.after)) errs.push(`Unit ${u.id}: unknown "after" unit ${u.after}`);
+    (u.monster || []).forEach(m => { if (!ART.monster(m).includes('<path') && !ART.monster(m).includes('<g')) errs.push(`Unit ${u.id}: no art for monster ${m}`); });
+    if (!u.monster || u.monster.length !== 3 || !u.monsterNames || u.monsterNames.length !== 3) errs.push(`Unit ${u.id}: needs 3 monsters with names`);
+    const last = unitLevels(u.id).slice(-1)[0];
+    if (!last || last.type !== 'boss') errs.push(`Unit ${u.id}: last main level must be the boss`);
   }
   const introduced = {};
   for (const lv of CONTENT.levels) {
@@ -1696,6 +1936,7 @@ function validateContent() {
     if (!u) { errs.push(`Level ${lv.id}: unknown unit`); continue; }
     ['title', 'type', 'plan'].forEach(f => { if (!lv[f]) errs.push(`Level ${lv.id}: missing ${f}`); });
     if (lv.reward && !ITEM(lv.reward)) errs.push(`Level ${lv.id}: reward item ${lv.reward} missing`);
+    if (lv.boss && !(lv.boss.art === 'crab' || ART.bosses[lv.boss.art])) errs.push(`Level ${lv.id}: unknown boss art ${lv.boss.art}`);
     introduced[lv.unit] = introduced[lv.unit] || new Set();
     const pool = introduced[lv.unit];
     (lv.plan || []).forEach((seg, si) => {
@@ -1717,6 +1958,19 @@ function validateContent() {
       }
       if (seg.k === 'build' && (!seg.parts || seg.parts.length < 2)) errs.push(`${where}: build needs >= 2 parts`);
       if (seg.k === 'predict' && !(seg.answer >= 0 && seg.answer < seg.options.length)) errs.push(`${where}: predict answer index invalid`);
+      if (seg.k === 'predict' && new Set(seg.options).size !== seg.options.length) errs.push(`${where}: predict options not unique`);
+      if (seg.k === 'order') {
+        if (!seg.lines || seg.lines.length < 2) errs.push(`${where}: order needs >= 2 lines`);
+        else if (new Set(seg.lines.concat(seg.extra || [])).size !== seg.lines.length + (seg.extra || []).length) errs.push(`${where}: order lines must be unique`);
+      }
+      if (seg.k === 'trace') {
+        if (!seg.code || !seg.var || !(seg.steps || []).length) errs.push(`${where}: trace needs code, var, steps`);
+        else seg.steps.forEach((st, k) => {
+          if (!st.alt || !st.alt.length || st.alt.includes(st.v) || new Set(st.alt).size !== st.alt.length) errs.push(`${where}: trace step ${k} needs unique wrong options`);
+          if ((st.line != null ? st.line : k) >= seg.code.split('\n').length) errs.push(`${where}: trace step ${k} line out of range`);
+        });
+      }
+      if (seg.k === 'py' && (!seg.de || !seg.solution || !seg.check || !(seg.check.out != null || seg.check.has || seg.check.test))) errs.push(`${where}: py needs de, solution and check`);
       if (seg.k === 'dialogue') {
         const d = CONTENT.dialogues[seg.id];
         if (!d) errs.push(`${where}: dialogue ${seg.id} missing`);
@@ -1725,6 +1979,7 @@ function validateContent() {
           if (n.ask) n.options.filter(o => !o.ok).forEach(o => { if (!o.hint) warns.push(`Dialogue ${seg.id} node ${ni}: wrong option without hint`); });
           if (n.say && !n.de) errs.push(`Dialogue ${seg.id} node ${ni}: German translation missing`);
         });
+        if (d && !['juno', 'pixel', 'crab'].includes(d.npc) && !ART.bosses[d.npc]) errs.push(`Dialogue ${seg.id}: unknown npc ${d.npc}`);
       }
       if (seg.k === 'falling' && (seg.words || []).length < (seg.opts || 3)) errs.push(`${where}: falling needs at least ${seg.opts || 3} words`);
     });
@@ -1735,7 +1990,7 @@ function validateContent() {
     CONTENT.levels.filter(l => l.unit === u.id && !l.secret).forEach(lv => {
       expandPlan(lv).forEach(t => {
         const n = t.k === 'dialogue' ? 1 : 1;
-        taskWords(t).forEach(id => { count[id] = (count[id] || 0) + n; (mods[id] = mods[id] || new Set()); (MODALITY[t.k] || []).forEach(m => mods[id].add(m)); });
+        taskWords(t, u.id).forEach(id => { count[id] = (count[id] || 0) + n; (mods[id] = mods[id] || new Set()); (MODALITY[t.k] || []).forEach(m => mods[id].add(m)); });
       });
     });
     CONTENT.words.filter(w => w.unit === u.id).forEach(w => {
@@ -1766,7 +2021,7 @@ const REQUEUE_KINDS = ['catch', 'listen', 'spell'];
 
 function newRun(level, tasks) {
   const words = new Set();
-  tasks.forEach(t => taskWords(t).forEach(id => words.add(id)));
+  tasks.forEach(t => taskWords(t, level.unit).forEach(id => words.add(id)));
   return { level, tasks, idx: 0, total: 0, first: 0, itemWrong: 0, helpLevel: 0, onHelp: null, perWord: {},
            levelWords: words, timed: level.timed || 0, turboScore: 0, timers: [], raf: null };
 }
@@ -1828,16 +2083,14 @@ function distractors(wid, n, poolIds) {
   const same = shuffle(pool.filter(x => x.cat === w.cat)), other = shuffle(pool.filter(x => x.cat !== w.cat));
   return same.concat(other).slice(0, n).map(x => x.id);
 }
+const PY_KW = 'print|if|elif|else|for|in|range|repeat|while|def|return|and|or|not|True|False|input|len|str|int|append';
 function hl(line) {
-  return esc(sub(line)).replace(/(&quot;.*?&quot;)|\b(print|if|else|for|in|range|repeat|while)\b|([=+()])/g,
-    (m, s, k, o) => s ? `<span class="st">${s}</span>` : k ? `<span class="kw">${k}</span>` : `<span class="op">${o}</span>`);
+  return esc(sub(line)).replace(new RegExp(`(&quot;.*?&quot;|&#39;.*?&#39;)|((?<!&)#.*$)|\\b(${PY_KW})\\b|([=+\\-*/<>()\\[\\]:])`, 'g'),
+    (m, s, c, k, o) => s ? `<span class="st">${s}</span>` : c ? `<span class="cm">${c}</span>` : k ? `<span class="kw">${k}</span>` : `<span class="op">${o}</span>`);
 }
-const codeBlock = code => `<div class="code" lang="en">${sub(code).split('\n').map((l, i) => `<div class="ln"><span class="num">${i + 1}</span><span>${hl(l)}</span></div>`).join('')}</div>`;
-const tokClass = p => /^".*"$/.test(p) ? 'st' : /^[=+()]$/.test(p) ? 'op' : /^(print|if|else|for|in)$/.test(p) ? 'kw' : 'va';
-function wordsIn(text) {
-  const t = norm(text);
-  return CONTENT.words.filter(w => norm(w.en).length > 1 && (t === norm(w.en) || (norm(w.en).length > 2 && t.includes(norm(w.en))))).map(w => w.id);
-}
+/* hi = 0-based line index to highlight (trace) */
+const codeBlock = (code, hi = -1) => `<div class="code" lang="en">${sub(code).split('\n').map((l, i) => `<div class="ln ${i === hi ? 'hi' : ''}"><span class="num">${i + 1}</span><span class="src">${hl(l)}</span></div>`).join('')}</div>`;
+const tokClass = p => /^".*"$/.test(p) ? 'st' : /^[=+()\-*/<>:]$|^==$/.test(p) ? 'op' : new RegExp(`^(${PY_KW})$`).test(p) ? 'kw' : 'va';
 function throwBall(from, to) {
   return new Promise(res => {
     if (reducedMotion()) { res(); return; }
@@ -1864,7 +2117,7 @@ SCREENS.level = () => {
       ${Run.timed ? `<span class="chip timer" aria-label="Sekunden übrig">${Run.timed}</span>` : ''}
       <button class="ibtn hintbtn" data-a="hint" aria-label="Tipp holen">${IC('bulb')}<small></small></button>
     </div>
-    ${lv.boss ? `<div class="boss" aria-label="Boss ${esc(lv.boss.name)}">${ART.crab('grumpy')}<div class="grow"><b>${esc(lv.boss.name)}</b><div class="hp"><i></i></div></div></div>` : ''}
+    ${lv.boss ? `<div class="boss" aria-label="Boss ${esc(lv.boss.name)}">${ART.boss(lv.boss.art, 'grumpy')}<div class="grow"><b>${esc(lv.boss.name)}</b><div class="hp"><i></i></div></div></div>` : ''}
     <div class="stage"></div>
     <div class="foot"></div>
   </div>`);
@@ -2290,7 +2543,8 @@ TASKS.memory = (t, api) => {
 
 TASKS.dialogue = (t, api) => {
   const d = CONTENT.dialogues[t.id];
-  const npcArt = d.npc === 'crab' ? ART.crab('happy') : ART.juno();
+  const npcArt = ART.npc(d.npc);
+  const unit = Run.level.unit;
   const meArt = ART.avatar(S.profile.avatar, S.equip);
   const box = el(`<div class="task"><div class="chat"></div></div>`);
   Run.stage.append(box);
@@ -2326,9 +2580,9 @@ TASKS.dialogue = (t, api) => {
         const o = n.options[+b.dataset.k];
         if (o.ok) {
           busy = true; add('me', enSpan(o.en));
-          if (demo) api.demo(wordsIn(o.en)); else api.right(wordsIn(o.en), b);
+          if (demo) api.demo(wordsIn(o.en, unit)); else api.right(wordsIn(o.en, unit), b);
           Run.foot.replaceChildren(); await sayEn(o.en); await sleep(300); i++; step();
-        } else { b.classList.add('miss'); api.miss(wordsIn(n.options.find(x => x.ok).en), o.hint); }
+        } else { b.classList.add('miss'); api.miss(wordsIn(n.options.find(x => x.ok).en, unit), o.hint); }
       };
       wrap.onclick = e => { const b = e.target.closest('[data-k]'); if (b && !busy) pick(b); };
       api.setHelp(lvl => {
@@ -2402,15 +2656,15 @@ TASKS.build = (t, api) => {
 TASKS.predict = (t, api) => {
   const opts = shuffle(t.options.map((o, k) => ({ o, k })));
   const box = el(`<div class="task">${qRow('Was zeigt der Computer an?', 'codelab')}${codeBlock(t.code)}
-    <div class="stack popts">${opts.map(x => `<button class="btn block ctile" data-k="${x.k}" lang="en-GB" style="font-family:var(--mono)">${esc(sub(x.o))}</button>`).join('')}</div><div class="out stack"></div></div>`);
+    <div class="stack popts">${opts.map(x => `<button class="btn block ctile multi" data-k="${x.k}" lang="en-GB" style="font-family:var(--mono)">${esc(sub(x.o))}</button>`).join('')}</div><div class="out stack"></div></div>`);
   Run.stage.append(box);
   let done = false;
   const finish = (demo) => {
     done = true;
     const ans = sub(t.options[t.answer]);
     $('.popts', box).hidden = true;
-    $('.out', box).innerHTML = `<div class="console">&gt; ${esc(ans)}</div><div class="ex">${fmt(t.explain || '')}</div>`;
-    sayEn(ans);
+    $('.out', box).innerHTML = `${consoleOut(ans)}<div class="ex">${fmt(t.explain || '')}</div>`;
+    if (predictSpoken(t)) sayEn(ans);
     if (demo) api.demo(t.uses || []); else api.right(t.uses || [], $('.out', box));
     footBtn('Weiter', () => api.next());
   };
@@ -2422,9 +2676,111 @@ TASKS.predict = (t, api) => {
   api.setHelp(lvl => {
     if (done) return;
     if (lvl === 1) { const b = $$('.popts [data-k]', box).find(x => +x.dataset.k !== t.answer && !x.disabled); if (b) b.disabled = true; }
-    if (lvl === 2) api.say('thinking', 'Tipp: [[print]] zeigt den Inhalt an – nicht den Namen der Box.');
+    if (lvl === 2) api.say('thinking', t.tip || 'Tipp: [[print]] zeigt den Inhalt an – nicht den Namen der Box.');
     if (lvl === 3) finish(true);
   });
+};
+/* console lines: one "> " per output line */
+const consoleOut = (text, cls = '') => `<div class="console ${cls}">${String(text).split('\n').map(l => `<div>&gt; ${esc(l)}</div>`).join('')}</div>`;
+
+/* Parsons puzzle: tap the code lines in the right order (indentation is part of each line). */
+TASKS.order = (t, api) => {
+  const lines = t.lines.map(sub);
+  let tiles = shuffle(lines.concat((t.extra || []).map(sub)).map((p, i) => ({ p, i })));
+  if (tiles.length > 1 && tiles.map(x => x.p).join('\u0001') === lines.join('\u0001')) tiles.push(tiles.shift());
+  const box = el(`<div class="task">
+    ${qRow(t.de || 'Bring die Zeilen in die richtige Reihenfolge!', 'codelab')}
+    <div class="code prog"></div>
+    <div class="stack otiles"></div><div class="out stack"></div></div>`);
+  Run.stage.append(box);
+  const prog = $('.prog', box), tray = $('.otiles', box), out = $('.out', box);
+  let placed = [], lockedN = 0, done = false;
+  const indentOf = p => (/^ */.exec(p)[0].length / 4) | 0;
+  const render = () => {
+    prog.innerHTML = placed.map((ti, k) => `<div class="ln"><span class="num">${k + 1}</span><button class="oline ${k < lockedN ? 'lockd' : ''}" data-k="${k}" style="margin-left:${indentOf(tiles[ti].p) * 1.6}em">${hl(tiles[ti].p.trim())}</button></div>`).join('') +
+      (done ? '' : `<div class="ln"><span class="num">${placed.length + 1}</span><span class="cur"></span></div>`);
+    tray.innerHTML = tiles.map((x, i) => `<button class="btn block otile ${placed.includes(i) ? 'used' : ''}" data-i="${i}" data-p="${esc(x.p)}"><span class="ind">${'·&nbsp;&nbsp;&nbsp;'.repeat(indentOf(x.p))}</span>${hl(x.p.trim())}</button>`).join('');
+  };
+  const finish = demo => {
+    done = true; render(); tray.hidden = true;
+    out.innerHTML = (t.out != null ? consoleOut(sub(t.out)) : '<div class="console">✓ Compile successful</div>') + (t.explain ? `<div class="ex">${fmt(t.explain)}</div>` : '');
+    if (demo) api.demo(t.uses || []); else api.right(t.uses || [], out);
+    footBtn('Weiter', () => api.next());
+    setTimeout(() => out.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 50);
+  };
+  const check = () => {
+    if (placed.length < lines.length) return;
+    if (placed.map(i => tiles[i].p).join('\u0001') === lines.join('\u0001')) { finish(false); return; }
+    out.innerHTML = `<div class="console meh">⚠ Hmm, fast! Die Reihenfolge stimmt noch nicht ganz.</div>`;
+    api.miss(t.uses || [], 'Fast! Lies das Programm von oben nach unten. 🔍');
+    let k = lockedN; while (k < placed.length && tiles[placed[k]].p === lines[k]) k++;
+    placed = placed.slice(0, k); render();
+  };
+  const lockN = n => {
+    placed = [];
+    for (let k = 0; k < n; k++) placed.push(tiles.findIndex((x, i) => x.p === lines[k] && !placed.includes(i)));
+    lockedN = n; render();
+  };
+  box.onclick = e => {
+    if (done) return;
+    const tl = e.target.closest('.otile'), pl = e.target.closest('.oline');
+    if (tl) { placed.push(+tl.dataset.i); Sfx.play('pop'); out.innerHTML = ''; render(); check(); }
+    if (pl && +pl.dataset.k >= lockedN) { placed.splice(+pl.dataset.k, 1); render(); }
+  };
+  api.setHelp(lvl => {
+    if (done) return;
+    if (lvl === 1) lockN(Math.max(lockedN, 1));
+    if (lvl === 2) lockN(Math.max(lockedN, Math.ceil(lines.length / 2)));
+    if (lvl === 3) { lockN(lines.length); finish(true); }
+  });
+  render();
+  api.say('happy', t.extra && t.extra.length ? 'Achtung: Eine Zeile gehört nicht dazu! 🕵️' : 'Tippe die Zeilen von oben nach unten an.');
+};
+
+/* Trace: the computer runs line by line – what is in the box after each line? */
+TASKS.trace = (t, api) => {
+  const n = t.steps.length;
+  const box = el(`<div class="task">${qRow(t.de || `Spiel Computer! Was ist nach jeder Zeile in [[${t.var}]]?`, 'codelab')}
+    <div class="tcode"></div>
+    <div class="row" style="justify-content:center"><div class="varbox"><small>${esc(t.var)}</small><b class="vv">?</b></div></div>
+    <div class="story tq center"></div><div class="stack topts"></div><div class="out stack"></div></div>`);
+  Run.stage.append(box);
+  let s = 0, done = false, misses = 0;
+  const lineOf = k => t.steps[k].line != null ? t.steps[k].line : k;
+  const show = () => {
+    $('.tcode', box).innerHTML = codeBlock(t.code, lineOf(s));
+    $('.tq', box).innerHTML = fmt(`Nach Zeile ${lineOf(s) + 1}: Was ist in [[${t.var}]]?`);
+    const st = t.steps[s];
+    $('.topts', box).innerHTML = shuffle([st.v, ...st.alt]).map(o => `<button class="btn block ctile" data-o="${esc(o)}" style="font-family:var(--mono)">${esc(o)}</button>`).join('');
+  };
+  const finish = demo => {
+    done = true;
+    $('.topts', box).hidden = true; $('.tq', box).hidden = true;
+    $('.tcode', box).innerHTML = codeBlock(t.code);
+    $('.out', box).innerHTML = `${t.out != null ? consoleOut(sub(t.out)) : ''}<div class="ex">${fmt(t.explain || `Am Ende ist in [[${t.var}]]: [[${t.steps[n - 1].v}]]`)}</div>`;
+    if (demo) api.demo(t.uses || []); else { Run.itemWrong = misses ? 1 : 0; api.right(t.uses || [], $('.out', box)); }
+    footBtn('Weiter', () => api.next());
+  };
+  const advance = () => {
+    $('.vv', box).textContent = t.steps[s].v;
+    const vb = $('.varbox', box); vb.classList.remove('pop'); void vb.offsetWidth; vb.classList.add('pop');
+    Sfx.play('pop');
+    s++; Run.itemWrong = 0; Run.helpLevel = 0;
+    if (s >= n) finish(false); else show();
+  };
+  $('.topts', box).onclick = e => {
+    const b = e.target.closest('[data-o]'); if (!b || done) return;
+    if (b.dataset.o === t.steps[s].v) advance();
+    else { b.disabled = true; misses++; api.miss(t.uses || [], 'Fast! Schau, was in dieser Zeile mit der Box passiert. 🔍'); }
+  };
+  api.setHelp(lvl => {
+    if (done) return;
+    if (lvl === 1) { const b = $$('.topts [data-o]', box).find(x => x.dataset.o !== t.steps[s].v && !x.disabled); if (b) b.disabled = true; }
+    if (lvl === 2) api.say('thinking', t.tip || 'Rechne nur die markierte Zeile – der Rest bleibt gleich.');
+    if (lvl === 3) { misses++; $$('.topts [data-o]', box).forEach(x => { if (x.dataset.o === t.steps[s].v) x.classList.add('hintme'); }); setTimeout(() => { if (!done) advance(); }, 900); }
+  });
+  show();
+  api.say('happy', 'Du bist der Computer: Zeile für Zeile! 🤖');
 };
 
 TASKS.bug = (t, api) => {
@@ -2595,6 +2951,156 @@ function finishLevel() {
 </script>
 <script>
 /* ==========================================================================================
+   PYTHON (Pyodide) – real Python for Pixels Leuchtturm (u11). Loaded lazily from the CDN only
+   when a 'py' task needs it; everything else in the app stays offline.
+   Task: {k:'py', de, start, check:{out?, has?, test?}, inputs?, hint, solution, explain, uses}
+     check.out  = expected print output (exact, trailing spaces ignored)
+     check.has  = strings that must appear in the output
+     check.test = Python expression, evaluated after the run in the program's namespace
+   ========================================================================================== */
+const PY = {
+  base: 'https://cdn.jsdelivr.net/pyodide/v0.29.5/full/',
+  STEP_LIMIT: 200000,
+  py: null, pending: null,
+  load() {
+    if (this.py) return Promise.resolve(this.py);
+    if (!this.pending) this.pending = this.fetchRuntime().then(py => { this.py = py; return py; }, e => { this.pending = null; throw e; });
+    return this.pending;
+  },
+  fetchRuntime() {
+    const timeout = (p, ms, what) => Promise.race([p, new Promise((_, rej) => setTimeout(() => rej(new Error(what + ' timeout')), ms))]);
+    const script = window.loadPyodide ? Promise.resolve() : new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = this.base + 'pyodide.js'; s.crossOrigin = 'anonymous';
+      s.onload = res; s.onerror = () => { s.remove(); rej(new Error('pyodide.js could not be loaded')); };
+      document.head.append(s);
+    });
+    return timeout(script, 45000, 'script').then(() => timeout(loadPyodide({ indexURL: this.base }), 120000, 'runtime'));
+  },
+  /* Runs code in a fresh namespace. Returns {ok, out, shown, err, passed}. out = printed text only,
+     shown = printed text with the typed inputs echoed (like a terminal). */
+  async run(code, check = {}, inputs = []) {
+    const py = await this.load();
+    let out = '', shown = '';
+    const dec = new TextDecoder();
+    const queue = inputs.map(String);
+    py.setStdout({ write: buf => { const s = dec.decode(buf, { stream: true }); out += s; shown += s; return buf.length; } });
+    py.setStderr({ write: buf => buf.length });
+    py.setStdin({ stdin: () => { if (!queue.length) return null; const v = queue.shift(); shown += v + '\n'; return v + '\n'; } });
+    const ns = py.globals.get('dict')();
+    py.runPython(`import sys\n_ec_n = [0]\ndef _ec_t(f, e, a):\n    _ec_n[0] += 1\n    if _ec_n[0] > ${this.STEP_LIMIT}:\n        raise RuntimeError("EC_STEP_LIMIT")\n    return _ec_t\n`, { globals: ns });
+    let err = null;
+    try {
+      py.runPython('sys.settrace(_ec_t)', { globals: ns });
+      await py.runPythonAsync(code, { globals: ns });
+    } catch (e) {
+      err = PY.explain(e);
+    } finally {
+      py.runPython('sys.settrace(None)', { globals: ns });
+    }
+    let passed = !err;
+    if (passed && check.out != null) passed = PY.same(out, sub(check.out));
+    if (passed && check.has) passed = check.has.every(h => out.includes(sub(h)));
+    if (passed && check.test) passed = !!py.runPython(sub(check.test), { globals: ns });
+    ns.destroy();
+    return { ok: !err, out, shown, err, passed };
+  },
+  same(a, b) { const n = s => s.replace(/\r/g, '').split('\n').map(l => l.replace(/\s+$/, '')).join('\n').replace(/\n+$/, ''); return n(a) === n(b); },
+  /* PythonError -> short German explanation + the original last line */
+  explain(e) {
+    const msg = String(e && e.message || e);
+    const last = msg.trim().split('\n').filter(Boolean).pop() || msg;
+    if (/EC_STEP_LIMIT/.test(msg)) return { de: 'Dein Programm läuft und läuft … Ist da eine Endlosschleife? 🔁', line: 'Gestoppt nach zu vielen Schritten' };
+    const map = [
+      [/IndentationError/, 'Die Einrückung stimmt nicht. Unter einem Doppelpunkt brauchst du 4 Leerzeichen.'],
+      [/SyntaxError/, 'Python versteht die Schreibweise nicht. Fehlt eine Klammer, ein Doppelpunkt oder ein Anführungszeichen?'],
+      [/NameError/, 'Python kennt ein Wort nicht. Tippfehler? Oder fehlen Anführungszeichen?'],
+      [/TypeError/, 'Da passen zwei Sachen nicht zusammen – zum Beispiel Text und Zahl.'],
+      [/ValueError/, 'Ein Wert passt nicht – zum Beispiel Text, wo eine Zahl stehen soll.'],
+      [/ZeroDivisionError/, 'Durch 0 teilen geht nicht!'],
+      [/IndexError/, 'So viele Elemente hat die Liste nicht. Zählen beginnt bei 0!'],
+      [/KeyError/, 'Diesen Schlüssel gibt es im Wörterbuch nicht.'],
+      [/EOFError/, 'Das Programm wollte mehr Eingaben, als es gibt.']
+    ];
+    const hit = map.find(([re]) => re.test(last));
+    return { de: hit ? hit[1] : 'Python hat einen Fehler gemeldet.', line: last };
+  }
+};
+
+/* Code editor + run button. Offline: a German hint, retry and skip (skip counts as a demo). */
+TASKS.py = (t, api) => {
+  const keys = ['⇥', '"', '(', ')', ':', '=', '+', '[', ']'];
+  const box = el(`<div class="task">${qRow(t.de, 'codelab')}
+    ${t.inputs && t.inputs.length ? `<div class="chip" style="align-self:center">⌨️ Eingabe beim Test: <b lang="en-GB">${t.inputs.map(x => esc(sub(x))).join(', ')}</b></div>` : ''}
+    <textarea class="pyed" spellcheck="false" autocapitalize="none" autocorrect="off" autocomplete="off" lang="en" aria-label="Python-Code"></textarea>
+    <div class="pykeys">${keys.map(k => `<button class="btn small" data-key="${esc(k)}" aria-label="${k === '⇥' ? 'Einrücken (4 Leerzeichen)' : 'Zeichen ' + esc(k)}">${esc(k)}</button>`).join('')}</div>
+    <button class="btn pri block" data-run>${IC('play')} Ausführen</button>
+    <div class="out stack"></div></div>`);
+  Run.stage.append(box);
+  const ed = $('.pyed', box), out = $('.out', box), runBtn = $('[data-run]', box);
+  ed.value = sub(t.start || '');
+  ed.rows = Math.max(4, ed.value.split('\n').length + 1);
+  let done = false, busy = false;
+  const insert = s => {
+    const a = ed.selectionStart, b = ed.selectionEnd;
+    ed.setRangeText(s, a, b, 'end'); ed.focus();
+  };
+  ed.addEventListener('keydown', e => {
+    if (e.key === 'Tab') { e.preventDefault(); insert('    '); }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const before = ed.value.slice(0, ed.selectionStart), line = before.split('\n').pop();
+      insert('\n' + /^ */.exec(line)[0] + (/:\s*$/.test(line) ? '    ' : ''));
+    }
+  });
+  $('.pykeys', box).onclick = e => { const k = e.target.closest('[data-key]'); if (k) insert(k.dataset.key === '⇥' ? '    ' : k.dataset.key); };
+  const offline = () => {
+    out.innerHTML = `<div class="warn">📡 Für echtes Python brauchst du Internet. Python wird aus dem Netz geladen – verbinde dich und probier's nochmal.</div>
+      <div class="row"><button class="btn grow" data-retry>${IC('replay')} Nochmal versuchen</button><button class="btn grow" data-skip>Überspringen</button></div>`;
+    $('[data-retry]', out).onclick = () => { out.innerHTML = ''; warm(); };
+    $('[data-skip]', out).onclick = () => { if (done) return; done = true; ed.value = sub(t.solution); out.innerHTML = `<div class="ex">So hätte die Lösung ausgesehen. ${fmt(t.explain || '')}</div>`; api.demo(t.uses || []); footBtn('Weiter', () => api.next()); };
+  };
+  const warm = () => {
+    if (PY.py) return;
+    if (navigator.onLine === false) { offline(); return; }
+    out.innerHTML = '<div class="console">⏳ Python wird geladen …</div>';
+    runBtn.disabled = true;
+    PY.load().then(() => { runBtn.disabled = false; if (!done) out.innerHTML = '<div class="console">✓ Python ist bereit!</div>'; },
+      e => { console.warn('Python could not be loaded', e); runBtn.disabled = false; if (!done) offline(); });
+  };
+  const finish = (r, demo) => {
+    done = true; runBtn.disabled = true; ed.readOnly = true;
+    out.innerHTML = `${r ? consoleOut(r.shown.replace(/\n+$/, '') || '(keine Ausgabe)') : ''}<div class="console">✓ Geschafft!</div>${t.explain ? `<div class="ex">${fmt(t.explain)}</div>` : ''}`;
+    if (demo) api.demo(t.uses || []); else api.right(t.uses || [], out);
+    footBtn('Weiter', () => api.next());
+    setTimeout(() => out.scrollIntoView({ block: 'nearest', behavior: 'smooth' }), 50);
+  };
+  const run = async demo => {
+    if (busy || done) return;
+    busy = true; runBtn.disabled = true;
+    out.innerHTML = '<div class="console">▶ läuft …</div>';
+    const loaded = await PY.load().then(() => true, e => { console.warn('Python unavailable', e); return false; });
+    if (!loaded) { busy = false; runBtn.disabled = false; offline(); return; }
+    const r = await PY.run(ed.value, t.check || {}, (t.inputs || []).map(sub));
+    busy = false; runBtn.disabled = false;
+    if (r.passed) { finish(r, demo); return; }
+    if (r.err) out.innerHTML = `${r.shown ? consoleOut(r.shown.replace(/\n+$/, '')) : ''}<div class="console meh">🐞 ${esc(r.err.line)}</div><div class="ex">${esc(r.err.de)}</div>`;
+    else out.innerHTML = `${consoleOut(r.shown.replace(/\n+$/, '') || '(keine Ausgabe)')}<div class="ex">Das Programm läuft – aber das Ergebnis passt noch nicht ganz.${t.check && t.check.out != null ? ` Gesucht ist: ${consoleOut(sub(t.check.out))}` : ''}</div>`;
+    api.miss(t.uses || [], 'Fast! Der Bug ist bestimmt klein. 🐞');
+  };
+  runBtn.onclick = () => run(false);
+  api.setHelp(lvl => {
+    if (done) return;
+    if (lvl === 1) api.say('thinking', t.hint || 'Lies die Aufgabe nochmal Wort für Wort.');
+    if (lvl === 2) { const first = sub(t.solution).split('\n').find(l => l.trim()); api.say('thinking', 'Tipp: Die Lösung beginnt so: ' + first); }
+    if (lvl === 3) { ed.value = sub(t.solution); if (PY.py) run(true); else { out.innerHTML = ''; finish(null, true); } }
+  });
+  api.say('happy', 'Echtes Python! Schreib den Code und tippe auf [[Ausführen]].');
+  warm();
+};
+</script>
+<script>
+/* ==========================================================================================
    SCREENS – start, onboarding, map, result, album, shop, room, settings, parent area
    ========================================================================================== */
 const sparkleField = n => Array.from({ length: n }, (_, i) => `<i style="left:${(i * 37) % 95}%;top:${(i * 53) % 90}%;animation-delay:${(i * .37) % 2.4}s">${ART.fx(i % 4 ? 'star' : 'heart')}</i>`).join('');
@@ -2661,7 +3167,7 @@ function unitSection(u) {
   const nodes = pts.map(p => {
     const st = levelState(p.l), rec = S.levels[p.l.id];
     const isNext = nxt && nxt.id === p.l.id;
-    const icon = p.l.type === 'boss' ? `<div style="width:70px">${ART.crab(isDone(p.l.id) ? 'happy' : 'grumpy')}</div>` : p.secret ? IC('sparkle') : IC(p.l.type);
+    const icon = p.l.type === 'boss' ? `<div style="width:70px">${ART.boss(p.l.boss.art, isDone(p.l.id) ? 'happy' : 'grumpy')}</div>` : p.secret ? IC('sparkle') : IC(p.l.type);
     return `<button class="node ${st} ${isNext ? 'next' : ''} ${p.l.type === 'boss' ? 'boss' : ''} ${p.secret ? 'secret' : ''}" style="left:${p.x}%;top:${p.y}px" data-l="${p.l.id}" aria-label="${esc(p.l.title)}${st === 'locked' ? ', gesperrt' : st === 'done' ? ', ' + rec.stars + ' Sterne' : ''}">
       ${p.l.type === 'boss' ? icon : `<span class="ic" style="width:40px;height:40px;display:grid">${icon}</span>`}
       ${st === 'done' ? `<span class="stars">${[1, 2, 3].map(k => ART.star(k <= rec.stars)).join('')}</span>` : ''}
@@ -2669,7 +3175,7 @@ function unitSection(u) {
       <span class="lbl">${esc(p.l.title)}</span></button>`;
   }).join('');
   const nxtPt = nxt && pts.find(p => p.l.id === nxt.id);
-  return `<section class="unit" style="--accent:${u.accent}">
+  return `<section class="unit ${u.dark ? 'dark' : ''}" style="--accent:${u.accent}">
     <div class="unit-scene">${ART.scene(u.scene, H + 90)}</div>
     <div class="unit-head"><div class="mon">${ART.monster(stage ? u.monster[stage - 1] : 'locked', '', stage ? u.monsterNames[stage - 1] : 'Unbekanntes Monster')}</div>
       <div class="grow"><span class="tag">Route ${u.num}</span><h2>${esc(u.title)}</h2><small class="muted" style="font-weight:800">${esc(u.subtitle)} · ${unitStars(u.id)}/${lvls.length * 3} ${ART.star(true).replace('<svg', '<svg style="width:14px;height:14px;display:inline;vertical-align:-2px"')}</small></div></div>
@@ -2681,8 +3187,9 @@ function unitSection(u) {
     </div></section>`;
 }
 function soonCard(u) {
-  return `<div class="soon" style="--accent:${u.accent}"><span class="ribbon">COMING SOON</span><div class="mon">${ART.monster('locked')}</div>
-    <div><span class="tag">Route ${u.num}</span><h3>${esc(u.title)}</h3><small class="muted" style="font-weight:800">${esc(u.subtitle)}</small></div>
+  const after = u.status === 'open' && U(u.after);
+  return `<div class="soon" style="--accent:${u.accent}"><span class="ribbon">${after ? 'GESPERRT' : 'COMING SOON'}</span><div class="mon">${ART.monster('locked')}</div>
+    <div><span class="tag">Route ${u.num}</span><h3>${esc(u.title)}</h3><small class="muted" style="font-weight:800">${after ? `Öffnet sich, wenn du ${esc(after.title)} geschafft hast.` : esc(u.subtitle)}</small></div>
     <span style="margin-left:auto;width:28px;color:var(--ink2)">${IC('lock', 'Gesperrt')}</span></div>`;
 }
 function topBar() {
@@ -2711,7 +3218,7 @@ function wireCommon(node) {
   }
 }
 SCREENS.map = () => {
-  const open = CONTENT.units.filter(u => u.status === 'open'), soon = CONTENT.units.filter(u => u.status !== 'open');
+  const open = CONTENT.units.filter(u => unitOpen(u.id)), soon = CONTENT.units.filter(u => !unitOpen(u.id));
   const due = dueIds();
   const node = el(`<div class="screen">${topBar()}
     <div class="scroll"><div class="mapwrap">
