@@ -2,11 +2,14 @@
 
 Each line gets a normal clip and a slow clip (length_scale 1.45 ~ 0.7x speed), MP3 32 kbps mono,
 embedded as base64 data URIs in `const AUDIO = { key: {n, s} }`.
-Usage: .venv/Scripts/python make_audio.py
+Usage: .venv/Scripts/python make_audio.py [--fresh]
+Existing clips in src/03b-audio.html are reused by key; --fresh renders everything again
+(needed after changing SAY_AS or the voice settings).
 """
 import base64
 import json
 import re
+import argparse
 from pathlib import Path
 
 import lameenc
@@ -46,12 +49,29 @@ def render(voice: PiperVoice, text: str, length_scale: float) -> str:
     return "data:audio/mpeg;base64," + base64.b64encode(mp3).decode("ascii")
 
 
-def main() -> None:
+def cached_clips(fresh: bool) -> dict:
+    """Clips already in OUT, reused by key (same key = same spoken text). --fresh ignores them."""
+    if fresh or not OUT.exists():
+        return {}
+    pattern = re.compile(r'^("(?:[^"\\]|\\.)*"):\{"n":"([^"]+)","s":"([^"]+)"\},?$')
+    found = {}
+    for row in OUT.read_text(encoding="utf-8").splitlines():
+        m = pattern.match(row)
+        if m:
+            found[json.loads(m.group(1))] = {"n": m.group(2), "s": m.group(3)}
+    return found
+
+
+def main(fresh: bool) -> None:
     lines = json.loads((HERE / "lines.json").read_text(encoding="utf-8"))
     voice = PiperVoice.load(str(MODEL))
+    cache = cached_clips(fresh)
     clips = {}
     for item in lines:
         if item["key"] in clips:
+            continue
+        if item["key"] in cache:
+            clips[item["key"]] = cache[item["key"]]
             continue
         spoken = say_as(item["text"])
         clips[item["key"]] = {"n": render(voice, spoken, 1.0), "s": render(voice, spoken, SLOW_LENGTH_SCALE)}
@@ -68,4 +88,6 @@ def main() -> None:
 
 
 if __name__ == "__main__":
-    main()
+    ap = argparse.ArgumentParser(description="Render tts/lines.json into src/03b-audio.html (reuses existing clips).")
+    ap.add_argument("--fresh", action="store_true", help="render every clip again instead of reusing src/03b-audio.html")
+    main(ap.parse_args().fresh)

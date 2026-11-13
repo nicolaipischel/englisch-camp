@@ -132,6 +132,1314 @@
   "key": "ten points for you"
  },
  {
+  "text": "red",
+  "key": "red"
+ },
+ {
+  "text": "My bag is red.",
+  "key": "my bag is red"
+ },
+ {
+  "text": "blue",
+  "key": "blue"
+ },
+ {
+  "text": "The sky is blue.",
+  "key": "the sky is blue"
+ },
+ {
+  "text": "green",
+  "key": "green"
+ },
+ {
+  "text": "The grass is green.",
+  "key": "the grass is green"
+ },
+ {
+  "text": "yellow",
+  "key": "yellow"
+ },
+ {
+  "text": "The sun is yellow.",
+  "key": "the sun is yellow"
+ },
+ {
+  "text": "black",
+  "key": "black"
+ },
+ {
+  "text": "My pen is black.",
+  "key": "my pen is black"
+ },
+ {
+  "text": "white",
+  "key": "white"
+ },
+ {
+  "text": "The cloud is white.",
+  "key": "the cloud is white"
+ },
+ {
+  "text": "pink",
+  "key": "pink"
+ },
+ {
+  "text": "Pink is my favourite colour.",
+  "key": "pink is my favourite colour"
+ },
+ {
+  "text": "orange",
+  "key": "orange"
+ },
+ {
+  "text": "I've got an orange ruler.",
+  "key": "i've got an orange ruler"
+ },
+ {
+  "text": "bag",
+  "key": "bag"
+ },
+ {
+  "text": "Is this your bag?",
+  "key": "is this your bag"
+ },
+ {
+  "text": "book",
+  "key": "book"
+ },
+ {
+  "text": "I've got a blue book.",
+  "key": "i've got a blue book"
+ },
+ {
+  "text": "pen",
+  "key": "pen"
+ },
+ {
+  "text": "This is a black pen.",
+  "key": "this is a black pen"
+ },
+ {
+  "text": "pencil",
+  "key": "pencil"
+ },
+ {
+  "text": "A pencil and a rubber, please.",
+  "key": "a pencil and a rubber please"
+ },
+ {
+  "text": "ruler",
+  "key": "ruler"
+ },
+ {
+  "text": "My ruler is yellow.",
+  "key": "my ruler is yellow"
+ },
+ {
+  "text": "rubber",
+  "key": "rubber"
+ },
+ {
+  "text": "Where is my rubber?",
+  "key": "where is my rubber"
+ },
+ {
+  "text": "scissors",
+  "key": "scissors"
+ },
+ {
+  "text": "The scissors are red.",
+  "key": "the scissors are red"
+ },
+ {
+  "text": "chair",
+  "key": "chair"
+ },
+ {
+  "text": "Sit on your chair, please.",
+  "key": "sit on your chair please"
+ },
+ {
+  "text": "What colour is it?",
+  "key": "what colour is it"
+ },
+ {
+  "text": "What colour is it? It's green.",
+  "key": "what colour is it it's green"
+ },
+ {
+  "text": "open",
+  "key": "open"
+ },
+ {
+  "text": "Open your book, please.",
+  "key": "open your book please"
+ },
+ {
+  "text": "close",
+  "key": "close"
+ },
+ {
+  "text": "Close the door, please.",
+  "key": "close the door please"
+ },
+ {
+  "text": "listen",
+  "key": "listen"
+ },
+ {
+  "text": "Listen to Nuvi!",
+  "key": "listen to nuvi"
+ },
+ {
+  "text": "look",
+  "key": "look"
+ },
+ {
+  "text": "Look at the board.",
+  "key": "look at the board"
+ },
+ {
+  "text": "write",
+  "key": "write"
+ },
+ {
+  "text": "Write your name.",
+  "key": "write your name"
+ },
+ {
+  "text": "read",
+  "key": "read"
+ },
+ {
+  "text": "Read the text, please.",
+  "key": "read the text please"
+ },
+ {
+  "text": "draw",
+  "key": "draw"
+ },
+ {
+  "text": "Draw a cat.",
+  "key": "draw a cat"
+ },
+ {
+  "text": "sit down",
+  "key": "sit down"
+ },
+ {
+  "text": "Sit down, please.",
+  "key": "sit down please"
+ },
+ {
+  "text": "stand up",
+  "key": "stand up"
+ },
+ {
+  "text": "Stand up, please.",
+  "key": "stand up please"
+ },
+ {
+  "text": "Be quiet!",
+  "key": "be quiet"
+ },
+ {
+  "text": "Be quiet, please!",
+  "key": "be quiet please"
+ },
+ {
+  "text": "please",
+  "key": "please"
+ },
+ {
+  "text": "Can I have a pen, please?",
+  "key": "can i have a pen please"
+ },
+ {
+  "text": "thank you",
+  "key": "thank you"
+ },
+ {
+  "text": "Thank you, Juno!",
+  "key": "thank you juno"
+ },
+ {
+  "text": "sorry",
+  "key": "sorry"
+ },
+ {
+  "text": "Sorry, I'm late.",
+  "key": "sorry i'm late"
+ },
+ {
+  "text": "can",
+  "key": "can"
+ },
+ {
+  "text": "I can draw a cat.",
+  "key": "i can draw a cat"
+ },
+ {
+  "text": "can't",
+  "key": "can't"
+ },
+ {
+  "text": "I can't swim.",
+  "key": "i can't swim"
+ },
+ {
+  "text": "Don't!",
+  "key": "don't"
+ },
+ {
+  "text": "Don't run in the classroom!",
+  "key": "don't run in the classroom"
+ },
+ {
+  "text": "mum",
+  "key": "mum"
+ },
+ {
+  "text": "This is my mum.",
+  "key": "this is my mum"
+ },
+ {
+  "text": "dad",
+  "key": "dad"
+ },
+ {
+  "text": "My dad is funny.",
+  "key": "my dad is funny"
+ },
+ {
+  "text": "brother",
+  "key": "brother"
+ },
+ {
+  "text": "I've got a brother.",
+  "key": "i've got a brother"
+ },
+ {
+  "text": "sister",
+  "key": "sister"
+ },
+ {
+  "text": "Her sister is ten.",
+  "key": "her sister is ten"
+ },
+ {
+  "text": "grandma",
+  "key": "grandma"
+ },
+ {
+  "text": "My grandma is nice.",
+  "key": "my grandma is nice"
+ },
+ {
+  "text": "grandpa",
+  "key": "grandpa"
+ },
+ {
+  "text": "Grandpa's cat is black.",
+  "key": "grandpa's cat is black"
+ },
+ {
+  "text": "baby",
+  "key": "baby"
+ },
+ {
+  "text": "The baby is happy.",
+  "key": "the baby is happy"
+ },
+ {
+  "text": "family",
+  "key": "family"
+ },
+ {
+  "text": "This is my family.",
+  "key": "this is my family"
+ },
+ {
+  "text": "parents",
+  "key": "parents"
+ },
+ {
+  "text": "My parents are at home.",
+  "key": "my parents are at home"
+ },
+ {
+  "text": "aunt",
+  "key": "aunt"
+ },
+ {
+  "text": "My aunt is a teacher.",
+  "key": "my aunt is a teacher"
+ },
+ {
+  "text": "uncle",
+  "key": "uncle"
+ },
+ {
+  "text": "Uncle Tom is tall.",
+  "key": "uncle tom is tall"
+ },
+ {
+  "text": "cousin",
+  "key": "cousin"
+ },
+ {
+  "text": "My cousin is nine.",
+  "key": "my cousin is nine"
+ },
+ {
+  "text": "friend",
+  "key": "friend"
+ },
+ {
+  "text": "Juno is my friend.",
+  "key": "juno is my friend"
+ },
+ {
+  "text": "This is my brother.",
+  "key": "this is my brother"
+ },
+ {
+  "text": "This is my brother. His name is Leo.",
+  "key": "this is my brother his name is leo"
+ },
+ {
+  "text": "Who is this?",
+  "key": "who is this"
+ },
+ {
+  "text": "Who is this? It's my aunt.",
+  "key": "who is this it's my aunt"
+ },
+ {
+  "text": "house",
+  "key": "house"
+ },
+ {
+  "text": "My house is big.",
+  "key": "my house is big"
+ },
+ {
+  "text": "kitchen",
+  "key": "kitchen"
+ },
+ {
+  "text": "Mum is in the kitchen.",
+  "key": "mum is in the kitchen"
+ },
+ {
+  "text": "bathroom",
+  "key": "bathroom"
+ },
+ {
+  "text": "The bathroom is blue.",
+  "key": "the bathroom is blue"
+ },
+ {
+  "text": "bedroom",
+  "key": "bedroom"
+ },
+ {
+  "text": "This is my bedroom.",
+  "key": "this is my bedroom"
+ },
+ {
+  "text": "garden",
+  "key": "garden"
+ },
+ {
+  "text": "The cat is in the garden.",
+  "key": "the cat is in the garden"
+ },
+ {
+  "text": "bed",
+  "key": "bed"
+ },
+ {
+  "text": "There is a cat on my bed.",
+  "key": "there is a cat on my bed"
+ },
+ {
+  "text": "lamp",
+  "key": "lamp"
+ },
+ {
+  "text": "The lamp is on the table.",
+  "key": "the lamp is on the table"
+ },
+ {
+  "text": "window",
+  "key": "window"
+ },
+ {
+  "text": "Open the window, please.",
+  "key": "open the window please"
+ },
+ {
+  "text": "door",
+  "key": "door"
+ },
+ {
+  "text": "sofa",
+  "key": "sofa"
+ },
+ {
+  "text": "Dad is on the sofa.",
+  "key": "dad is on the sofa"
+ },
+ {
+  "text": "cupboard",
+  "key": "cupboard"
+ },
+ {
+  "text": "My books are in the cupboard.",
+  "key": "my books are in the cupboard"
+ },
+ {
+  "text": "computer",
+  "key": "computer"
+ },
+ {
+  "text": "There is a computer in my room.",
+  "key": "there is a computer in my room"
+ },
+ {
+  "text": "in",
+  "key": "in"
+ },
+ {
+  "text": "The ball is in the box.",
+  "key": "the ball is in the box"
+ },
+ {
+  "text": "on",
+  "key": "on"
+ },
+ {
+  "text": "The ball is on the box.",
+  "key": "the ball is on the box"
+ },
+ {
+  "text": "under",
+  "key": "under"
+ },
+ {
+  "text": "The ball is under the table.",
+  "key": "the ball is under the table"
+ },
+ {
+  "text": "Where is the cat?",
+  "key": "where is the cat"
+ },
+ {
+  "text": "Where is the cat? It's under the bed.",
+  "key": "where is the cat it's under the bed"
+ },
+ {
+  "text": "dog",
+  "key": "dog"
+ },
+ {
+  "text": "My dog is brown.",
+  "key": "my dog is brown"
+ },
+ {
+  "text": "cat",
+  "key": "cat"
+ },
+ {
+  "text": "The cat is on the sofa.",
+  "key": "the cat is on the sofa"
+ },
+ {
+  "text": "bird",
+  "key": "bird"
+ },
+ {
+  "text": "The bird can sing.",
+  "key": "the bird can sing"
+ },
+ {
+  "text": "fish",
+  "key": "fish"
+ },
+ {
+  "text": "My fish is orange.",
+  "key": "my fish is orange"
+ },
+ {
+  "text": "rabbit",
+  "key": "rabbit"
+ },
+ {
+  "text": "I've got a white rabbit.",
+  "key": "i've got a white rabbit"
+ },
+ {
+  "text": "horse",
+  "key": "horse"
+ },
+ {
+  "text": "The horse is big.",
+  "key": "the horse is big"
+ },
+ {
+  "text": "mouse",
+  "key": "mouse"
+ },
+ {
+  "text": "The mouse is under the bed.",
+  "key": "the mouse is under the bed"
+ },
+ {
+  "text": "hamster",
+  "key": "hamster"
+ },
+ {
+  "text": "Her hamster is very small.",
+  "key": "her hamster is very small"
+ },
+ {
+  "text": "tortoise",
+  "key": "tortoise"
+ },
+ {
+  "text": "My tortoise is old.",
+  "key": "my tortoise is old"
+ },
+ {
+  "text": "snake",
+  "key": "snake"
+ },
+ {
+  "text": "Zischel is a green snake.",
+  "key": "zischel is a green snake"
+ },
+ {
+  "text": "frog",
+  "key": "frog"
+ },
+ {
+  "text": "The frog is in the water.",
+  "key": "the frog is in the water"
+ },
+ {
+  "text": "owl",
+  "key": "owl"
+ },
+ {
+  "text": "The owl is in the tree.",
+  "key": "the owl is in the tree"
+ },
+ {
+  "text": "fox",
+  "key": "fox"
+ },
+ {
+  "text": "The fox is red.",
+  "key": "the fox is red"
+ },
+ {
+  "text": "hedgehog",
+  "key": "hedgehog"
+ },
+ {
+  "text": "The hedgehog is in the garden.",
+  "key": "the hedgehog is in the garden"
+ },
+ {
+  "text": "I've got a dog.",
+  "key": "i've got a dog"
+ },
+ {
+  "text": "I've got a dog. His name is Bello.",
+  "key": "i've got a dog his name is bello"
+ },
+ {
+  "text": "Have you got a pet?",
+  "key": "have you got a pet"
+ },
+ {
+  "text": "Have you got a pet? Yes, I have.",
+  "key": "have you got a pet yes i have"
+ },
+ {
+  "text": "football",
+  "key": "football"
+ },
+ {
+  "text": "I play football with Juno.",
+  "key": "i play football with juno"
+ },
+ {
+  "text": "basketball",
+  "key": "basketball"
+ },
+ {
+  "text": "Leo plays basketball.",
+  "key": "leo plays basketball"
+ },
+ {
+  "text": "tennis",
+  "key": "tennis"
+ },
+ {
+  "text": "Do you play tennis?",
+  "key": "do you play tennis"
+ },
+ {
+  "text": "swimming",
+  "key": "swimming"
+ },
+ {
+  "text": "Swimming is fun!",
+  "key": "swimming is fun"
+ },
+ {
+  "text": "dancing",
+  "key": "dancing"
+ },
+ {
+  "text": "Juno likes dancing.",
+  "key": "juno likes dancing"
+ },
+ {
+  "text": "singing",
+  "key": "singing"
+ },
+ {
+  "text": "Nuvi loves singing.",
+  "key": "nuvi loves singing"
+ },
+ {
+  "text": "painting",
+  "key": "painting"
+ },
+ {
+  "text": "I like painting pictures.",
+  "key": "i like painting pictures"
+ },
+ {
+  "text": "skating",
+  "key": "skating"
+ },
+ {
+  "text": "Skating is cool!",
+  "key": "skating is cool"
+ },
+ {
+  "text": "cycling",
+  "key": "cycling"
+ },
+ {
+  "text": "We go cycling in the park.",
+  "key": "we go cycling in the park"
+ },
+ {
+  "text": "reading",
+  "key": "reading"
+ },
+ {
+  "text": "My grandma likes reading.",
+  "key": "my grandma likes reading"
+ },
+ {
+  "text": "games",
+  "key": "games"
+ },
+ {
+  "text": "Do you like computer games?",
+  "key": "do you like computer games"
+ },
+ {
+  "text": "music",
+  "key": "music"
+ },
+ {
+  "text": "I listen to music.",
+  "key": "i listen to music"
+ },
+ {
+  "text": "guitar",
+  "key": "guitar"
+ },
+ {
+  "text": "My brother plays the guitar.",
+  "key": "my brother plays the guitar"
+ },
+ {
+  "text": "piano",
+  "key": "piano"
+ },
+ {
+  "text": "She plays the piano.",
+  "key": "she plays the piano"
+ },
+ {
+  "text": "I like swimming.",
+  "key": "i like swimming"
+ },
+ {
+  "text": "I like swimming. And you?",
+  "key": "i like swimming and you"
+ },
+ {
+  "text": "I don't like football.",
+  "key": "i don't like football"
+ },
+ {
+  "text": "I don't like football. I like tennis.",
+  "key": "i don't like football i like tennis"
+ },
+ {
+  "text": "Monday",
+  "key": "monday"
+ },
+ {
+  "text": "On Monday I go to school.",
+  "key": "on monday i go to school"
+ },
+ {
+  "text": "Tuesday",
+  "key": "tuesday"
+ },
+ {
+  "text": "On Tuesday I play tennis.",
+  "key": "on tuesday i play tennis"
+ },
+ {
+  "text": "Wednesday",
+  "key": "wednesday"
+ },
+ {
+  "text": "Wednesday is in the middle.",
+  "key": "wednesday is in the middle"
+ },
+ {
+  "text": "Thursday",
+  "key": "thursday"
+ },
+ {
+  "text": "On Thursday we have music.",
+  "key": "on thursday we have music"
+ },
+ {
+  "text": "Friday",
+  "key": "friday"
+ },
+ {
+  "text": "Friday is my favourite day.",
+  "key": "friday is my favourite day"
+ },
+ {
+  "text": "Saturday",
+  "key": "saturday"
+ },
+ {
+  "text": "On Saturday I sleep long.",
+  "key": "on saturday i sleep long"
+ },
+ {
+  "text": "Sunday",
+  "key": "sunday"
+ },
+ {
+  "text": "On Sunday we visit grandma.",
+  "key": "on sunday we visit grandma"
+ },
+ {
+  "text": "morning",
+  "key": "morning"
+ },
+ {
+  "text": "Good morning, Juno!",
+  "key": "good morning juno"
+ },
+ {
+  "text": "evening",
+  "key": "evening"
+ },
+ {
+  "text": "In the evening I read.",
+  "key": "in the evening i read"
+ },
+ {
+  "text": "get up",
+  "key": "get up"
+ },
+ {
+  "text": "I get up at seven.",
+  "key": "i get up at seven"
+ },
+ {
+  "text": "breakfast",
+  "key": "breakfast"
+ },
+ {
+  "text": "I have breakfast at half past seven.",
+  "key": "i have breakfast at half past seven"
+ },
+ {
+  "text": "lunch",
+  "key": "lunch"
+ },
+ {
+  "text": "We have lunch at one.",
+  "key": "we have lunch at one"
+ },
+ {
+  "text": "homework",
+  "key": "homework"
+ },
+ {
+  "text": "I do my homework after lunch.",
+  "key": "i do my homework after lunch"
+ },
+ {
+  "text": "go to bed",
+  "key": "go to bed"
+ },
+ {
+  "text": "I go to bed at eight.",
+  "key": "i go to bed at eight"
+ },
+ {
+  "text": "always",
+  "key": "always"
+ },
+ {
+  "text": "I always have breakfast.",
+  "key": "i always have breakfast"
+ },
+ {
+  "text": "never",
+  "key": "never"
+ },
+ {
+  "text": "Nuvi never gets up early.",
+  "key": "nuvi never gets up early"
+ },
+ {
+  "text": "o'clock",
+  "key": "o'clock"
+ },
+ {
+  "text": "It's seven o'clock.",
+  "key": "it's seven o'clock"
+ },
+ {
+  "text": "half past",
+  "key": "half past"
+ },
+ {
+  "text": "It's half past six.",
+  "key": "it's half past six"
+ },
+ {
+  "text": "apple",
+  "key": "apple"
+ },
+ {
+  "text": "An apple a day!",
+  "key": "an apple a day"
+ },
+ {
+  "text": "banana",
+  "key": "banana"
+ },
+ {
+  "text": "Monkeys like bananas.",
+  "key": "monkeys like bananas"
+ },
+ {
+  "text": "carrot",
+  "key": "carrot"
+ },
+ {
+  "text": "Hoppel loves carrots.",
+  "key": "hoppel loves carrots"
+ },
+ {
+  "text": "tomato",
+  "key": "tomato"
+ },
+ {
+  "text": "The tomato is red.",
+  "key": "the tomato is red"
+ },
+ {
+  "text": "bread",
+  "key": "bread"
+ },
+ {
+  "text": "Some bread, please.",
+  "key": "some bread please"
+ },
+ {
+  "text": "milk",
+  "key": "milk"
+ },
+ {
+  "text": "I drink milk for breakfast.",
+  "key": "i drink milk for breakfast"
+ },
+ {
+  "text": "cheese",
+  "key": "cheese"
+ },
+ {
+  "text": "Cheese is yellow.",
+  "key": "cheese is yellow"
+ },
+ {
+  "text": "egg",
+  "key": "egg"
+ },
+ {
+  "text": "I've got two eggs.",
+  "key": "i've got two eggs"
+ },
+ {
+  "text": "juice",
+  "key": "juice"
+ },
+ {
+  "text": "Apple juice, please!",
+  "key": "apple juice please"
+ },
+ {
+  "text": "pizza",
+  "key": "pizza"
+ },
+ {
+  "text": "Pizza is my favourite food.",
+  "key": "pizza is my favourite food"
+ },
+ {
+  "text": "chocolate",
+  "key": "chocolate"
+ },
+ {
+  "text": "Chocolate is sweet.",
+  "key": "chocolate is sweet"
+ },
+ {
+  "text": "water",
+  "key": "water"
+ },
+ {
+  "text": "Can I have some water, please?",
+  "key": "can i have some water please"
+ },
+ {
+  "text": "ice cream",
+  "key": "ice cream"
+ },
+ {
+  "text": "I'd like an ice cream, please.",
+  "key": "i'd like an ice cream please"
+ },
+ {
+  "text": "money",
+  "key": "money"
+ },
+ {
+  "text": "I haven't got any money.",
+  "key": "i haven't got any money"
+ },
+ {
+  "text": "How much is it?",
+  "key": "how much is it"
+ },
+ {
+  "text": "How much is it? It's two euros.",
+  "key": "how much is it it's two euros"
+ },
+ {
+  "text": "I'd like an apple, please.",
+  "key": "i'd like an apple please"
+ },
+ {
+  "text": "I'd like an apple, please. Here you are.",
+  "key": "i'd like an apple please here you are"
+ },
+ {
+  "text": "January",
+  "key": "january"
+ },
+ {
+  "text": "January is cold.",
+  "key": "january is cold"
+ },
+ {
+  "text": "February",
+  "key": "february"
+ },
+ {
+  "text": "February is short.",
+  "key": "february is short"
+ },
+ {
+  "text": "March",
+  "key": "march"
+ },
+ {
+  "text": "In March the flowers come.",
+  "key": "in march the flowers come"
+ },
+ {
+  "text": "April",
+  "key": "april"
+ },
+ {
+  "text": "April is rainy.",
+  "key": "april is rainy"
+ },
+ {
+  "text": "May",
+  "key": "may"
+ },
+ {
+  "text": "My birthday is in May.",
+  "key": "my birthday is in may"
+ },
+ {
+  "text": "June",
+  "key": "june"
+ },
+ {
+  "text": "In June we go swimming.",
+  "key": "in june we go swimming"
+ },
+ {
+  "text": "July",
+  "key": "july"
+ },
+ {
+  "text": "July is hot.",
+  "key": "july is hot"
+ },
+ {
+  "text": "August",
+  "key": "august"
+ },
+ {
+  "text": "In August we are on holiday.",
+  "key": "in august we are on holiday"
+ },
+ {
+  "text": "September",
+  "key": "september"
+ },
+ {
+  "text": "School starts in September.",
+  "key": "school starts in september"
+ },
+ {
+  "text": "October",
+  "key": "october"
+ },
+ {
+  "text": "October is orange.",
+  "key": "october is orange"
+ },
+ {
+  "text": "November",
+  "key": "november"
+ },
+ {
+  "text": "November is grey.",
+  "key": "november is grey"
+ },
+ {
+  "text": "December",
+  "key": "december"
+ },
+ {
+  "text": "December is my favourite month.",
+  "key": "december is my favourite month"
+ },
+ {
+  "text": "birthday",
+  "key": "birthday"
+ },
+ {
+  "text": "Happy birthday!",
+  "key": "happy birthday"
+ },
+ {
+  "text": "party",
+  "key": "party"
+ },
+ {
+  "text": "Come to my party!",
+  "key": "come to my party"
+ },
+ {
+  "text": "present",
+  "key": "present"
+ },
+ {
+  "text": "This present is for you.",
+  "key": "this present is for you"
+ },
+ {
+  "text": "balloon",
+  "key": "balloon"
+ },
+ {
+  "text": "The balloon is gold.",
+  "key": "the balloon is gold"
+ },
+ {
+  "text": "first",
+  "key": "first"
+ },
+ {
+  "text": "My birthday is on the first of May.",
+  "key": "my birthday is on the first of may"
+ },
+ {
+  "text": "second",
+  "key": "second"
+ },
+ {
+  "text": "Juno is second.",
+  "key": "juno is second"
+ },
+ {
+  "text": "print",
+  "key": "print"
+ },
+ {
+  "text": "Print your name.",
+  "key": "print your name"
+ },
+ {
+  "text": "input",
+  "key": "input"
+ },
+ {
+  "text": "Type your input here.",
+  "key": "type your input here"
+ },
+ {
+  "text": "if",
+  "key": "if"
+ },
+ {
+  "text": "If it rains, take an umbrella.",
+  "key": "if it rains take an umbrella"
+ },
+ {
+  "text": "else",
+  "key": "else"
+ },
+ {
+  "text": "If it is red, stop. Else, go.",
+  "key": "if it is red stop else go"
+ },
+ {
+  "text": "for",
+  "key": "for"
+ },
+ {
+  "text": "A cake for every friend!",
+  "key": "a cake for every friend"
+ },
+ {
+  "text": "while",
+  "key": "while"
+ },
+ {
+  "text": "While the music plays, we dance.",
+  "key": "while the music plays we dance"
+ },
+ {
+  "text": "define",
+  "key": "define"
+ },
+ {
+  "text": "Define a new word.",
+  "key": "define a new word"
+ },
+ {
+  "text": "return",
+  "key": "return"
+ },
+ {
+  "text": "Return the book, please.",
+  "key": "return the book please"
+ },
+ {
+  "text": "true",
+  "key": "true"
+ },
+ {
+  "text": "That is true!",
+  "key": "that is true"
+ },
+ {
+  "text": "false",
+  "key": "false"
+ },
+ {
+  "text": "That is false!",
+  "key": "that is false"
+ },
+ {
+  "text": "and",
+  "key": "and"
+ },
+ {
+  "text": "Juno and Nuvi.",
+  "key": "juno and nuvi"
+ },
+ {
+  "text": "or",
+  "key": "or"
+ },
+ {
+  "text": "Tea or juice?",
+  "key": "tea or juice"
+ },
+ {
+  "text": "not",
+  "key": "not"
+ },
+ {
+  "text": "This is not a bug.",
+  "key": "this is not a bug"
+ },
+ {
+  "text": "list",
+  "key": "list"
+ },
+ {
+  "text": "Make a list, please.",
+  "key": "make a list please"
+ },
+ {
+  "text": "loop",
+  "key": "loop"
+ },
+ {
+  "text": "The loop runs three times.",
+  "key": "the loop runs three times"
+ },
+ {
+  "text": "error",
+  "key": "error"
+ },
+ {
+  "text": "Oops, an error!",
+  "key": "oops an error"
+ },
+ {
   "text": "Hello!",
   "key": "hello"
  },
@@ -176,6 +1484,770 @@
   "key": "i'm fine thank you hello harbour"
  },
  {
+  "text": "Hello! Can you help me? I need a pen.",
+  "key": "hello can you help me i need a pen"
+ },
+ {
+  "text": "Here is a pen.",
+  "key": "here is a pen"
+ },
+ {
+  "text": "Here is a chair.",
+  "key": "here is a chair"
+ },
+ {
+  "text": "Thank you! What colour is it?",
+  "key": "thank you what colour is it"
+ },
+ {
+  "text": "It's blue.",
+  "key": "it's blue"
+ },
+ {
+  "text": "It's a book.",
+  "key": "it's a book"
+ },
+ {
+  "text": "I like blue! Where are my scissors?",
+  "key": "i like blue where are my scissors"
+ },
+ {
+  "text": "On the ruler.",
+  "key": "on the ruler"
+ },
+ {
+  "text": "On the chair.",
+  "key": "on the chair"
+ },
+ {
+  "text": "Here you are! Goodbye!",
+  "key": "here you are goodbye"
+ },
+ {
+  "text": "Thank you! Goodbye!",
+  "key": "thank you goodbye"
+ },
+ {
+  "text": "Grey, grey, grey! All the colours are mine!",
+  "key": "grey grey grey all the colours are mine"
+ },
+ {
+  "text": "Hello! How are you?",
+  "key": "hello how are you"
+ },
+ {
+  "text": "Go away!",
+  "key": "go away"
+ },
+ {
+  "text": "I'm sad. Everything is grey.",
+  "key": "i'm sad everything is grey"
+ },
+ {
+  "text": "Look! The flower is a bag.",
+  "key": "look the flower is a bag"
+ },
+ {
+  "text": "Look! The flower is yellow.",
+  "key": "look the flower is yellow"
+ },
+ {
+  "text": "Yellow! Wow! What colour is the sky?",
+  "key": "yellow wow what colour is the sky"
+ },
+ {
+  "text": "The sky is green.",
+  "key": "the sky is green"
+ },
+ {
+  "text": "Blue and yellow! Thank you! Colours are fun!",
+  "key": "blue and yellow thank you colours are fun"
+ },
+ {
+  "text": "Psst! Can I have a pencil, please?",
+  "key": "psst can i have a pencil please"
+ },
+ {
+  "text": "Yes, here you are.",
+  "key": "yes here you are"
+ },
+ {
+  "text": "Don't talk!",
+  "key": "don't talk"
+ },
+ {
+  "text": "Thank you! Can you draw a cat?",
+  "key": "thank you can you draw a cat"
+ },
+ {
+  "text": "Sorry.",
+  "key": "sorry"
+ },
+ {
+  "text": "Yes, I can.",
+  "key": "yes i can"
+ },
+ {
+  "text": "I can't draw. Can you help me?",
+  "key": "i can't draw can you help me"
+ },
+ {
+  "text": "Look! A head and two ears.",
+  "key": "look a head and two ears"
+ },
+ {
+  "text": "Close the door.",
+  "key": "close the door"
+ },
+ {
+  "text": "Be quiet, please! Open your books.",
+  "key": "be quiet please open your books"
+ },
+ {
+  "text": "Sorry!",
+  "key": "sorry"
+ },
+ {
+  "text": "Stand up!",
+  "key": "stand up"
+ },
+ {
+  "text": "Stand up! Sit down! Stand up! Sit down!",
+  "key": "stand up sit down stand up sit down"
+ },
+ {
+  "text": "Please say please!",
+  "key": "please say please"
+ },
+ {
+  "text": "Sit down!",
+  "key": "sit down"
+ },
+ {
+  "text": "Please? What is please?",
+  "key": "please what is please"
+ },
+ {
+  "text": "Don't sit down.",
+  "key": "don't sit down"
+ },
+ {
+  "text": "Sit down, please. Oh! That is nice!",
+  "key": "sit down please oh that is nice"
+ },
+ {
+  "text": "Thank you!",
+  "key": "thank you"
+ },
+ {
+  "text": "Thank you! I can say please now!",
+  "key": "thank you i can say please now"
+ },
+ {
+  "text": "Look! This is my family photo.",
+  "key": "look this is my family photo"
+ },
+ {
+  "text": "And who is this?",
+  "key": "and who is this"
+ },
+ {
+  "text": "That's my aunt. Her name is Rosa.",
+  "key": "that's my aunt her name is rosa"
+ },
+ {
+  "text": "This is my sister.",
+  "key": "this is my sister"
+ },
+ {
+  "text": "This is my uncle.",
+  "key": "this is my uncle"
+ },
+ {
+  "text": "Great! My grandpa is coming too.",
+  "key": "great my grandpa is coming too"
+ },
+ {
+  "text": "Great! See you!",
+  "key": "great see you"
+ },
+ {
+  "text": "I'm lost. Where is my family?",
+  "key": "i'm lost where is my family"
+ },
+ {
+  "text": "Hello! Don't be sad.",
+  "key": "hello don't be sad"
+ },
+ {
+  "text": "My mum is white. My dad is brown.",
+  "key": "my mum is white my dad is brown"
+ },
+ {
+  "text": "Is this your chair?",
+  "key": "is this your chair"
+ },
+ {
+  "text": "Is this your mum?",
+  "key": "is this your mum"
+ },
+ {
+  "text": "Yes! That's my mum! And my sister!",
+  "key": "yes that's my mum and my sister"
+ },
+ {
+  "text": "Hooray! Your family is here!",
+  "key": "hooray your family is here"
+ },
+ {
+  "text": "Your family is a bag.",
+  "key": "your family is a bag"
+ },
+ {
+  "text": "Thank you! You are my friend now!",
+  "key": "thank you you are my friend now"
+ },
+ {
+  "text": "Help! Where is my cat?",
+  "key": "help where is my cat"
+ },
+ {
+  "text": "Is it in the kitchen?",
+  "key": "is it in the kitchen"
+ },
+ {
+  "text": "Is it a kitchen?",
+  "key": "is it a kitchen"
+ },
+ {
+  "text": "No. It isn't in the kitchen.",
+  "key": "no it isn't in the kitchen"
+ },
+ {
+  "text": "Look! It is on the lamp.",
+  "key": "look it is on the lamp"
+ },
+ {
+  "text": "Look! It is under the sofa.",
+  "key": "look it is under the sofa"
+ },
+ {
+  "text": "Yes! There it is! Thank you!",
+  "key": "yes there it is thank you"
+ },
+ {
+  "text": "Good idea! There is a basket for her too.",
+  "key": "good idea there is a basket for her too"
+ },
+ {
+  "text": "Where is the basket?",
+  "key": "where is the basket"
+ },
+ {
+  "text": "Who is the basket?",
+  "key": "who is the basket"
+ },
+ {
+  "text": "It's in my bedroom.",
+  "key": "it's in my bedroom"
+ },
+ {
+  "text": "Klotz! Klotz! No house for Klotz!",
+  "key": "klotz klotz no house for klotz"
+ },
+ {
+  "text": "Hello! Can I help you?",
+  "key": "hello can i help you"
+ },
+ {
+  "text": "Go away, Klotz!",
+  "key": "go away klotz"
+ },
+ {
+  "text": "I want a house. With a door and a window.",
+  "key": "i want a house with a door and a window"
+ },
+ {
+  "text": "Here is a sofa.",
+  "key": "here is a sofa"
+ },
+ {
+  "text": "Here is a door.",
+  "key": "here is a door"
+ },
+ {
+  "text": "A door! And a window?",
+  "key": "a door and a window"
+ },
+ {
+  "text": "There is a window.",
+  "key": "there is a window"
+ },
+ {
+  "text": "There are a window.",
+  "key": "there are a window"
+ },
+ {
+  "text": "My house! I love my house! Thank you!",
+  "key": "my house i love my house thank you"
+ },
+ {
+  "text": "Yes, I have.",
+  "key": "yes i have"
+ },
+ {
+  "text": "Yes, I am.",
+  "key": "yes i am"
+ },
+ {
+  "text": "Cool! I've got a hamster. Its name is Krümel.",
+  "key": "cool i've got a hamster its name is kr mel"
+ },
+ {
+  "text": "Have it got a house?",
+  "key": "have it got a house"
+ },
+ {
+  "text": "Has it got a house?",
+  "key": "has it got a house"
+ },
+ {
+  "text": "Yes, it has. And it's got a wheel.",
+  "key": "yes it has and it's got a wheel"
+ },
+ {
+  "text": "My grandpa has got a horse.",
+  "key": "my grandpa has got a horse"
+ },
+ {
+  "text": "My grandpa have got a horse.",
+  "key": "my grandpa have got a horse"
+ },
+ {
+  "text": "Wow! I love horses!",
+  "key": "wow i love horses"
+ },
+ {
+  "text": "Ssss! Go away! Ssss!",
+  "key": "ssss go away ssss"
+ },
+ {
+  "text": "Hello, Zischel! How are you?",
+  "key": "hello zischel how are you"
+ },
+ {
+  "text": "Help! A snake!",
+  "key": "help a snake"
+ },
+ {
+  "text": "I'm sad. The animals have got friends. I haven't got a friend.",
+  "key": "i'm sad the animals have got friends i haven't got a friend"
+ },
+ {
+  "text": "You haven't got a dog.",
+  "key": "you haven't got a dog"
+ },
+ {
+  "text": "You've got a friend now!",
+  "key": "you've got a friend now"
+ },
+ {
+  "text": "Really? Have you got time to play?",
+  "key": "really have you got time to play"
+ },
+ {
+  "text": "Yes, I have!",
+  "key": "yes i have"
+ },
+ {
+  "text": "No, I am.",
+  "key": "no i am"
+ },
+ {
+  "text": "Hooray! Thank you, friend!",
+  "key": "hooray thank you friend"
+ },
+ {
+  "text": "What do you like doing?",
+  "key": "what do you like doing"
+ },
+ {
+  "text": "I like swim.",
+  "key": "i like swim"
+ },
+ {
+  "text": "Me too! Do you like football?",
+  "key": "me too do you like football"
+ },
+ {
+  "text": "No, I not like football.",
+  "key": "no i not like football"
+ },
+ {
+  "text": "No, I don't like football.",
+  "key": "no i don't like football"
+ },
+ {
+  "text": "OK! My brother plays the guitar. He likes music.",
+  "key": "ok my brother plays the guitar he likes music"
+ },
+ {
+  "text": "My sister plays the piano.",
+  "key": "my sister plays the piano"
+ },
+ {
+  "text": "My sister play the piano.",
+  "key": "my sister play the piano"
+ },
+ {
+  "text": "Cool! Let's make music together!",
+  "key": "cool let's make music together"
+ },
+ {
+  "text": "Yawn   Everything is boring.",
+  "key": "yawn everything is boring"
+ },
+ {
+  "text": "Do you like football?",
+  "key": "do you like football"
+ },
+ {
+  "text": "Are you football?",
+  "key": "are you football"
+ },
+ {
+  "text": "No. I don't like football. It's too fast.",
+  "key": "no i don't like football it's too fast"
+ },
+ {
+  "text": "Do you like running?",
+  "key": "do you like running"
+ },
+ {
+  "text": "Do you like reading?",
+  "key": "do you like reading"
+ },
+ {
+  "text": "Reading? Hmm   I like reading! And I like music.",
+  "key": "reading hmm i like reading and i like music"
+ },
+ {
+  "text": "Let's sing together!",
+  "key": "let's sing together"
+ },
+ {
+  "text": "Let's sleep together!",
+  "key": "let's sleep together"
+ },
+ {
+  "text": "Singing is fun! Thank you!",
+  "key": "singing is fun thank you"
+ },
+ {
+  "text": "Hi! What time is it?",
+  "key": "hi what time is it"
+ },
+ {
+  "text": "It's seven clock.",
+  "key": "it's seven clock"
+ },
+ {
+  "text": "Oh no! I always get up at seven!",
+  "key": "oh no i always get up at seven"
+ },
+ {
+  "text": "I have breakfast at half seven.",
+  "key": "i have breakfast at half seven"
+ },
+ {
+  "text": "What day is it today?",
+  "key": "what day is it today"
+ },
+ {
+  "text": "Today is Friday.",
+  "key": "today is friday"
+ },
+ {
+  "text": "Today is Fridays.",
+  "key": "today is fridays"
+ },
+ {
+  "text": "Friday! I never do homework on Fridays.",
+  "key": "friday i never do homework on fridays"
+ },
+ {
+  "text": "Great! See you on Saturday!",
+  "key": "great see you on saturday"
+ },
+ {
+  "text": "Tick, tock! Today is Sunday! No, Monday! No, Tuesday!",
+  "key": "tick tock today is sunday no monday no tuesday"
+ },
+ {
+  "text": "Stop, Wusel! Look at the clock.",
+  "key": "stop wusel look at the clock"
+ },
+ {
+  "text": "Go to bed, Wusel!",
+  "key": "go to bed wusel"
+ },
+ {
+  "text": "What time is it?",
+  "key": "what time is it"
+ },
+ {
+  "text": "It's three o'clock.",
+  "key": "it's three o'clock"
+ },
+ {
+  "text": "It's half past three.",
+  "key": "it's half past three"
+ },
+ {
+  "text": "And what day is it?",
+  "key": "and what day is it"
+ },
+ {
+  "text": "Today is Wednesday.",
+  "key": "today is wednesday"
+ },
+ {
+  "text": "Today is Thursday.",
+  "key": "today is thursday"
+ },
+ {
+  "text": "Wednesday! Thank you! Now I always know the time!",
+  "key": "wednesday thank you now i always know the time"
+ },
+ {
+  "text": "I'd like a apple, please.",
+  "key": "i'd like a apple please"
+ },
+ {
+  "text": "Here you are. Anything else?",
+  "key": "here you are anything else"
+ },
+ {
+  "text": "How many is it?",
+  "key": "how many is it"
+ },
+ {
+  "text": "It's two euros, please.",
+  "key": "it's two euros please"
+ },
+ {
+  "text": "Here you are. Thank you!",
+  "key": "here you are thank you"
+ },
+ {
+  "text": "Go away. Thank you!",
+  "key": "go away thank you"
+ },
+ {
+  "text": "Mine! Mine! All the pizza is mine!",
+  "key": "mine mine all the pizza is mine"
+ },
+ {
+  "text": "Stop! Ask, please!",
+  "key": "stop ask please"
+ },
+ {
+  "text": "Take the cheese!",
+  "key": "take the cheese"
+ },
+ {
+  "text": "Ask? How?",
+  "key": "ask how"
+ },
+ {
+  "text": "Say: I'd like any bread.",
+  "key": "say i'd like any bread"
+ },
+ {
+  "text": "Say: I'd like some bread, please.",
+  "key": "say i'd like some bread please"
+ },
+ {
+  "text": "I'd like some bread, please. Have you got any fish?",
+  "key": "i'd like some bread please have you got any fish"
+ },
+ {
+  "text": "Sorry, there isn't any fish.",
+  "key": "sorry there isn't any fish"
+ },
+ {
+  "text": "Sorry, there isn't some fish.",
+  "key": "sorry there isn't some fish"
+ },
+ {
+  "text": "OK! Bread is nice too. Thank you!",
+  "key": "ok bread is nice too thank you"
+ },
+ {
+  "text": "When is your birthday?",
+  "key": "when is your birthday"
+ },
+ {
+  "text": "Cool! My birthday is in July. On the first of July!",
+  "key": "cool my birthday is in july on the first of july"
+ },
+ {
+  "text": "Are you having a party?",
+  "key": "are you having a party"
+ },
+ {
+  "text": "Are you have a party?",
+  "key": "are you have a party"
+ },
+ {
+  "text": "Yes! We are making a cake right now.",
+  "key": "yes we are making a cake right now"
+ },
+ {
+  "text": "Happy Monday, Juno!",
+  "key": "happy monday juno"
+ },
+ {
+  "text": "Happy birthday, Juno!",
+  "key": "happy birthday juno"
+ },
+ {
+  "text": "Thank you! Here is a balloon for you.",
+  "key": "thank you here is a balloon for you"
+ },
+ {
+  "text": "Thank you! It is beautiful!",
+  "key": "thank you it is beautiful"
+ },
+ {
+  "text": "Sorry! It is a cake!",
+  "key": "sorry it is a cake"
+ },
+ {
+  "text": "Nobody knows my birthday. Nobody comes to my party.",
+  "key": "nobody knows my birthday nobody comes to my party"
+ },
+ {
+  "text": "Where is your birthday?",
+  "key": "where is your birthday"
+ },
+ {
+  "text": "It's today! The second of November!",
+  "key": "it's today the second of november"
+ },
+ {
+  "text": "Goodbye, Glimmer!",
+  "key": "goodbye glimmer"
+ },
+ {
+  "text": "Happy birthday, Glimmer!",
+  "key": "happy birthday glimmer"
+ },
+ {
+  "text": "Look! Who is coming?",
+  "key": "look who is coming"
+ },
+ {
+  "text": "Juno, Knarz and Hoppel are coming to your party!",
+  "key": "juno knarz and hoppel are coming to your party"
+ },
+ {
+  "text": "Juno, Knarz and Hoppel is go home.",
+  "key": "juno knarz and hoppel is go home"
+ },
+ {
+  "text": "My friends! This is the best party! Thank you!",
+  "key": "my friends this is the best party thank you"
+ },
+ {
+  "text": "Hello! I am Professor Pixel. Welcome to my lighthouse!",
+  "key": "hello i am professor pixel welcome to my lighthouse"
+ },
+ {
+  "text": "Hello, Professor Pixel!",
+  "key": "hello professor pixel"
+ },
+ {
+  "text": "Goodbye, Professor!",
+  "key": "goodbye professor"
+ },
+ {
+  "text": "Computers speak English. Do you know a Python word?",
+  "key": "computers speak english do you know a python word"
+ },
+ {
+  "text": "Yes! Banana shows text.",
+  "key": "yes banana shows text"
+ },
+ {
+  "text": "Yes! Print shows text.",
+  "key": "yes print shows text"
+ },
+ {
+  "text": "Great! And what does return do?",
+  "key": "great and what does return do"
+ },
+ {
+  "text": "It gives back a result.",
+  "key": "it gives back a result"
+ },
+ {
+  "text": "It is a colour.",
+  "key": "it is a colour"
+ },
+ {
+  "text": "Look! An error! Can you fix it?",
+  "key": "look an error can you fix it"
+ },
+ {
+  "text": "Yes, I can fix the error!",
+  "key": "yes i can fix the error"
+ },
+ {
+  "text": "No, it is not true.",
+  "key": "no it is not true"
+ },
+ {
+  "text": "Error! Error! I break every program!",
+  "key": "error error i break every program"
+ },
+ {
+  "text": "Why are you so angry?",
+  "key": "why are you so angry"
+ },
+ {
+  "text": "Print the bug!",
+  "key": "print the bug"
+ },
+ {
+  "text": "Nobody likes bugs. Everybody wants to delete me.",
+  "key": "nobody likes bugs everybody wants to delete me"
+ },
+ {
+  "text": "Bugs are false.",
+  "key": "bugs are false"
+ },
+ {
+  "text": "Bugs help us learn!",
+  "key": "bugs help us learn"
+ },
+ {
+  "text": "Really? Is that true?",
+  "key": "really is that true"
+ },
+ {
+  "text": "Yes, it is true!",
+  "key": "yes it is true"
+ },
+ {
+  "text": "No, it is false!",
+  "key": "no it is false"
+ },
+ {
+  "text": "Then I am a good bug! Thank you!",
+  "key": "then i am a good bug thank you"
+ },
+ {
   "text": "Goodbye",
   "key": "goodbye"
  },
@@ -198,6 +2270,498 @@
  {
   "text": "Two stars for you!",
   "key": "two stars for you"
+ },
+ {
+  "text": "Go!",
+  "key": "go"
+ },
+ {
+  "text": "My bag is pink.",
+  "key": "my bag is pink"
+ },
+ {
+  "text": "My pencil is orange.",
+  "key": "my pencil is orange"
+ },
+ {
+  "text": "red\nyellow\ngreen",
+  "key": "red yellow green"
+ },
+ {
+  "text": "This is a pencil.",
+  "key": "this is a pencil"
+ },
+ {
+  "text": "Two books for Juno.",
+  "key": "two books for juno"
+ },
+ {
+  "text": "Three chairs for us.",
+  "key": "three chairs for us"
+ },
+ {
+  "text": "The scissors are black.",
+  "key": "the scissors are black"
+ },
+ {
+  "text": "Is it a yellow rubber?",
+  "key": "is it a yellow rubber"
+ },
+ {
+  "text": "an orange pen",
+  "key": "an orange pen"
+ },
+ {
+  "text": "Rain!",
+  "key": "rain"
+ },
+ {
+  "text": "Look outside!",
+  "key": "look outside"
+ },
+ {
+  "text": "Please sit down.",
+  "key": "please sit down"
+ },
+ {
+  "text": "Don't talk, please!",
+  "key": "don't talk please"
+ },
+ {
+  "text": "He can swim.",
+  "key": "he can swim"
+ },
+ {
+  "text": "I can't draw.",
+  "key": "i can't draw"
+ },
+ {
+  "text": "Don't run!",
+  "key": "don't run"
+ },
+ {
+  "text": "Sit down, please!",
+  "key": "sit down please"
+ },
+ {
+  "text": "Don't run, please!",
+  "key": "don't run please"
+ },
+ {
+  "text": "This is my cousin.",
+  "key": "this is my cousin"
+ },
+ {
+  "text": "sister\nbrother",
+  "key": "sister brother"
+ },
+ {
+  "text": "My mum's name is Anna.",
+  "key": "my mum's name is anna"
+ },
+ {
+  "text": "Juno and her sister.",
+  "key": "juno and her sister"
+ },
+ {
+  "text": "Tom and his dad.",
+  "key": "tom and his dad"
+ },
+ {
+  "text": "This is my grandma.",
+  "key": "this is my grandma"
+ },
+ {
+  "text": "Is this your uncle?",
+  "key": "is this your uncle"
+ },
+ {
+  "text": "My grandpa's name is Max.",
+  "key": "my grandpa's name is max"
+ },
+ {
+  "text": "Two sisters and a brother.",
+  "key": "two sisters and a brother"
+ },
+ {
+  "text": "My parents are nice.",
+  "key": "my parents are nice"
+ },
+ {
+  "text": "Knock!\nKnock!",
+  "key": "knock knock"
+ },
+ {
+  "text": "bedroom\ngarden\nkitchen",
+  "key": "bedroom garden kitchen"
+ },
+ {
+  "text": "There is a lamp in my room.",
+  "key": "there is a lamp in my room"
+ },
+ {
+  "text": "on\non\non\nunder",
+  "key": "on on on under"
+ },
+ {
+  "text": "There is a sofa.",
+  "key": "there is a sofa"
+ },
+ {
+  "text": "There are two lamps.",
+  "key": "there are two lamps"
+ },
+ {
+  "text": "The ball is under the sofa.",
+  "key": "the ball is under the sofa"
+ },
+ {
+  "text": "My bed is in my bedroom.",
+  "key": "my bed is in my bedroom"
+ },
+ {
+  "text": "There are three doors.",
+  "key": "there are three doors"
+ },
+ {
+  "text": "Where is the computer?",
+  "key": "where is the computer"
+ },
+ {
+  "text": "There is a garden.",
+  "key": "there is a garden"
+ },
+ {
+  "text": "The cat is under the bed.",
+  "key": "the cat is under the bed"
+ },
+ {
+  "text": "Block\nBlock\nBlock",
+  "key": "block block block"
+ },
+ {
+  "text": "Blub\nBlub\nBlub",
+  "key": "blub blub blub"
+ },
+ {
+  "text": "hop\nhop\nfrog!",
+  "key": "hop hop frog"
+ },
+ {
+  "text": "I've got a hedgehog.",
+  "key": "i've got a hedgehog"
+ },
+ {
+  "text": "It has got big eyes.",
+  "key": "it has got big eyes"
+ },
+ {
+  "text": "I have got a dog.",
+  "key": "i have got a dog"
+ },
+ {
+  "text": "She has got a cat.",
+  "key": "she has got a cat"
+ },
+ {
+  "text": "Have you got a fish? Yes, I have.",
+  "key": "have you got a fish yes i have"
+ },
+ {
+  "text": "My horse has got four legs.",
+  "key": "my horse has got four legs"
+ },
+ {
+  "text": "The mouse is small.",
+  "key": "the mouse is small"
+ },
+ {
+  "text": "Two rabbits in the garden.",
+  "key": "two rabbits in the garden"
+ },
+ {
+  "text": "The owl has got big eyes.",
+  "key": "the owl has got big eyes"
+ },
+ {
+  "text": "A tortoise is slow.",
+  "key": "a tortoise is slow"
+ },
+ {
+  "text": "The frog is green.",
+  "key": "the frog is green"
+ },
+ {
+  "text": "He has got a snake.",
+  "key": "he has got a snake"
+ },
+ {
+  "text": "Zischel has got a friend!",
+  "key": "zischel has got a friend"
+ },
+ {
+  "text": "Hi!",
+  "key": "hi"
+ },
+ {
+  "text": "I like skating.\nI like music.",
+  "key": "i like skating i like music"
+ },
+ {
+  "text": "She likes dancing.",
+  "key": "she likes dancing"
+ },
+ {
+  "text": "He plays the guitar.",
+  "key": "he plays the guitar"
+ },
+ {
+  "text": "We like singing and dancing.",
+  "key": "we like singing and dancing"
+ },
+ {
+  "text": "Do you like tennis?",
+  "key": "do you like tennis"
+ },
+ {
+  "text": "She likes painting.",
+  "key": "she likes painting"
+ },
+ {
+  "text": "Leo goes cycling on Sundays.",
+  "key": "leo goes cycling on sundays"
+ },
+ {
+  "text": "He likes reading.",
+  "key": "he likes reading"
+ },
+ {
+  "text": "Let's play!",
+  "key": "let's play"
+ },
+ {
+  "text": "Today is Monday.",
+  "key": "today is monday"
+ },
+ {
+  "text": "Wusel gets up at seven.",
+  "key": "wusel gets up at seven"
+ },
+ {
+  "text": "On Tuesday I do my homework.",
+  "key": "on tuesday i do my homework"
+ },
+ {
+  "text": "She gets up at seven.",
+  "key": "she gets up at seven"
+ },
+ {
+  "text": "He has lunch at one.",
+  "key": "he has lunch at one"
+ },
+ {
+  "text": "I always do my homework.",
+  "key": "i always do my homework"
+ },
+ {
+  "text": "Juno never goes to bed at eight.",
+  "key": "juno never goes to bed at eight"
+ },
+ {
+  "text": "See you on Wednesday!",
+  "key": "see you on wednesday"
+ },
+ {
+  "text": "I have breakfast at seven.",
+  "key": "i have breakfast at seven"
+ },
+ {
+  "text": "He watches TV on Saturdays.",
+  "key": "he watches tv on saturdays"
+ },
+ {
+  "text": "He gets up at six.",
+  "key": "he gets up at six"
+ },
+ {
+  "text": "I never do homework on Sunday.",
+  "key": "i never do homework on sunday"
+ },
+ {
+  "text": "Today is Wednesday!",
+  "key": "today is wednesday"
+ },
+ {
+  "text": "apple\negg",
+  "key": "apple egg"
+ },
+ {
+  "text": "How much is the chocolate?",
+  "key": "how much is the chocolate"
+ },
+ {
+  "text": "Have you got any eggs?",
+  "key": "have you got any eggs"
+ },
+ {
+  "text": "There isn't any juice.",
+  "key": "there isn't any juice"
+ },
+ {
+  "text": "I'd like some bread, please.",
+  "key": "i'd like some bread please"
+ },
+ {
+  "text": "How much is the pizza?",
+  "key": "how much is the pizza"
+ },
+ {
+  "text": "Two tomatoes, please.",
+  "key": "two tomatoes please"
+ },
+ {
+  "text": "I like chocolate.",
+  "key": "i like chocolate"
+ },
+ {
+  "text": "A banana is yellow.",
+  "key": "a banana is yellow"
+ },
+ {
+  "text": "Can I have some water?",
+  "key": "can i have some water"
+ },
+ {
+  "text": "The cheese is yellow.",
+  "key": "the cheese is yellow"
+ },
+ {
+  "text": "Have you got any fish?",
+  "key": "have you got any fish"
+ },
+ {
+  "text": "How much is the ice cream?",
+  "key": "how much is the ice cream"
+ },
+ {
+  "text": "Sorry, no fish!",
+  "key": "sorry no fish"
+ },
+ {
+  "text": "My birthday is in March.",
+  "key": "my birthday is in march"
+ },
+ {
+  "text": "The party is on the first of April.",
+  "key": "the party is on the first of april"
+ },
+ {
+  "text": "It is the second of December.",
+  "key": "it is the second of december"
+ },
+ {
+  "text": "January\n3",
+  "key": "january 3"
+ },
+ {
+  "text": "Juno: book\nKnarz: shell",
+  "key": "juno book knarz shell"
+ },
+ {
+  "text": "My birthday is in October.",
+  "key": "my birthday is in october"
+ },
+ {
+  "text": "Juno is dancing at the party.",
+  "key": "juno is dancing at the party"
+ },
+ {
+  "text": "We are singing Happy Birthday.",
+  "key": "we are singing happy birthday"
+ },
+ {
+  "text": "I am eating cake.",
+  "key": "i am eating cake"
+ },
+ {
+  "text": "My birthday is in June.",
+  "key": "my birthday is in june"
+ },
+ {
+  "text": "It is the first of May.",
+  "key": "it is the first of may"
+ },
+ {
+  "text": "The second of March.",
+  "key": "the second of march"
+ },
+ {
+  "text": "Two balloons for Juno!",
+  "key": "two balloons for juno"
+ },
+ {
+  "text": "A present for you!",
+  "key": "a present for you"
+ },
+ {
+  "text": "See you in August!",
+  "key": "see you in august"
+ },
+ {
+  "text": "My party is in February.",
+  "key": "my party is in february"
+ },
+ {
+  "text": "They are coming to the party.",
+  "key": "they are coming to the party"
+ },
+ {
+  "text": "False",
+  "key": "false"
+ },
+ {
+  "text": "True",
+  "key": "true"
+ },
+ {
+  "text": "Great!",
+  "key": "great"
+ },
+ {
+  "text": "print( \"Hello\" )",
+  "key": "print hello"
+ },
+ {
+  "text": "if x == 5:",
+  "key": "if x 5"
+ },
+ {
+  "text": "for i in range(3):",
+  "key": "for i in range 3"
+ },
+ {
+  "text": "x = 5 + 3",
+  "key": "x 5 3"
+ },
+ {
+  "text": "elif x > 3:",
+  "key": "elif x 3"
+ },
+ {
+  "text": "print( \"Hi\" )",
+  "key": "print hi"
+ },
+ {
+  "text": "x = True",
+  "key": "x true"
+ },
+ {
+  "text": "while x < 3:",
+  "key": "while x 3"
+ },
+ {
+  "text": "big bug\nsmall bug",
+  "key": "big bug small bug"
  },
  {
   "text": "Hello! I'm Nuvi. How are you?",
