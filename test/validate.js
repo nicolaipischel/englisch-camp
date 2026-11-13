@@ -12,6 +12,8 @@ const path = require('path');
   const v = await page.evaluate(() => ({ errs: VALIDATION.errs, warns: VALIDATION.warns, text: validationText(), words: CONTENT.words.length, levels: CONTENT.levels.length }));
   await browser.close();
   errors.forEach(e => console.log(e));
-  console.log(v.text);
-  process.exit(errors.length || v.errs.length || v.warns.length ? 1 : 0);
+  // --no-audio: ignore missing clips (audio is regenerated in one go at the end)
+  const warns = process.argv.includes('--no-audio') ? v.warns.filter(w => !/^No audio clip/.test(w)) : v.warns;
+  console.log(v.errs.length || warns.length ? [...v.errs.map(e => 'ERR ' + e), ...warns.map(w => 'WARN ' + w)].join('\n') : `OK (${v.words} words, ${v.levels} levels)`);
+  process.exit(errors.length || v.errs.length || warns.length ? 1 : 0);
 })().catch(e => { console.error(e); process.exit(1); });

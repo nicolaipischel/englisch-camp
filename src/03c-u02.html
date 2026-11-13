@@ -1,0 +1,149 @@
+<script>
+/* ==========================================================================================
+   WORLD u2 – Farbenfeld (meadow, butter-yellow). Colours + school things; a/an, plural -s.
+   Code Lab: if / else. Boss: Grauwolke Nebelino, who drained the colours from the meadow.
+   ========================================================================================== */
+addWorld({
+  unit: { id:'u2', num:2, title:'Farbenfeld', subtitle:'Farben & Schulsachen', accent:'#f2b33d', scene:'meadow', status:'open', after:'u1',
+    monster:['petal-1','petal-2','petal-3'], monsterNames:['Klecksi','Klecksor','Farbklecksia'],
+    intro:'Im Farbenfeld ist alles grau geworden. Bring die Farben zurück! 🌈' },
+
+  words: [
+    { id:'red',     unit:'u2', cat:'colour', en:'red',     de:'rot',     icon:'col:#ef4b4b', pron:'räd',      exampleEn:'My bag is red.',               exampleDe:'Meine Tasche ist rot.' },
+    { id:'blue',    unit:'u2', cat:'colour', en:'blue',    de:'blau',    icon:'col:#3b82f6', pron:'bluu',     exampleEn:'The sky is blue.',             exampleDe:'Der Himmel ist blau.' },
+    { id:'green',   unit:'u2', cat:'colour', en:'green',   de:'grün',    icon:'col:#3fbf5f', pron:'grien',    exampleEn:'The grass is green.',          exampleDe:'Das Gras ist grün.' },
+    { id:'yellow',  unit:'u2', cat:'colour', en:'yellow',  de:'gelb',    icon:'col:#ffd23f', pron:'JÄ-lou',   exampleEn:'The sun is yellow.',           exampleDe:'Die Sonne ist gelb.' },
+    { id:'black',   unit:'u2', cat:'colour', en:'black',   de:'schwarz', icon:'col:#2d2a32', pron:'bläck',    exampleEn:'My pen is black.',             exampleDe:'Mein Stift ist schwarz.' },
+    { id:'white',   unit:'u2', cat:'colour', en:'white',   de:'weiß',    icon:'col:#ffffff',                  exampleEn:'The cloud is white.',          exampleDe:'Die Wolke ist weiß.' },
+    { id:'pink',    unit:'u2', cat:'colour', en:'pink',    de:'rosa / pink', icon:'col:#ff8fc8',              exampleEn:'Pink is my favourite colour.', exampleDe:'Rosa ist meine Lieblingsfarbe.' },
+    { id:'orange',  unit:'u2', cat:'colour', en:'orange',  de:'orange',  icon:'col:#ff9a3c',                  exampleEn:"I've got an orange ruler.",    exampleDe:'Ich habe ein oranges Lineal.' },
+    { id:'bag',     unit:'u2', cat:'school', en:'bag',     de:'Tasche / Schultasche', icon:'bag', emoji:'🎒', pron:'bäg', exampleEn:'Is this your bag?',  exampleDe:'Ist das deine Tasche?' },
+    { id:'book',    unit:'u2', cat:'school', en:'book',    de:'Buch',    icon:'book', emoji:'📘', pron:'buck',   exampleEn:"I've got a blue book.",       exampleDe:'Ich habe ein blaues Buch.' },
+    { id:'pen',     unit:'u2', cat:'school', en:'pen',     de:'Stift / Kuli', icon:'pen', emoji:'🖊️', pron:'pänn', exampleEn:'This is a black pen.',       exampleDe:'Das ist ein schwarzer Kuli.' },
+    { id:'pencil',  unit:'u2', cat:'school', en:'pencil',  de:'Bleistift', icon:'pencil', emoji:'✏️', pron:'PÄN-ßl', exampleEn:'A pencil and a rubber, please.', exampleDe:'Einen Bleistift und einen Radiergummi, bitte.' },
+    { id:'ruler',   unit:'u2', cat:'school', en:'ruler',   de:'Lineal',  icon:'ruler', emoji:'📏', pron:'RUU-ler', exampleEn:'My ruler is yellow.',         exampleDe:'Mein Lineal ist gelb.' },
+    { id:'rubber',  unit:'u2', cat:'school', en:'rubber',  de:'Radiergummi', icon:'rubber',  pron:'RA-ber',  exampleEn:'Where is my rubber?',           exampleDe:'Wo ist mein Radiergummi?' },
+    { id:'scissors',unit:'u2', cat:'school', en:'scissors',de:'Schere',  icon:'scissors', emoji:'✂️',         exampleEn:'The scissors are red.',         exampleDe:'Die Schere ist rot.' },
+    { id:'chair',   unit:'u2', cat:'school', en:'chair',   de:'Stuhl',   icon:'chair', emoji:'🪑', pron:'tschär', exampleEn:'Sit on your chair, please.',  exampleDe:'Setz dich bitte auf deinen Stuhl.' },
+    { id:'whatcolour', unit:'u2', cat:'phrase', en:'What colour is it?', de:'Welche Farbe hat es?', icon:'palette', emoji:'🎨', exampleEn:"What colour is it? – It's green.", exampleDe:'Welche Farbe hat es? – Es ist grün.' }
+  ],
+
+  levels: [
+    { id:'u2l1', unit:'u2', type:'catch', title:'Farben fangen', minutes:'2–3', reward:'acc_clip',
+      story:{ before:'Das Farbenfeld ist ganz grau. Fang die ersten Farben ein!', after:'Die ersten Blumen leuchten wieder! 🌷' },
+      plan:[ {intro:['red','blue','green','yellow']},
+             {k:'catch', words:['red','blue','green','yellow'], reps:2, opts:3} ] },
+
+    { id:'u2l2', unit:'u2', type:'listen', title:'Hör die Farben', minutes:'3', reward:'acc_phones',
+      story:{ before:'Die Bienen summen Farbnamen. Hör genau hin! 🐝', after:'Stark! Jetzt kennst du schon acht Farben.' },
+      plan:[ {intro:['black','white','pink','orange']},
+             {k:'listen', words:['black','white','pink','orange'], reps:2, opts:3},
+             {k:'speak', words:['orange','yellow']} ] },
+
+    { id:'u2l3', unit:'u2', type:'memory', title:'Schulsachen-Memory', minutes:'3–4', reward:'room_bean',
+      story:{ before:'Junos Schultasche ist umgekippt! Sammle alles wieder ein.', after:'Alles wieder in der Tasche! 🎒' },
+      plan:[ {intro:['bag','book','pen','pencil','ruler','rubber']},
+             {k:'memory', words:['bag','book','pen','pencil','ruler','rubber']},
+             {k:'listen', words:['bag','book','pen','pencil','ruler','rubber'], reps:1, opts:3} ] },
+
+    { id:'u2l4', unit:'u2', type:'dialogue', title:'Im Klassenzimmer', minutes:'3–4', reward:'room_shelf',
+      story:{ before:'Juno sitzt schon im Klassenzimmer – und braucht deine Hilfe.', after:'Juno und du seid ein super Team! 💛' },
+      plan:[ {intro:['scissors','chair','whatcolour']},
+             {k:'dialogue', id:'d_u2_juno'},
+             {k:'speak', words:['whatcolour','scissors','chair']} ] },
+
+    { id:'u2l5', unit:'u2', type:'spell', title:'Farbschilder', minutes:'3–4', reward:'room_bed',
+      story:{ before:'Die Blumenbeete brauchen Schilder. Schreibst du die Farben?', after:'Jedes Beet hat jetzt sein Schild! ✨' },
+      plan:[ {k:'spell', words:['red','blue','green','pink','black','white','bag','pen','book','chair'], mode:'tiles'},
+             {k:'spell', words:['yellow','orange','ruler','rubber'], mode:'first'} ] },
+
+    { id:'u2l6', unit:'u2', type:'codelab', title:'Code Lab: if / else', minutes:'4–5', reward:'room_rainbow',
+      story:{ before:'Prof. Pixel hat einen Farbsensor gebaut. Er soll selbst entscheiden!', after:'Der Farbsensor entscheidet ganz allein. Compile successful! 💻' },
+      plan:[
+        {k:'card', title:'Code Lab: if 🤔', text:'Computer können entscheiden! [[if]] heißt „wenn“. Was danach eingerückt steht, passiert nur, wenn die Bedingung stimmt. [[==]] fragt: Ist das gleich?', code:'colour = "red"\nif colour == "red":\n    print("Stop!")', out:'Stop!'},
+        {k:'predict', code:'colour = "green"\nif colour == "green":\n    print("Go!")', options:['Go!','Stop!','green'], answer:0, explain:'In [[colour]] liegt „green“. Die Bedingung stimmt – also [[Go!]]', uses:['green']},
+        {k:'card', title:'else 🔀', text:'[[else]] heißt „sonst“. Stimmt die Bedingung nicht, läuft der [[else]]-Teil.', code:'colour = "blue"\nif colour == "red":\n    print("Stop!")\nelse:\n    print("Go!")', out:'Go!'},
+        {k:'predict', code:'bag = "pink"\nif bag == "black":\n    print("My bag is black.")\nelse:\n    print("My bag is pink.")', options:['My bag is pink.','My bag is black.','pink'], answer:0, explain:'In [[bag]] liegt „pink“, nicht „black“. Darum läuft der [[else]]-Teil.', uses:['pink','black','bag']},
+        {k:'order', de:'Bau das Programm: Ist das Lineal gelb, zeig [[Yes!]] an – sonst [[No!]]', lines:['ruler = "yellow"','if ruler == "yellow":','    print("Yes!")','else:','    print("No!")'], out:'Yes!', uses:['ruler','yellow']},
+        {k:'build', code:true, parts:['if','colour','==','"white"',':'], de:'Bau die Bedingung: wenn die Farbe weiß ist', py:'if colour == "white":\n    print("Snow!")', uses:['white']},
+        {k:'trace', code:'pens = 1\npens = pens + 2\nif pens == 3:\n    pens = pens + 1', var:'pens', steps:[{v:'1', alt:['2','0']},{v:'3', alt:['12','2']},{v:'3', alt:['4','True']},{v:'4', alt:['3','5']}], explain:'[[pens == 3]] stimmt – darum kommt noch 1 dazu: am Ende 4 Stifte.', uses:['pen']},
+        {k:'build', parts:['My','pencil','is','orange.'], de:'Mein Bleistift ist orange.', py:'print("My pencil is orange.")', uses:['pencil','orange']},
+        {k:'predict', code:'print("red")\nprint("yellow")\nprint("green")', options:['red\nyellow\ngreen','green\nyellow\nred','red yellow green'], answer:0, explain:'Jedes [[print]] schreibt eine neue Zeile – von oben nach unten. 🚦', uses:['red','yellow','green']}
+      ] },
+
+    { id:'u2l7', unit:'u2', type:'bughunt', title:'Bug-Jagd: a oder an?', minutes:'3–4', reward:null,
+      story:{ before:'Auf den Schulsachen krabbeln Bugs! 🐞', after:'Alle Bugs gefangen! Nuvi nennt einen davon „Kleckschen“.' },
+      plan:[
+        {k:'card', title:'Bug-Jagd 🐞', text:'Klingt das nächste Wort am Anfang wie a, e, i, o, u, heißt es [[an]] statt [[a]]: [[an orange]]. Mehr als eins? Dann meist mit [[-s]]: [[two pens]].'},
+        {k:'bug', tokens:["I've",'got','a','orange','ruler.'], bug:2, options:['an','am','and'], fix:'an', explain:'[[orange]] beginnt mit o – also [[an orange ruler]].', uses:['orange','ruler']},
+        {k:'bug', tokens:['This','is','an','pencil.'], bug:2, options:['a','am','in'], fix:'a', explain:'[[pencil]] beginnt mit p – da reicht [[a]].', uses:['pencil']},
+        {k:'bug', tokens:['Two','book','for','Juno.'], bug:1, options:['books','bookes','bookz'], fix:'books', explain:'Zwei Bücher – mehr als eins, also [[books]].', uses:['book']},
+        {k:'bug', tokens:['My','bag','is','rad.'], bug:3, options:['red.','rot.','redd.'], fix:'red.', explain:'Rot heißt [[red]] – mit e.', uses:['bag','red']},
+        {k:'bug', tokens:['The','sky','is','blau.'], bug:3, options:['blue.','blu.','bleu.'], fix:'blue.', explain:'Blau = [[blue]] – mit ue am Ende.', uses:['blue']},
+        {k:'bug', tokens:['Three','chair','for','us.'], bug:1, options:['chairs','chaires','chairz'], fix:'chairs', explain:'Drei Stühle: [[chairs]] mit -s.', uses:['chair']},
+        {k:'bug', tokens:['The','scissor','are','black.'], bug:1, options:['scissors','sissors','scisors'], fix:'scissors', explain:'Eine Schere = [[scissors]] – immer mit s am Ende!', uses:['scissors','black']},
+        {k:'bug', tokens:['Is','it','a','yelow','rubber?'], bug:3, options:['yellow','yello','jellow'], fix:'yellow', explain:'Gelb = [[yellow]] mit zwei l.', uses:['yellow','rubber']},
+        {k:'bug', tokens:['What','colour','are','it?'], bug:2, options:['is','am','be'], fix:'is', explain:'Es heißt [[What colour is it?]]', uses:['whatcolour']}
+      ] },
+
+    { id:'u2boss', unit:'u2', type:'boss', title:'Boss: Grauwolke Nebelino', minutes:'6–8', reward:'acc_flower',
+      boss:{ name:'Nebelino', art:'cloud' },
+      story:{ before:'Grauwolke Nebelino hat alle Farben geschluckt. Zeig ihm, wie schön Farben sind!',
+              after:{ flag:'u2gift', ruler:'Mit Junos gelbem Lineal malst du einen Regenbogen. 🌈 Nebelino lacht!',
+                      pencil:'Mit Junos rosa Bleistift malst du Nebelino ein Lächeln. 🌈',
+                      default:'Nebelino strahlt in allen Farben! 🌈' } },
+      plan:[
+        {k:'catch', words:['red'], opts:3},
+        {k:'listen', words:['white'], opts:3},
+        {k:'listen', words:['scissors'], opts:4},
+        {k:'spell', words:['blue'], mode:'tiles'},
+        {k:'catch', words:['bag','pencil'], opts:4},
+        {k:'speak', words:['orange']},
+        {k:'bug', tokens:['a','orange','pen'], bug:0, options:['an','am','and'], fix:'an', explain:'[[an orange pen]] – vor o kommt [[an]].', uses:['orange','pen']},
+        {k:'listen', words:['ruler','rubber'], opts:4},
+        {k:'build', parts:['What','colour','is','it?'], de:'Welche Farbe hat es?', py:'print("What colour is it?")', uses:['whatcolour']},
+        {k:'predict', code:'sky = "grey"\nif sky == "grey":\n    print("Rain!")\nelse:\n    print("Sun!")', options:['Rain!','Sun!','grey'], answer:0, explain:'In [[sky]] liegt „grey“ – also [[Rain!]] Gleich wird es bunt!', uses:[]},
+        {k:'catch', words:['chair','book'], opts:4},
+        {k:'spell', words:['green'], mode:'tiles'},
+        {k:'listen', words:['pink','black','yellow'], opts:4},
+        {k:'dialogue', id:'d_nebelino'}
+      ] },
+
+    { id:'u2secret', unit:'u2', type:'falling', secret:true, title:'Geheim: Farbregen', minutes:'3', reward:'room_paints',
+      story:{ before:'Psst … hier regnet es Farben! ☔', after:'Du hast den Farbregen gemeistert! 🎨' },
+      plan:[ {k:'falling', words:['red','blue','green','yellow','black','white','pink','orange'], rounds:8, opts:3} ] }
+  ],
+
+  dialogues: {
+    d_u2_juno: { npc:'juno', nodes:[
+      { say:'Hello! Can you help me? I need a pen.', de:'Hallo! Kannst du mir helfen? Ich brauche einen Stift.' },
+      { ask:'Gib Juno einen Stift!', options:[ {en:'Here is a pen.', ok:true}, {en:'Here is a chair.', hint:'Juno braucht etwas zum Schreiben ✏️'} ] },
+      { say:'Thank you! What colour is it?', de:'Danke! Welche Farbe hat er?' },
+      { ask:'Der Stift ist blau. Sag es!', options:[ {en:"It's blue.", ok:true}, {en:"It's a book.", hint:'Juno fragt nach der Farbe 🎨'} ] },
+      { say:'I like blue! Where are my scissors?', de:'Ich mag Blau! Wo ist meine Schere?' },
+      { ask:'Die Schere liegt auf dem Stuhl.', options:[ {en:'On the ruler.', hint:'Schau nochmal: Sie liegt auf dem Stuhl.'}, {en:'On the chair.', ok:true} ] },
+      { story:'Juno will dir etwas leihen. Was nimmst du?', flag:'u2gift', options:[ {de:'📏 Ihr gelbes Lineal', value:'ruler'}, {de:'✏️ Ihren rosa Bleistift', value:'pencil'} ] },
+      { say:'Here you are! Goodbye!', de:'Bitte schön! Tschüss!' },
+      { ask:'Bedank dich!', options:[ {en:'Thank you! Goodbye!', ok:true}, {en:'What colour is it?', hint:'Juno hat dir etwas geliehen – sag danke!'} ] }
+    ]},
+    d_nebelino: { npc:'cloud', nodes:[
+      { say:'Grey, grey, grey! All the colours are mine!', de:'Grau, grau, grau! Alle Farben gehören mir!' },
+      { ask:'Bleib freundlich!', options:[ {en:'Hello! How are you?', ok:true}, {en:'Go away!', hint:'Wir wollen Nebelino doch helfen 🙂'} ] },
+      { say:"I'm sad. Everything is grey.", de:'Ich bin traurig. Alles ist grau.' },
+      { ask:'Zeig ihm eine Farbe! Die Blume ist gelb.', options:[ {en:'Look! The flower is a bag.', hint:'Welche Farbe hat die Blume? 🌼'}, {en:'Look! The flower is yellow.', ok:true} ] },
+      { say:'Yellow! Wow! What colour is the sky?', de:'Gelb! Wow! Welche Farbe hat der Himmel?' },
+      { ask:'Der Himmel ist blau.', options:[ {en:'The sky is blue.', ok:true}, {en:'The sky is green.', hint:'Schau nach oben – der Himmel ist blau.'} ] },
+      { say:'Blue and yellow! Thank you! Colours are fun!', de:'Blau und Gelb! Danke! Farben machen Spaß!' }
+    ]}
+  },
+
+  items: [
+    { id:'acc_flower',   kind:'acc', slot:'head', name:'Blütenspange', price:null },
+    { id:'room_rainbow', kind:'room', name:'Regenbogenlampe', price:null, pos:{x:30,y:40,w:18} },
+    { id:'room_paints',  kind:'room', name:'Farbtöpfe',       price:null, pos:{x:40,y:96,w:16} },
+    { id:'room_crayons', kind:'room', name:'Wachsmalstifte',  price:null, pos:{x:62,y:72,w:12} }
+  ],
+  badges: [ { id:'b_boss_u2', name:'Farbheldin', desc:'Nebelino ist wieder bunt', emblem:'palette', when:{level:'u2boss'} } ],
+  secrets: [ { id:'s_u2_crayons', unit:'u2', item:'room_crayons', x:16, y:30, text:'Du hast Wachsmalstifte im Gras gefunden! 🖍️' } ]
+});
+</script>

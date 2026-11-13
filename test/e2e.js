@@ -133,7 +133,7 @@ const note = m => { problems.push(m); console.log('PROBLEM:', m); };
           await tap(`.popts [data-k="${t.answer}"]`); await page.waitForTimeout(300); await tap('.foot .btn'); break;
         case 'bug':
           await tap(`.tok[data-i="${t.bug}"]`);
-          await page.locator(`[data-o]`).filter({ hasText: await page.evaluate(f => sub(f), t.fix) }).first().click();
+          await page.evaluate(f => [...document.querySelectorAll('[data-o]')].find(b => b.dataset.o === f).click(), t.fix);
           await page.waitForTimeout(300); await tap('.foot .btn'); break;
         case 'order': {
           const lines = await page.evaluate(() => Run.tasks[Run.idx].lines.map(sub));

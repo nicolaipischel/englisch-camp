@@ -24,7 +24,16 @@
        {k:'predict', code, options:[...], answer:0, explain, uses}
        {k:'bug', tokens:[...], bug:index, options:[...], fix, explain, uses}
        {k:'card', title, text, code, out}                 info card (not scored)
+       {k:'order', lines:[...], extra:[...], de, out, explain, uses}   Parsons: tap code lines in order
+                                                          (indent = 4 spaces, part of the line)
+       {k:'trace', code, var, steps:[{v, alt:[...], line?}], explain, uses}   value of var after each line
+       {k:'py', de, start, check:{out|has|test}, inputs, hint, solution, explain, uses}   real Python
+                                                          (Pyodide from the CDN, only used in u11)
+       predict: code and options may have several lines ("\n"); say:false = do not speak the answer.
      Single-task segments may be listed in boss levels in any mix.
+   - Add a WORLD (unit): one file src/03c-uNN.html calling addWorld({unit, words, levels, dialogues,
+     items, badges, secrets}). unit.after = id of the unit whose boss opens this one. Boss art,
+     scenes, monsters (unit.monster = ['<monSpec>-1','-2','-3']) and item art live in 04-art.html.
    - English inside German text: wrap in [[double brackets]] -> rendered with lang="en-GB".
    - The startup validation (see #debug) checks ids, references, distractors and that every
      word appears >= 5 times in >= 3 modalities within its unit.
@@ -35,10 +44,7 @@ const CONTENT = {
   units: [
     { id:'u1', num:1, title:'Hallohafen', subtitle:'Hallo, ich bin … & Zahlen 1–10', accent:'#2fb3c6', scene:'harbour', status:'open',
       monster:['plaudi1','plaudi2','plaudi3'], monsterNames:['Plaudi','Plauderon','Plauderaxx'],
-      intro:'Willkommen in Hallohafen! Hier sagt keiner mehr [[Hello]]. Das ändern wir! ⚓' },
-    { id:'u2', num:2, title:'Farbenfeld', subtitle:'Farben & Schulsachen', accent:'#f2b33d', scene:'meadow', status:'soon' },
-    { id:'u3', num:3, title:'Familienfelsen', subtitle:'Familie & Haustiere', accent:'#f07aa0', scene:'cliffs', status:'soon' },
-    { id:'u4', num:4, title:'Blockdorf', subtitle:'Mein Zimmer & Zuhause', accent:'#6cc070', scene:'blocks', status:'soon' }
+      intro:'Willkommen in Hallohafen! Hier sagt keiner mehr [[Hello]]. Das ändern wir! ⚓' }
   ],
 
   /* cat = group used for distractors. pron = German-style hint, ONLY where it is not misleading
@@ -224,4 +230,11 @@ const CONTENT = {
     brk:   ['Du trainierst schon richtig lange – stark! Kurze Pause? 🧃']
   }
 };
+/* World files (src/03c-uNN.html) register their content here, in map order. */
+function addWorld(w) {
+  CONTENT.units.push(w.unit);
+  ['words', 'levels', 'items', 'badges', 'secrets'].forEach(k => CONTENT[k].push(...(w[k] || [])));
+  Object.keys(w.dialogues || {}).forEach(k => { if (CONTENT.dialogues[k]) console.error(`Duplicate dialogue id "${k}" in ${w.unit.id}`); });
+  Object.assign(CONTENT.dialogues, w.dialogues || {});
+}
 </script>

@@ -86,11 +86,13 @@ const ART = {
       case 'acc_clip': return `<path d="M32 26 a9 9 0 1 0 8 12 a7 7 0 1 1 -8 -12 z" fill="#ffe08a" ${SW}/>`;
       case 'acc_crown': return `<path d="M30 26 v-16 l8 6 l6 -10 h12 l6 10 l8 -6 v16 z" fill="#ffd34d" ${SW}/><rect x="46" y="14" width="8" height="8" fill="#ff8fc0" ${SW}/>`;
       case 'acc_glasses': return `<circle cx="41" cy="56" r="8" fill="#bfe3ff" fill-opacity=".35" ${SW}/><circle cx="59" cy="56" r="8" fill="#bfe3ff" fill-opacity=".35" ${SW}/><path d="M49 56 h2 M33 54 l-8 -3 M67 54 l8 -3" ${SW}/>`;
+      case 'acc_flower': return `${[0, 1, 2, 3, 4].map(k => `<circle cx="${(68 + Math.cos(k * 1.257) * 7).toFixed(1)}" cy="${(22 + Math.sin(k * 1.257) * 7).toFixed(1)}" r="5.5" fill="#ff9fd0" ${SW.replace('3"', '2"')}/>`).join('')}<circle cx="68" cy="22" r="4.5" fill="#ffd76a" ${SW.replace('3"', '2"')}/>`;
     }
     return '';
   },
   accIcon(id, cls = 'it', label = '') {
-    const vb = id === 'acc_glasses' ? '24 40 52 32' : id === 'acc_phones' ? '8 6 84 64' : '18 2 64 46';
+    const it = CONTENT.items.find(i => i.id === id);
+    const vb = it && it.slot === 'face' ? '24 40 52 32' : id === 'acc_phones' ? '8 6 84 64' : '18 2 64 46';
     return svg(vb, ART.acc(id), cls, label);
   },
 
@@ -322,7 +324,7 @@ const ART = {
       ${[0, 1, 2, 3].map(i => `<path d="M${80 + Math.cos(i * Math.PI / 2) * 16} ${88 + Math.sin(i * Math.PI / 2) * 16} L${80 + Math.cos(i * Math.PI / 2) * 19} ${88 + Math.sin(i * Math.PI / 2) * 19}" ${SW.replace('3"', '2"')}/>`).join('')}
       <path d="M80 88 v-12 ${h ? 'M80 88 l9 0' : 'M80 88 l8 8'}" ${SW}/>
       <path d="M54 82 l-18 -8 M106 82 l18 -8" ${SW}/><path d="M68 114 v4 M92 114 v4" ${SW}/>
-      <circle cx="80" cy="42" r="22" fill="#ffd9c2" ${SW}/><path d="M56 34 L80 -4 L104 34 z" fill="#7d6bd8" ${SW}/><path d="${starPath(80, 18, 5)}" fill="#ffd76a"/>
+      <circle cx="80" cy="42" r="22" fill="#ffd9c2" ${SW}/><path d="M56 34 L80 2 L104 34 z" fill="#7d6bd8" ${SW}/><path d="${starPath(80, 18, 5)}" fill="#ffd76a"/>
       <path d="M62 56 q18 18 36 0 q-2 14 -18 16 q-16 -2 -18 -16 z" fill="#fff" ${SW}/>
       ${eyes(72, 88, 42, 3.6)}${h ? `<path d="M74 52 q6 5 12 0" fill="none" ${SW}/>` : `<path d="M66 34 l8 3 M94 34 l-8 3" ${SW}/><path d="M74 54 q6 -4 12 0" fill="none" ${SW}/>`}` },
     gull: { name: 'Schnapp', draw: h => `<path d="M42 72 q-32 -22 -36 6 q20 4 36 10 z M118 72 q32 -22 36 6 q-20 4 -36 10 z" fill="#e8eef6" ${SW}/>
@@ -364,7 +366,11 @@ const ART = {
         <rect x="14" y="14" width="6" height="18" fill="#7cc4ff" ${SW.replace('3"', '2"')}/><rect x="22" y="12" width="6" height="20" fill="#ff8fc0" ${SW.replace('3"', '2"')}/>
         <rect x="38" y="40" width="12" height="12" fill="#8fdcc0" ${SW.replace('3"', '2"')}/>`,
       room_bean: `<path d="M10 56 q-6 -30 22 -36 q26 2 22 36 z" fill="#c3b1f5" ${SW}/><path d="M20 40 q12 -6 22 0" fill="none" ${SW}/>`,
-      room_shell: `<path d="M32 54 L10 28 Q32 4 54 28 Z" fill="#ffd2e6" ${SW}/><path d="M32 54 L22 22 M32 54 L32 16 M32 54 L42 22" ${SW}/><path d="${starPath(52, 12, 6)}" fill="#ffd76a" ${SW}/>`
+      room_shell: `<path d="M32 54 L10 28 Q32 4 54 28 Z" fill="#ffd2e6" ${SW}/><path d="M32 54 L22 22 M32 54 L32 16 M32 54 L42 22" ${SW}/><path d="${starPath(52, 12, 6)}" fill="#ffd76a" ${SW}/>`,
+      /* u2 */
+      room_rainbow: `<path d="M8 52 a24 24 0 0 1 48 0" fill="none" stroke="#ff8fb2" stroke-width="7"/><path d="M15 52 a17 17 0 0 1 34 0" fill="none" stroke="#ffd76a" stroke-width="7"/><path d="M22 52 a10 10 0 0 1 20 0" fill="none" stroke="#8fd3f4" stroke-width="7"/><path d="M4 52 h56 v8 h-56 z" fill="#fff" ${SW}/>`,
+      room_paints: `<rect x="6" y="30" width="16" height="22" rx="3" fill="#ef4b4b" ${SW}/><rect x="24" y="24" width="16" height="28" rx="3" fill="#ffd23f" ${SW}/><rect x="42" y="32" width="16" height="20" rx="3" fill="#3b82f6" ${SW}/><path d="M4 52 h56" ${SW}/>`,
+      room_crayons: `<rect x="10" y="22" width="44" height="32" rx="4" fill="#ffe7a0" ${SW}/>${['#ef4b4b', '#3fbf5f', '#3b82f6', '#ff8fc8'].map((c, k) => `<path d="M${17 + k * 10} 22 v-12 l4 -6 l4 6 v12 z" fill="${c}" ${SW.replace('3"', '2"')}/>`).join('')}`
     }[id] || '';
     return svg('0 0 64 64', b, cls, label);
   },
@@ -389,7 +395,8 @@ const ART = {
       flame: `<path d="M50 72 q-18 -2 -16 -20 q2 -12 12 -20 q0 10 8 12 q2 -10 -2 -16 q16 8 16 26 q0 18 -18 18 z" fill="#ffad5c" ${SW}/><text x="50" y="66" font-size="16" font-weight="900" text-anchor="middle" fill="${O}" font-family="Nunito,sans-serif">7</text>`,
       cycle: `<path d="M34 50 a16 16 0 0 1 28 -10 M66 50 a16 16 0 0 1 -28 10" fill="none" ${SW}/><path d="M62 30 v10 h-10 M38 70 v-10 h10" fill="none" ${SW}/>`,
       chest: `<rect x="32" y="42" width="36" height="24" rx="3" fill="#e0a877" ${SW}/><path d="M32 42 q0 -12 18 -12 q18 0 18 12 z" fill="#c98f63" ${SW}/><rect x="46" y="46" width="8" height="8" fill="#ffd76a" ${SW}/>`,
-      anchor: `<circle cx="50" cy="32" r="5" fill="none" ${SW}/><path d="M50 37 v34 M40 46 h20 M32 58 q4 14 18 13 q14 1 18 -13" fill="none" ${SW}/>`
+      anchor: `<circle cx="50" cy="32" r="5" fill="none" ${SW}/><path d="M50 37 v34 M40 46 h20 M32 58 q4 14 18 13 q14 1 18 -13" fill="none" ${SW}/>`,
+      palette: `<path d="M50 30 q22 0 22 18 q0 10 -10 10 q-6 0 -6 6 q0 8 -8 8 q-20 0 -20 -20 q0 -22 22 -22 z" fill="#fff4e0" ${SW}/><circle cx="42" cy="42" r="4" fill="#ef4b4b"/><circle cx="54" cy="38" r="4" fill="#ffd23f"/><circle cx="63" cy="46" r="4" fill="#3b82f6"/><circle cx="40" cy="56" r="4" fill="#3fbf5f"/>`
     }[b.emblem] || '';
     const ring = owned ? '#ffc2d6' : '#ddd6ea';
     return svg('0 0 100 100', `<path d="M36 78 l-8 18 l12 -4 l6 10 l4 -20 M64 78 l8 18 l-12 -4 l-6 10 l-4 -20" fill="#7cc4ff" ${SW}/>

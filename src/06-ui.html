@@ -200,6 +200,8 @@ function validateContent() {
     });
   }
   CONTENT.items.filter(i => i.kind === 'room' && !i.pos).forEach(i => errs.push(`Item ${i.id}: room item without pos`));
+  CONTENT.items.forEach(i => { if (!/<(path|rect|circle|ellipse|g)\b/.test(i.kind === 'acc' ? ART.acc(i.id) : ART.item(i.id))) errs.push(`Item ${i.id}: no art`); });
+  CONTENT.badges.forEach(b => { if (!/<(path|rect|circle|ellipse|text)\b/.test(ART.badge(b).split('fill="#fff"').pop())) errs.push(`Badge ${b.id}: no emblem art "${b.emblem}"`); });
   CONTENT.secrets.forEach(s => { if (!ITEM(s.item)) errs.push(`Secret ${s.id}: item missing`); });
   /* every English line should have a recorded clip (else device voice is used) */
   if (typeof AUDIO !== 'undefined') englishLines().forEach(t => { if (!AUDIO[audioKey(t)]) warns.push(`No audio clip for "${t}" – run tts/make_audio.py`); });

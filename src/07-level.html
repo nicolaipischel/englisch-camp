@@ -685,7 +685,7 @@ TASKS.order = (t, api) => {
   const render = () => {
     prog.innerHTML = placed.map((ti, k) => `<div class="ln"><span class="num">${k + 1}</span><button class="oline ${k < lockedN ? 'lockd' : ''}" data-k="${k}" style="margin-left:${indentOf(tiles[ti].p) * 1.6}em">${hl(tiles[ti].p.trim())}</button></div>`).join('') +
       (done ? '' : `<div class="ln"><span class="num">${placed.length + 1}</span><span class="cur"></span></div>`);
-    tray.innerHTML = tiles.map((x, i) => `<button class="btn block otile ${placed.includes(i) ? 'used' : ''}" data-i="${i}" data-p="${esc(x.p)}"><span class="ind">${'·&nbsp;&nbsp;&nbsp;'.repeat(indentOf(x.p))}</span>${hl(x.p.trim())}</button>`).join('');
+    tray.innerHTML = tiles.map((x, i) => `<button class="btn block otile ${placed.includes(i) ? 'used' : ''}" data-i="${i}" data-p="${esc(x.p)}"><span><span class="ind">${'·&nbsp;&nbsp;&nbsp;'.repeat(indentOf(x.p))}</span>${hl(x.p.trim())}</span></button>`).join('');
   };
   const finish = demo => {
     done = true; render(); tray.hidden = true;
