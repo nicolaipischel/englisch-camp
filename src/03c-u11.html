@@ -1,0 +1,180 @@
+<script>
+/* ==========================================================================================
+   WORLD u11 – Pixels Leuchtturm (lighthouse at night, mint). Bonus route, opens after u4.
+   Real Python (Pyodide, loaded from the CDN only here): print, arithmetic, types, f-strings,
+   input, comparisons, if/elif/else, range, lists, while, functions/return, dict, error messages,
+   mini project. Words = the English words behind Python keywords. Boss: Der Große Bug.
+   Do not use {name} inside code: sub() would replace it with the player's name.
+   ========================================================================================== */
+addWorld({
+  unit: { id:'u11', num:11, title:'Pixels Leuchtturm', subtitle:'Echtes Python (braucht Internet)', accent:'#3cc9a0', scene:'lighthouse', dark:true, status:'open', after:'u4',
+    monster:['byte-1','byte-2','byte-3'], monsterNames:['Bitti','Bytello','Bytezilla'],
+    intro:'Prof. Pixel lädt dich in seinen Leuchtturm ein. Hier programmierst du echtes Python! 🐍' },
+
+  words: [
+    { id:'print',  unit:'u11', cat:'code', en:'print',  de:'anzeigen / drucken', icon:'print',  emoji:'🖨️', pron:'print',    exampleEn:'Print your name.',              exampleDe:'Zeig deinen Namen an.' },
+    { id:'input',  unit:'u11', cat:'code', en:'input',  de:'Eingabe',            icon:'input',  emoji:'⌨️', pron:'IN-put',   exampleEn:'Type your input here.',         exampleDe:'Tipp deine Eingabe hier ein.' },
+    { id:'if',     unit:'u11', cat:'code', en:'if',     de:'wenn / falls',       icon:'if',     emoji:'❓', pron:'iff',      exampleEn:'If it rains, take an umbrella.', exampleDe:'Wenn es regnet, nimm einen Schirm.' },
+    { id:'else',   unit:'u11', cat:'code', en:'else',   de:'sonst',              icon:'else',   emoji:'🔀', pron:'äls',      exampleEn:'If it is red, stop. Else, go.',  exampleDe:'Wenn es rot ist, halt an. Sonst geh.' },
+    { id:'for',    unit:'u11', cat:'code', en:'for',    de:'für (jedes)',        icon:'for',    emoji:'🔁', pron:'for',      exampleEn:'A cake for every friend!',       exampleDe:'Einen Kuchen für jeden Freund!' },
+    { id:'while',  unit:'u11', cat:'code', en:'while',  de:'solange',            icon:'while',  emoji:'⏳',                  exampleEn:'While the music plays, we dance.', exampleDe:'Solange die Musik spielt, tanzen wir.' },
+    { id:'define', unit:'u11', cat:'code', en:'define', de:'festlegen (def)',    icon:'define', emoji:'🧩', pron:'di-FAIN',  exampleEn:'Define a new word.',             exampleDe:'Leg ein neues Wort fest.' },
+    { id:'return', unit:'u11', cat:'code', en:'return', de:'zurückgeben',        icon:'return', emoji:'↩️', pron:'ri-TÖRN',  exampleEn:'Return the book, please.',       exampleDe:'Gib bitte das Buch zurück.' },
+    { id:'true',   unit:'u11', cat:'logic', en:'true',  de:'wahr',               icon:'true',   emoji:'✅', pron:'truu',     exampleEn:'That is true!',                  exampleDe:'Das ist wahr!' },
+    { id:'false',  unit:'u11', cat:'logic', en:'false', de:'falsch',             icon:'false',  emoji:'❌', pron:'fols',     exampleEn:'That is false!',                 exampleDe:'Das ist falsch!' },
+    { id:'and',    unit:'u11', cat:'logic', en:'and',   de:'und',                icon:'and',    emoji:'🔗', pron:'änd',      exampleEn:'Juno and Nuvi.',                 exampleDe:'Juno und Nuvi.' },
+    { id:'or',     unit:'u11', cat:'logic', en:'or',    de:'oder',               icon:'or',     emoji:'⚖️',                  exampleEn:'Tea or juice?',                  exampleDe:'Tee oder Saft?' },
+    { id:'not',    unit:'u11', cat:'logic', en:'not',   de:'nicht',              icon:'not',    emoji:'🚫', pron:'nott',     exampleEn:'This is not a bug.',             exampleDe:'Das ist kein Bug.' },
+    { id:'list',   unit:'u11', cat:'code', en:'list',   de:'Liste',              icon:'list',   emoji:'📋', pron:'list',     exampleEn:'Make a list, please.',           exampleDe:'Mach bitte eine Liste.' },
+    { id:'loop',   unit:'u11', cat:'code', en:'loop',   de:'Schleife',           icon:'loop',   emoji:'➰', pron:'luup',     exampleEn:'The loop runs three times.',     exampleDe:'Die Schleife läuft dreimal.' },
+    { id:'error',  unit:'u11', cat:'code', en:'error',  de:'Fehler',             icon:'error',  emoji:'⚠️', pron:'Ä-ror',    exampleEn:'Oops, an error!',                exampleDe:'Hoppla, ein Fehler!' }
+  ],
+
+  levels: [
+    { id:'u11l1', unit:'u11', type:'catch', title:'Hallo, Python!', minutes:'5',
+      story:{ before:'Willkommen im Leuchtturm! Hier läuft echtes Python. Du brauchst Internet. 📡', after:'Dein erstes echtes Python-Programm läuft! 🐍' },
+      plan:[ {intro:['print','input','if','else']},
+             {k:'catch', words:['print','input','if','else'], reps:1, opts:3},
+             {k:'card', title:'Echtes Python 🐍', text:'Ab jetzt läuft echter Python-Code! Prof. Pixel lädt Python aus dem Internet – beim ersten Mal dauert das ein paar Sekunden.'},
+             {k:'py', de:'Ändere den Text: Python soll [[Hello, Pixel!]] anzeigen. Dann tippe auf [[Ausführen]].', start:'print("Hello!")', check:{out:'Hello, Pixel!'}, solution:'print("Hello, Pixel!")', hint:'Ändere nur den Text zwischen den Anführungszeichen.', explain:'[[print]] zeigt an, was in den Klammern steht.', uses:['print']},
+             {k:'card', title:'Rechnen ➕', text:'Python ist ein Super-Taschenrechner: [[+]] plus, [[-]] minus, [[*]] mal, [[/]] geteilt.', code:'print(3 + 4)\nprint(6 * 7)', out:'7\n42'},
+             {k:'predict', code:'print(10 - 3)\nprint(2 * 5)', options:['7\n10','13\n7','10 - 3\n2 * 5'], answer:0, explain:'Python rechnet erst – und zeigt dann das Ergebnis an.', uses:['print']},
+             {k:'py', de:'Nuvi hat 3 Dosen mit je 4 Keksen. Lass Python ausrechnen, wie viele Kekse das sind!', start:'print(3 ? 4)', check:{out:'12'}, solution:'print(3 * 4)', hint:'Mal heißt in Python [[*]].', explain:'3 mal 4 = 12 Kekse. Nuvi zählt trotzdem 13. 🍪', uses:['print']},
+             {k:'card', title:'Text oder Zahl? 🔢', text:'Mit Anführungszeichen ist es Text, ohne ist es eine Zahl. Text wird mit [[+]] zusammengeklebt!', code:'print(3 + 4)\nprint("3" + "4")', out:'7\n34'},
+             {k:'predict', code:'print("5" + "5")', options:['55','10','5 + 5'], answer:0, explain:'Mit Anführungszeichen ist es Text – Text wird zusammengeklebt.', uses:['print']},
+             {k:'catch', words:['print','else'], opts:3} ] },
+
+    { id:'u11l2', unit:'u11', type:'listen', title:'Boxen & Vergleiche', minutes:'5',
+      story:{ before:'Prof. Pixel zeigt dir Boxen, die sprechen können – und Fragen mit Ja oder Nein.', after:'Du vergleichst wie ein Profi! ✅' },
+      plan:[ {intro:['true','false','and','or','not']},
+             {k:'listen', words:['true','false','and','or','not'], reps:1, opts:3},
+             {k:'card', title:'f-Strings ✨', text:'Mit einem [[f]] vor dem Text setzt du Boxen direkt ein: den Namen der Box in geschweifte Klammern.', code:'friend = "Juno"\nprint(f"Hello, {friend}!")', out:'Hello, Juno!'},
+             {k:'py', de:'Setz dein Lieblingstier in die Box [[pet]] ein (statt „cat“).', start:'pet = "cat"\nprint(f"I like {pet}s.")', check:{has:['I like '], test:'pet != "cat" and len(pet) > 0'}, solution:'pet = "dog"\nprint(f"I like {pet}s.")', hint:'Ändere nur das Wort in der ersten Zeile.', explain:'Der f-String setzt den Inhalt von [[pet]] ein.', uses:['print']},
+             {k:'card', title:'True & False ✅', text:'Vergleiche geben [[True]] oder [[False]]: [[==]] gleich, [[!=]] ungleich, [[<]] kleiner, [[>]] größer.', code:'print(5 > 3)\nprint(2 == 3)', out:'True\nFalse'},
+             {k:'predict', code:'print(4 < 9 and 2 > 5)', options:['False','True','4 < 9'], answer:0, explain:'[[and]]: Beides muss stimmen – aber 2 > 5 stimmt nicht.', uses:['and','false']},
+             {k:'predict', code:'print(not False)', options:['True','False','not False'], answer:0, explain:'[[not]] dreht um: nicht falsch = wahr.', uses:['not','true']},
+             {k:'predict', code:'print(1 > 5 or 3 == 3)', options:['True','False','3'], answer:0, explain:'[[or]]: Eins reicht – 3 == 3 stimmt.', uses:['or','true']},
+             {k:'py', de:'Bau einen Vergleich, der [[True]] ergibt: Ist 10 größer als 7?', start:'print(10 ? 7)', check:{out:'True'}, solution:'print(10 > 7)', hint:'Größer als heißt [[>]].', uses:['true']},
+             {k:'py', de:'Das Programm fragt nach einem Namen. Es soll [[Hi, …!]] mit dem Namen antworten.', inputs:['Mia'], start:'who = input("Name? ")\nprint("Hi!")', check:{has:['Hi, Mia!']}, solution:'who = input("Name? ")\nprint(f"Hi, {who}!")', hint:'Benutze einen f-String: [[f"Hi, {who}!"]]', explain:'[[input]] holt die Eingabe in die Box [[who]].', uses:['input']} ] },
+
+    { id:'u11l3', unit:'u11', type:'memory', title:'Wenn, sonst & elif', minutes:'5',
+      story:{ before:'Der Leuchtturm soll selbst entscheiden, wann er leuchtet. Programmier ihn!', after:'Der Leuchtturm entscheidet ganz allein! 💡' },
+      plan:[ {intro:['for','while','loop','list']},
+             {k:'memory', words:['for','while','loop','list','if','else']},
+             {k:'card', title:'elif 🪜', text:'[[elif]] heißt „sonst wenn“. Python prüft von oben nach unten – die erste wahre Bedingung gewinnt.', code:'temp = 25\nif temp > 30:\n    print("Hot!")\nelif temp > 20:\n    print("Warm!")\nelse:\n    print("Cold!")', out:'Warm!'},
+             {k:'predict', code:'stars = 2\nif stars == 3:\n    print("Perfect!")\nelif stars == 2:\n    print("Great!")\nelse:\n    print("OK!")', options:['Great!','Perfect!','Great!\nOK!'], answer:0, explain:'Nur die erste wahre Bedingung zählt: [[stars == 2]].', uses:['if','else']},
+             {k:'py', de:'Ergänze den [[else]]-Teil: Ist die Zahl nicht 7, soll [[Try again!]] erscheinen.', start:'number = 5\nif number == 7:\n    print("You win!")\n', check:{out:'Try again!'}, solution:'number = 5\nif number == 7:\n    print("You win!")\nelse:\n    print("Try again!")', hint:'Schreib [[else:]] ohne Einrückung, darunter eingerückt das [[print]].', explain:'5 ist nicht 7 – also läuft der [[else]]-Teil.', uses:['else','if']},
+             {k:'py', de:'Ändere die Zahl in [[age]] so, dass Python [[Teenager!]] anzeigt.', start:'age = 8\nif age >= 13:\n    print("Teenager!")\nelse:\n    print("Kid!")', check:{out:'Teenager!'}, solution:'age = 13\nif age >= 13:\n    print("Teenager!")\nelse:\n    print("Kid!")', hint:'[[>=]] heißt „größer oder gleich“. Ab 13 passt es.', uses:['if']},
+             {k:'listen', words:['for','while','loop','list'], reps:1, opts:3} ] },
+
+    { id:'u11l4', unit:'u11', type:'dialogue', title:'Listen & Schleifen', minutes:'5–6',
+      story:{ before:'Prof. Pixel wartet oben im Leuchtturm auf dich.', after:'Prof. Pixel nennt dich jetzt „Kollegin“! 🔭' },
+      plan:[ {intro:['define','return','error']},
+             {k:'dialogue', id:'d_pixel'},
+             {k:'card', title:'range 🔁', text:'[[range(1, 4)]] zählt 1, 2, 3 – die letzte Zahl ist nicht mehr dabei!', code:'for i in range(1, 4):\n    print(i)', out:'1\n2\n3'},
+             {k:'predict', code:'for i in range(3):\n    print(i)', options:['0\n1\n2','1\n2\n3','0\n1\n2\n3'], answer:0, explain:'[[range(3)]] zählt ab 0: 0, 1, 2.', uses:['for','loop']},
+             {k:'py', de:'Lass Python alle Zahlen von 1 bis 5 anzeigen.', start:'for i in range(1, 3):\n    print(i)', check:{out:'1\n2\n3\n4\n5'}, solution:'for i in range(1, 6):\n    print(i)', hint:'Die zweite Zahl in [[range]] ist nicht mehr dabei – nimm 6.', uses:['for','loop']},
+             {k:'py', de:'Häng [[Mew]] an die Liste an.', start:'fans = ["Umbreon", "Sylveon"]\n\nprint(fans)', check:{test:'fans == ["Umbreon", "Sylveon", "Mew"]'}, solution:'fans = ["Umbreon", "Sylveon"]\nfans.append("Mew")\nprint(fans)', hint:'Benutze [[fans.append("Mew")]] in der leeren Zeile.', explain:'Nuvi ist begeistert: alle drei in einer Liste!', uses:['list']},
+             {k:'py', de:'Begrüße jeden Freund: [[Hi, Juno!]] und so weiter.', start:'friends = ["Juno", "Knarz", "Hoppel"]\nfor f in friends:\n    print("Hi")', check:{out:'Hi, Juno!\nHi, Knarz!\nHi, Hoppel!'}, solution:'friends = ["Juno", "Knarz", "Hoppel"]\nfor f in friends:\n    print(f"Hi, {f}!")', hint:'Mit einem f-String: [[f"Hi, {f}!"]]', uses:['for','list']},
+             {k:'speak', words:['define','return','error']} ] },
+
+    { id:'u11l5', unit:'u11', type:'spell', title:'Python-Wörter schreiben', minutes:'5',
+      story:{ before:'Prof. Pixels Tastatur hat Buchstaben verloren. Schreibst du die Python-Wörter?', after:'Alle Wörter sitzen! Und die Endlosschleife ist gezähmt. ✨' },
+      plan:[ {k:'spell', words:['print','input','if','else','for','while','true','false','and','or','not','list','loop'], mode:'tiles'},
+             {k:'spell', words:['define','return','error'], mode:'first'},
+             {k:'card', title:'while ⏳', text:'[[while]] wiederholt, solange die Bedingung stimmt. Ändert sich nichts, läuft die Schleife ewig – Python stoppt sie dann für dich.', code:'n = 3\nwhile n > 0:\n    print(n)\n    n = n - 1', out:'3\n2\n1'},
+             {k:'py', de:'Countdown! Zähl von 5 bis 1 runter und zeig dann [[Go!]] an.', start:'n = 5\nwhile n > 0:\n    print(n)\n\nprint("Go!")', check:{out:'5\n4\n3\n2\n1\nGo!'}, solution:'n = 5\nwhile n > 0:\n    print(n)\n    n = n - 1\nprint("Go!")', hint:'In der Schleife fehlt eine Zeile, die [[n]] kleiner macht – sonst läuft sie ewig!', uses:['while','loop']} ] },
+
+    { id:'u11l6', unit:'u11', type:'codelab', title:'Funktionen & return', minutes:'6', reward:'room_duck',
+      story:{ before:'Prof. Pixel zeigt dir sein Lieblingswerkzeug: eigene Funktionen.', after:'Deine Funktionen rechnen wie verrückt. Compile successful! 💻' },
+      plan:[
+        {k:'card', title:'def & return 🧩', text:'[[def]] (von [[define]]) legt eine Funktion fest. [[return]] gibt ein Ergebnis zurück.', code:'def double(x):\n    return x * 2\n\nprint(double(21))', out:'42'},
+        {k:'predict', code:'def add(a, b):\n    return a + b\n\nprint(add(2, 3))', options:['5','23','add(2, 3)'], answer:0, explain:'[[add]] gibt 2 + 3 zurück – also 5.', uses:['define','return']},
+        {k:'py', de:'Schreib die Funktion [[triple]] fertig: Sie soll die Zahl mal 3 zurückgeben.', start:'def triple(x):\n    return x\n\nprint(triple(5))', check:{test:'triple(5) == 15 and triple(2) == 6'}, solution:'def triple(x):\n    return x * 3\n\nprint(triple(5))', hint:'Ändere die [[return]]-Zeile: [[x * 3]].', uses:['define','return']},
+        {k:'py', de:'Die Funktion soll [[Happy birthday, …!]] mit dem Namen zurückgeben.', start:'def wish(who):\n    return "Happy birthday!"\n\nprint(wish("Glimmer"))', check:{test:'wish("Juno") == "Happy birthday, Juno!"'}, solution:'def wish(who):\n    return f"Happy birthday, {who}!"\n\nprint(wish("Glimmer"))', hint:'Mit einem f-String: [[f"Happy birthday, {who}!"]]', uses:['return','define']},
+        {k:'trace', code:'def plus_one(n):\n    return n + 1\n\nx = 1\nx = plus_one(x)\nx = plus_one(x) * 2', var:'x', steps:[{line:3, v:'1', alt:['2','0']},{line:4, v:'2', alt:['1','3']},{line:5, v:'6', alt:['5','3']}], explain:'Erst plus 1 (das gibt 3), dann mal 2: 6.', uses:['return']},
+        {k:'order', de:'Bau die Funktion: Ist eine Zahl gerade?', lines:['def is_even(n):','    return n % 2 == 0','print(is_even(4))'], out:'True', explain:'[[%]] gibt den Rest beim Teilen. Rest 0 heißt: gerade.', uses:['define','true']},
+        {k:'card', title:'Wörterbuch 📖', text:'Ein Wörterbuch speichert Paare: Schlüssel und Wert.', code:'ages = {"Juno": 11, "Leo": 8}\nprint(ages["Juno"])', out:'11'},
+        {k:'py', de:'Trag Nuvi mit 3 Keksen ins Wörterbuch ein.', start:'biscuits = {"Juno": 2}\n\nprint(biscuits)', check:{test:'biscuits.get("Nuvi") == 3'}, solution:'biscuits = {"Juno": 2}\nbiscuits["Nuvi"] = 3\nprint(biscuits)', hint:'In die leere Zeile: [[biscuits["Nuvi"] = 3]]', uses:[]}
+      ] },
+
+    { id:'u11l7', unit:'u11', type:'bughunt', title:'Fehlermeldungen', minutes:'5',
+      story:{ before:'Im Leuchtturm-Code krabbeln echte Bugs! 🐞', after:'Alle Bugs repariert! Python meldet keinen Fehler mehr.' },
+      plan:[
+        {k:'card', title:'Fehlermeldungen lesen 🐞', text:'Python sagt dir, was kaputt ist! [[SyntaxError]] = Schreibweise falsch, [[NameError]] = Wort unbekannt, [[IndentationError]] = Einrückung falsch.'},
+        {k:'bug', tokens:['pritn(','"Hello"',')'], bug:0, options:['print(','prnt(','Print('], fix:'print(', explain:'Ein [[NameError]]: Python kennt [[pritn]] nicht.', uses:['print','error']},
+        {k:'bug', tokens:['if','x','==','5'], bug:3, options:['5:','5;','5.'], fix:'5:', explain:'Nach der Bedingung kommt ein Doppelpunkt – sonst gibt es einen [[SyntaxError]].', uses:['if','error']},
+        {k:'bug', tokens:['for','i','in','range(3)'], bug:3, options:['range(3):','range(3);','range[3]:'], fix:'range(3):', explain:'Auch nach [[for]] kommt ein Doppelpunkt.', uses:['for']},
+        {k:'bug', tokens:['print(','"Hello',')'], bug:1, options:['"Hello"','Hello"','"Hello\''], fix:'"Hello"', explain:'Anführungszeichen kommen immer paarweise!', uses:['print','error']},
+        {k:'bug', tokens:['x','=','"5"','+','3'], bug:2, options:['5','"5','five'], fix:'5', explain:'Text + Zahl gibt einen [[TypeError]]. Ohne Anführungszeichen ist 5 eine Zahl.', uses:['error']},
+        {k:'bug', tokens:['elsif','x','>','3:'], bug:0, options:['elif','elseif','elsef'], fix:'elif', explain:'„Sonst wenn“ heißt in Python [[elif]].', uses:['else','if']},
+        {k:'bug', tokens:['Print(','"Hi"',')'], bug:0, options:['print(','PRINT(','prin('], fix:'print(', explain:'Python achtet auf Groß und Klein: [[print]] schreibt man klein!', uses:['print']},
+        {k:'bug', tokens:['x','=','true'], bug:2, options:['True','TRUE','ture'], fix:'True', explain:'In Python schreibt man [[True]] mit großem T.', uses:['true']},
+        {k:'py', de:'Dieser Code hat zwei Bugs. Repariere ihn!', start:'for i in range(3)\nprint("Bug!")', check:{out:'Bug!\nBug!\nBug!'}, solution:'for i in range(3):\n    print("Bug!")', hint:'Es fehlt ein Doppelpunkt – und die zweite Zeile braucht 4 Leerzeichen Einrückung.', explain:'Doppelpunkt und Einrückung – die zwei häufigsten Bugs überhaupt!', uses:['error','for']},
+        {k:'py', de:'Repariere den [[NameError]]!', start:'colour = "mint"\nprint(color)', check:{out:'mint'}, solution:'colour = "mint"\nprint(colour)', hint:'Vergleiche die Namen der Box genau: [[colour]] mit u!', uses:['error','print']}
+      ] },
+
+    { id:'u11boss', unit:'u11', type:'boss', title:'Boss: Der Große Bug', minutes:'8–10', reward:'acc_visor',
+      boss:{ name:'Der Große Bug', art:'bug' },
+      story:{ before:'Der Große Bug macht jedes Programm im Leuchtturm kaputt! Nur du kannst ihn aufhalten.',
+              after:{ flag:'u11show', telescope:'Durch das Fernrohr siehst du alle Inseln – und der Bug winkt dir zu. 🔭',
+                      computer:'Der Bug wohnt jetzt im alten Computer und meldet Fehler – ganz freundlich. 🐞',
+                      default:'Der Große Bug ist jetzt ein guter Bug! Der Leuchtturm strahlt. 🐞' } },
+      plan:[
+        {k:'catch', words:['print'], opts:3},
+        {k:'listen', words:['return'], opts:3},
+        {k:'spell', words:['loop'], mode:'tiles'},
+        {k:'listen', words:['true','false'], opts:4},
+        {k:'speak', words:['error']},
+        {k:'bug', tokens:['while','x','<','3'], bug:3, options:['3:','3;','3.'], fix:'3:', explain:'Auch nach [[while]] kommt ein Doppelpunkt.', uses:['while','error']},
+        {k:'catch', words:['list','input'], opts:4},
+        {k:'predict', code:'bugs = ["big", "small"]\nfor b in bugs:\n    print(b + " bug")', options:['big bug\nsmall bug','bugs\nbugs','big\nsmall'], answer:0, explain:'Die Schleife nimmt jeden Bug aus der Liste.', uses:['for','list']},
+        {k:'py', de:'Mini-Projekt: Die Funktion soll zählen, wie oft [[bug]] in der Liste steht.', start:'def count_bugs(things):\n    n = 0\n    for t in things:\n        n = n\n    return n\n\nprint(count_bugs(["bug", "cat", "bug"]))', check:{test:'count_bugs(["bug", "bug", "x", "bug"]) == 3 and count_bugs([]) == 0'}, solution:'def count_bugs(things):\n    n = 0\n    for t in things:\n        if t == "bug":\n            n = n + 1\n    return n\n\nprint(count_bugs(["bug", "cat", "bug"]))', hint:'In die Schleife: [[if t == "bug":]] und darunter (eingerückt) [[n = n + 1]].', explain:'Schleife, [[if]] und [[return]] zusammen – das ist echtes Programmieren!', uses:['if','for','return','loop']},
+        {k:'listen', words:['and','or','not'], opts:4},
+        {k:'catch', words:['define','while'], opts:4},
+        {k:'spell', words:['if'], mode:'tiles'},
+        {k:'listen', words:['else','for'], opts:4},
+        {k:'dialogue', id:'d_bug'}
+      ] },
+
+    { id:'u11secret', unit:'u11', type:'falling', secret:true, title:'Geheim: Code-Regen', minutes:'3', reward:'room_lighthouse',
+      story:{ before:'Psst … ganz oben im Leuchtturm regnet es Python-Wörter! ☔', after:'Du hast den Code-Regen gemeistert! 🗼' },
+      plan:[ {k:'falling', words:['print','input','if','else','for','while','true','false','list','loop'], rounds:8, opts:3} ] }
+  ],
+
+  dialogues: {
+    d_pixel: { npc:'pixel', nodes:[
+      { say:'Hello! I am Professor Pixel. Welcome to my lighthouse!', de:'Hallo! Ich bin Professor Pixel. Willkommen in meinem Leuchtturm!' },
+      { ask:'Begrüße ihn!', options:[ {en:'Hello, Professor Pixel!', ok:true}, {en:'Goodbye, Professor!', hint:'Du bist gerade erst angekommen 🙂'} ] },
+      { say:'Computers speak English. Do you know a Python word?', de:'Computer sprechen Englisch. Kennst du ein Python-Wort?' },
+      { ask:'Nenn ein Python-Wort!', options:[ {en:'Yes! Banana shows text.', hint:'Welches Wort zeigt Text an? 🖨️'}, {en:'Yes! Print shows text.', ok:true} ] },
+      { say:'Great! And what does return do?', de:'Super! Und was macht return?' },
+      { ask:'[[return]] gibt etwas zurück.', options:[ {en:'It gives back a result.', ok:true}, {en:'It is a colour.', hint:'[[return]] heißt „zurückgeben“.'} ] },
+      { story:'Prof. Pixel will dir etwas zeigen. Was willst du sehen?', flag:'u11show', options:[ {de:'🔭 Das Fernrohr', value:'telescope'}, {de:'💾 Den alten Computer', value:'computer'} ] },
+      { say:'Look! An error! Can you fix it?', de:'Schau! Ein Fehler! Kannst du ihn reparieren?' },
+      { ask:'Klar kannst du das!', options:[ {en:'Yes, I can fix the error!', ok:true}, {en:'No, it is not true.', hint:'Du hast schon so viele Bugs gefangen! 🐞'} ] }
+    ]},
+    d_bug: { npc:'bug', nodes:[
+      { say:'Error! Error! I break every program!', de:'Fehler! Fehler! Ich mache jedes Programm kaputt!' },
+      { ask:'Bleib ruhig und frag ihn!', options:[ {en:'Why are you so angry?', ok:true}, {en:'Print the bug!', hint:'Frag ihn, warum er so wütend ist 🤔'} ] },
+      { say:'Nobody likes bugs. Everybody wants to delete me.', de:'Niemand mag Bugs. Alle wollen mich löschen.' },
+      { ask:'Sag ihm: Bugs helfen beim Lernen!', options:[ {en:'Bugs are false.', hint:'Jeder Bug zeigt uns etwas Neues 🐞'}, {en:'Bugs help us learn!', ok:true} ] },
+      { say:'Really? Is that true?', de:'Wirklich? Ist das wahr?' },
+      { ask:'Ja, das ist wahr!', options:[ {en:'Yes, it is true!', ok:true}, {en:'No, it is false!', hint:'Es stimmt doch – [[True]]!'} ] },
+      { say:'Then I am a good bug! Thank you!', de:'Dann bin ich ein guter Bug! Danke!' }
+    ]}
+  },
+
+  items: [
+    { id:'acc_visor',       kind:'acc', slot:'face', name:'Pixel-Visier', price:null },
+    { id:'room_duck',       kind:'room', name:'Debug-Ente',     price:null, pos:{x:84,y:76,w:10} },
+    { id:'room_lighthouse', kind:'room', name:'Mini-Leuchtturm', price:null, pos:{x:6,y:62,w:10} },
+    { id:'room_floppy',     kind:'room', name:'Diskette',       price:null, pos:{x:28,y:62,w:9} }
+  ],
+  badges: [
+    { id:'b_py',        name:'Python-Starterin', desc:'Dein erstes echtes Python-Programm', emblem:'code',   when:{level:'u11l1'} },
+    { id:'b_boss_u11',  name:'Code-Meisterin',   desc:'Der Große Bug ist ein guter Bug',    emblem:'python', when:{level:'u11boss'} }
+  ],
+  secrets: [ { id:'s_u11_floppy', unit:'u11', item:'room_floppy', x:14, y:30, text:'Du hast eine alte Diskette gefunden! 💾' } ]
+});
+</script>

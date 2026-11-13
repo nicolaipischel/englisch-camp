@@ -50,7 +50,8 @@ const PY = {
     let passed = !err;
     if (passed && check.out != null) passed = PY.same(out, sub(check.out));
     if (passed && check.has) passed = check.has.every(h => out.includes(sub(h)));
-    if (passed && check.test) passed = !!py.runPython(sub(check.test), { globals: ns });
+    /* an exception inside the check (e.g. the function was never defined) means: not solved yet */
+    if (passed && check.test) passed = py.runPython(`try:\n    _ec_ok = bool(${sub(check.test)})\nexcept Exception:\n    _ec_ok = False\n_ec_ok`, { globals: ns }) === true;
     ns.destroy();
     return { ok: !err, out, shown, err, passed };
   },
