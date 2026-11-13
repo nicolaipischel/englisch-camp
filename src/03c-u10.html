@@ -1,0 +1,158 @@
+<script>
+/* ==========================================================================================
+   WORLD u10 – Festbucht (harbour at night, gold). Birthday, months, ordinals; present progressive.
+   Code Lab: mini project (party planner: lists + loops + if + dict). Boss: Glimmer, a shy dragon
+   whose birthday nobody knows – the finale party. Months are capitalised: build/speak, no tiles.
+   ========================================================================================== */
+addWorld({
+  unit: { id:'u10', num:10, title:'Festbucht', subtitle:'Geburtstag & Monate', accent:'#d4a017', scene:'bay', dark:true, status:'open', after:'u9',
+    monster:['spark-1','spark-2','spark-3'], monsterNames:['Funki','Funkel','Funkelstella'],
+    intro:'In der Festbucht wird gefeiert! Nur ein kleiner Drache sitzt allein im Dunkeln. 🎆' },
+
+  words: [
+    { id:'january',   unit:'u10', cat:'month', en:'January',   de:'Januar',    icon:'month:1',  pron:'DSCHÄ-nju-ri', exampleEn:'January is cold.',             exampleDe:'Der Januar ist kalt.' },
+    { id:'february',  unit:'u10', cat:'month', en:'February',  de:'Februar',   icon:'month:2',  pron:'FÄB-ru-ri',   exampleEn:'February is short.',           exampleDe:'Der Februar ist kurz.' },
+    { id:'march',     unit:'u10', cat:'month', en:'March',     de:'März',      icon:'month:3',  pron:'maatsch',     exampleEn:'In March the flowers come.',   exampleDe:'Im März kommen die Blumen.' },
+    { id:'april',     unit:'u10', cat:'month', en:'April',     de:'April',     icon:'month:4',  pron:'ÄI-pril',     exampleEn:'April is rainy.',              exampleDe:'Der April ist regnerisch.' },
+    { id:'may',       unit:'u10', cat:'month', en:'May',       de:'Mai',       icon:'month:5',  pron:'mäi',         exampleEn:'My birthday is in May.',       exampleDe:'Mein Geburtstag ist im Mai.' },
+    { id:'june',      unit:'u10', cat:'month', en:'June',      de:'Juni',      icon:'month:6',  pron:'dschuun',     exampleEn:'In June we go swimming.',      exampleDe:'Im Juni gehen wir schwimmen.' },
+    { id:'july',      unit:'u10', cat:'month', en:'July',      de:'Juli',      icon:'month:7',  pron:'dschu-LAI',   exampleEn:'July is hot.',                 exampleDe:'Der Juli ist heiß.' },
+    { id:'august',    unit:'u10', cat:'month', en:'August',    de:'August',    icon:'month:8',  pron:'O-gast',      exampleEn:'In August we are on holiday.', exampleDe:'Im August haben wir Ferien.' },
+    { id:'september', unit:'u10', cat:'month', en:'September', de:'September', icon:'month:9',  pron:'sep-TÄM-ber', exampleEn:'School starts in September.',   exampleDe:'Die Schule beginnt im September.' },
+    { id:'october',   unit:'u10', cat:'month', en:'October',   de:'Oktober',   icon:'month:10', pron:'ok-TOU-ber',  exampleEn:'October is orange.',           exampleDe:'Der Oktober ist orange.' },
+    { id:'november',  unit:'u10', cat:'month', en:'November',  de:'November',  icon:'month:11', pron:'no-WÄM-ber',  exampleEn:'November is grey.',            exampleDe:'Der November ist grau.' },
+    { id:'december',  unit:'u10', cat:'month', en:'December',  de:'Dezember',  icon:'month:12', pron:'di-SÄM-ber',  exampleEn:'December is my favourite month.', exampleDe:'Der Dezember ist mein Lieblingsmonat.' },
+    { id:'birthday',  unit:'u10', cat:'party', en:'birthday',  de:'Geburtstag', icon:'birthday', emoji:'🎂',       exampleEn:'Happy birthday!',              exampleDe:'Alles Gute zum Geburtstag!' },
+    { id:'party',     unit:'u10', cat:'party', en:'party',     de:'Party / Feier', icon:'party', emoji:'🥳', pron:'PAA-ti', exampleEn:'Come to my party!',       exampleDe:'Komm zu meiner Party!' },
+    { id:'present',   unit:'u10', cat:'party', en:'present',   de:'Geschenk',  icon:'present',  emoji:'🎁', pron:'PRÄ-sent', exampleEn:'This present is for you.',   exampleDe:'Dieses Geschenk ist für dich.' },
+    { id:'balloon',   unit:'u10', cat:'party', en:'balloon',   de:'Luftballon', icon:'balloon', emoji:'🎈', pron:'ba-LUUN', exampleEn:'The balloon is gold.',        exampleDe:'Der Luftballon ist golden.' },
+    { id:'first',     unit:'u10', cat:'order', en:'first',     de:'erste / erster', icon:'first', emoji:'🥇', pron:'först', exampleEn:'My birthday is on the first of May.', exampleDe:'Mein Geburtstag ist am ersten Mai.' },
+    { id:'second',    unit:'u10', cat:'order', en:'second',    de:'zweite / zweiter', icon:'second', emoji:'🥈', pron:'SÄ-kend', exampleEn:'Juno is second.',  exampleDe:'Juno ist Zweite.' }
+  ],
+
+  levels: [
+    { id:'u10l1', unit:'u10', type:'catch', title:'Wintermonate', minutes:'2–3',
+      story:{ before:'Über der Festbucht leuchten Monats-Laternen. Fang sie ein!', after:'Die ersten Laternen leuchten! 🏮' },
+      plan:[ {intro:['january','february','march','april']},
+             {k:'catch', words:['january','february','march','april'], reps:2, opts:3},
+             {k:'speak', words:['january','february']} ] },
+
+    { id:'u10l2', unit:'u10', type:'listen', title:'Sommermonate', minutes:'3',
+      story:{ before:'Die Boote rufen sich Monate zu. Hör genau hin! 👂', after:'Stark! Schon acht Monate geschafft.' },
+      plan:[ {intro:['may','june','july','august']},
+             {k:'listen', words:['may','june','july','august'], reps:2, opts:3},
+             {k:'speak', words:['may','june','july','august']} ] },
+
+    { id:'u10l3', unit:'u10', type:'memory', title:'Herbst-Memory', minutes:'3–4',
+      story:{ before:'Auf dem Steg liegen Monatskarten. Finde die Paare!', after:'Alle zwölf Monate gefunden! 🍂' },
+      plan:[ {intro:['september','october','november','december']},
+             {k:'memory', words:['september','october','november','december','march','april']},
+             {k:'listen', words:['september','october','november','december'], reps:1, opts:3},
+             {k:'speak', words:['september','october','november','december']} ] },
+
+    { id:'u10l4', unit:'u10', type:'dialogue', title:'Wann hast du Geburtstag?', minutes:'3–4',
+      story:{ before:'Juno hat bald Geburtstag! Sie erzählt dir alles.', after:'Juno freut sich riesig auf ihre Party! 🎈' },
+      plan:[ {intro:['birthday','party','present','balloon']},
+             {k:'dialogue', id:'d_u10_juno'},
+             {k:'speak', words:['birthday','present']} ] },
+
+    { id:'u10l5', unit:'u10', type:'spell', title:'Einladungskarten', minutes:'3–4',
+      story:{ before:'Für die große Party braucht es Einladungen. Schreibst du sie?', after:'Alle Einladungen sind verschickt! ✨' },
+      plan:[ {intro:['first','second']},
+             {k:'spell', words:['party','first','second','balloon'], mode:'tiles'},
+             {k:'spell', words:['birthday','present'], mode:'first'},
+             {k:'build', parts:['My','birthday','is','in','March.'], de:'Mein Geburtstag ist im März.', py:'print("My birthday is in March.")', uses:['birthday','march']},
+             {k:'build', parts:['The','party','is','on','the','first','of','April.'], de:'Die Party ist am ersten April.', py:'print("The party is on the first of April.")', uses:['party','first','april']},
+             {k:'build', parts:['School','starts','in','September.'], de:'Die Schule beginnt im September.', py:'print("School starts in September.")', uses:['september']},
+             {k:'build', parts:['It','is','the','second','of','December.'], de:'Es ist der zweite Dezember.', py:'print("It is the second of December.")', uses:['second','december']} ] },
+
+    { id:'u10l6', unit:'u10', type:'codelab', title:'Code Lab: Party-Planer', minutes:'5–6', reward:'room_garland',
+      story:{ before:'Mini-Projekt! Prof. Pixel und du programmiert den Party-Planer für die Festbucht.', after:'Der Party-Planer läuft. Das war ein echtes Projekt! 💻' },
+      plan:[
+        {k:'card', title:'Mini-Projekt: Party-Planer 🎉', text:'Jetzt kommt alles zusammen: Listen, Schleifen und [[if]]. Zuerst die Gästeliste!', code:'guests = ["Juno", "Knarz", "Hoppel"]\nfor guest in guests:\n    print("Welcome, " + guest + "!")', out:'Welcome, Juno!\nWelcome, Knarz!\nWelcome, Hoppel!'},
+        {k:'predict', code:'month = "May"\nif month == "May":\n    print("Happy birthday!")\nelse:\n    print("Not yet!")', options:['Happy birthday!','Not yet!','May'], answer:0, explain:'In [[month]] liegt „May“ – also ist heute Geburtstag!', uses:['may','birthday']},
+        {k:'order', de:'Bau den Countdown: 3, 2, 1 – Party!', lines:['n = 3','while n > 0:','    print(n)','    n = n - 1','print("Party!")'], out:'3\n2\n1\nParty!', explain:'Erst zählt die Schleife runter. [[Party!]] steht nicht eingerückt – es kommt danach.', uses:['party']},
+        {k:'trace', code:'balloons = ["red"]\nballoons.append("blue")\nballoons.append("gold")\ncount = len(balloons)', var:'balloons', steps:[{v:"['red']", alt:["['blue']",'[]']},{v:"['red', 'blue']", alt:["['blue', 'red']","['blue']"]},{v:"['red', 'blue', 'gold']", alt:["['gold', 'red', 'blue']","['red', 'gold']"]},{v:"['red', 'blue', 'gold']", alt:['3',"['red', 'blue', 'gold', 3]"]}], explain:'Die letzte Zeile ändert [[balloons]] nicht – sie zählt nur. In [[count]] liegt 3.', uses:['balloon']},
+        {k:'predict', code:'months = ["January", "February", "March"]\nprint(months[0])\nprint(len(months))', options:['January\n3','February\n3','January\n2'], answer:0, explain:'Fach 0 ist [[January]], und die Liste hat 3 Teile.', uses:['january','february','march']},
+        {k:'predict', code:'presents = {"Juno": "book", "Knarz": "shell"}\nfor name in presents:\n    print(name + ": " + presents[name])', options:['Juno: book\nKnarz: shell','book\nshell','Juno\nKnarz'], answer:0, explain:'Die Schleife nimmt jeden Namen und holt sein Geschenk aus dem Wörterbuch.', uses:['present']},
+        {k:'build', parts:['My','birthday','is','in','October.'], de:'Mein Geburtstag ist im Oktober.', py:'print("My birthday is in October.")', uses:['birthday','october']},
+        {k:'build', code:true, parts:['for','guest','in','guests',':'], de:'Bau eine Schleife über alle Gäste!', py:'for guest in guests:\n    print("Hi, " + guest)', uses:['party']},
+        {k:'build', parts:['Juno','is','dancing','at','the','party.'], de:'Juno tanzt (gerade) auf der Party.', py:'print("Juno is dancing at the party.")', uses:['party']}
+      ] },
+
+    { id:'u10l7', unit:'u10', type:'bughunt', title:'Bug-Jagd: is dancing', minutes:'3–4',
+      story:{ before:'Auf den Einladungen krabbeln Bugs! 🐞', after:'Alle Bugs gefangen! Sie dürfen mitfeiern.' },
+      plan:[
+        {k:'card', title:'Bug-Jagd 🐞', text:'Was passiert gerade? am/is/are + -ing: [[Juno is dancing.]] [[We are singing.]] Monate schreibt man groß: [[May]]. Erster = [[first]], zweiter = [[second]].'},
+        {k:'bug', tokens:['Juno','are','dancing','at','the','party.'], bug:1, options:['is','am','be'], fix:'is', explain:'Juno = [[she]]: [[is dancing]].', uses:['party']},
+        {k:'bug', tokens:['We','is','singing','Happy','Birthday.'], bug:1, options:['are','am','be'], fix:'are', explain:'Bei [[we]]: [[are singing]].', uses:['birthday']},
+        {k:'bug', tokens:['I','am','eat','cake.'], bug:2, options:['eating','eats','eated'], fix:'eating', explain:'Gerade jetzt: [[am eating]] – mit -ing.', uses:[]},
+        {k:'bug', tokens:['My','birthday','is','in','june.'], bug:4, options:['June.','Juni.','Jun.'], fix:'June.', explain:'Monate schreibt man groß: [[June]] – und ohne i.', uses:['june','birthday']},
+        {k:'bug', tokens:['It','is','the','frist','of','May.'], bug:3, options:['first','firts','furst'], fix:'first', explain:'Erster = [[first]] – erst i, dann r.', uses:['first','may']},
+        {k:'bug', tokens:['The','secund','of','March.'], bug:1, options:['second','sekond','secont'], fix:'second', explain:'Zweiter = [[second]] – mit c und d.', uses:['second','march']},
+        {k:'bug', tokens:['Two','ballons','for','Juno!'], bug:1, options:['balloons','baloons','ballones'], fix:'balloons', explain:'Luftballon = [[balloon]] – zweimal l, zweimal o.', uses:['balloon']},
+        {k:'bug', tokens:['A','presant','for','you!'], bug:1, options:['present','präsent','presend'], fix:'present', explain:'Geschenk = [[present]] – mit e.', uses:['present']},
+        {k:'bug', tokens:['See','you','in','Agust!'], bug:3, options:['August!','Augst!','Ogust!'], fix:'August!', explain:'August = [[August]] – wie im Deutschen.', uses:['august']},
+        {k:'bug', tokens:['My','party','is','in','Febuary.'], bug:4, options:['February.','Februar.','Febrary.'], fix:'February.', explain:'Februar = [[February]] – mit r-u-a-r-y.', uses:['party','february']}
+      ] },
+
+    { id:'u10boss', unit:'u10', type:'boss', title:'Boss: Drache Glimmer', minutes:'6–8', reward:'acc_party',
+      boss:{ name:'Glimmer', art:'dragon' },
+      story:{ before:'Drache Glimmer sitzt allein in der dunklen Bucht. Sein Feuerwerk will nicht zünden. Warum ist er so traurig?',
+              after:{ flag:'u10month', may:'Glimmer verspricht: Im Mai kommt er zu DEINER Party – mit Feuerwerk! 🎆',
+                      december:'Glimmer verspricht: Im Dezember kommt er zu DEINER Party – mit Feuerwerk! 🎆',
+                      default:'Das Feuerwerk leuchtet über der ganzen Festbucht! 🎆' } },
+      plan:[
+        {k:'catch', words:['birthday'], opts:3},
+        {k:'listen', words:['march'], opts:3},
+        {k:'spell', words:['party'], mode:'tiles'},
+        {k:'listen', words:['january','april'], opts:4},
+        {k:'speak', words:['present']},
+        {k:'bug', tokens:['They','is','coming','to','the','party.'], bug:1, options:['are','am','be'], fix:'are', explain:'Bei [[they]]: [[are coming]].', uses:['party']},
+        {k:'catch', words:['balloon','present'], opts:4},
+        {k:'build', parts:['Happy','birthday,','Glimmer!'], de:'Alles Gute zum Geburtstag, Glimmer!', py:'print("Happy birthday, Glimmer!")', uses:['birthday']},
+        {k:'predict', code:'guests = ["Juno", "Knarz", "Hoppel"]\nprint(len(guests))', options:['3','2','Juno'], answer:0, explain:'3 Gäste – Glimmer ist nicht mehr allein!', uses:['party']},
+        {k:'listen', words:['september','october'], opts:4},
+        {k:'catch', words:['first','second'], opts:4},
+        {k:'listen', words:['november','december','june'], opts:4},
+        {k:'listen', words:['july','august','may'], opts:4},
+        {k:'dialogue', id:'d_glimmer'}
+      ] },
+
+    { id:'u10secret', unit:'u10', type:'falling', secret:true, title:'Geheim: Konfettiregen', minutes:'3', reward:'room_cake',
+      story:{ before:'Psst … über dem Steg regnet es Konfetti! ☔', after:'Du hast den Konfettiregen gemeistert! 🎂' },
+      plan:[ {k:'falling', words:['january','march','may','july','september','november','birthday','party','balloon'], rounds:8, opts:3} ] }
+  ],
+
+  dialogues: {
+    d_u10_juno: { npc:'juno', nodes:[
+      { say:'When is your birthday?', de:'Wann hast du Geburtstag?' },
+      { story:'In welchem Monat hast du Geburtstag? Such dir einen aus!', flag:'u10month', options:[ {de:'🌸 Im Mai', value:'may'}, {de:'❄️ Im Dezember', value:'december'} ] },
+      { say:'Cool! My birthday is in July. On the first of July!', de:'Cool! Mein Geburtstag ist im Juli. Am ersten Juli!' },
+      { ask:'Frag: Machst du eine Party?', options:[ {en:'Are you having a party?', ok:true}, {en:'Are you have a party?', hint:'Bald oder gerade: [[are you having]].'} ] },
+      { say:'Yes! We are making a cake right now.', de:'Ja! Wir backen gerade einen Kuchen.' },
+      { ask:'Gratuliere ihr schon mal!', options:[ {en:'Happy Monday, Juno!', hint:'Es geht um ihren Geburtstag 🎂'}, {en:'Happy birthday, Juno!', ok:true} ] },
+      { say:'Thank you! Here is a balloon for you.', de:'Danke! Hier ist ein Luftballon für dich.' },
+      { ask:'Bedank dich!', options:[ {en:'Thank you! It is beautiful!', ok:true}, {en:'Sorry! It is a cake!', hint:'Juno schenkt dir einen Ballon – sag danke 🎈'} ] }
+    ]},
+    d_glimmer: { npc:'dragon', nodes:[
+      { say:'Nobody knows my birthday. Nobody comes to my party.', de:'Niemand kennt meinen Geburtstag. Niemand kommt zu meiner Party.' },
+      { ask:'Frag ihn nach seinem Geburtstag!', options:[ {en:'When is your birthday?', ok:true}, {en:'Where is your birthday?', hint:'Nach der Zeit fragst du mit [[When]].'} ] },
+      { say:"It's today! The second of November!", de:'Heute! Am zweiten November!' },
+      { ask:'Gratuliere ihm!', options:[ {en:'Goodbye, Glimmer!', hint:'Heute ist sein Geburtstag! 🎂'}, {en:'Happy birthday, Glimmer!', ok:true} ] },
+      { say:'Look! Who is coming?', de:'Schau! Wer kommt da?' },
+      { ask:'Alle deine Freunde kommen gerade!', options:[ {en:'Juno, Knarz and Hoppel are coming to your party!', ok:true}, {en:'Juno, Knarz and Hoppel is go home.', hint:'Alle kommen gerade zur Party: [[are coming]].'} ] },
+      { say:'My friends! This is the best party! Thank you!', de:'Meine Freunde! Das ist die beste Party! Danke!' }
+    ]}
+  },
+
+  items: [
+    { id:'acc_party',    kind:'acc', slot:'head', name:'Partyhut', price:null },
+    { id:'room_garland', kind:'room', name:'Wimpelkette', price:null, pos:{x:50,y:12,w:40} },
+    { id:'room_cake',    kind:'room', name:'Geburtstagstorte', price:null, pos:{x:76,y:76,w:14} },
+    { id:'room_lantern', kind:'room', name:'Laterne',     price:null, pos:{x:6,y:30,w:10} }
+  ],
+  badges: [ { id:'b_boss_u10', name:'Festkönigin', desc:'Glimmer feiert mit allen', emblem:'cake', when:{level:'u10boss'} } ],
+  secrets: [ { id:'s_u10_lantern', unit:'u10', item:'room_lantern', x:14, y:26, text:'Du hast eine leuchtende Laterne gefunden! 🏮' } ]
+});
+</script>
