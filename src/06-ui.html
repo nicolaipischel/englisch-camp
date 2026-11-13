@@ -23,16 +23,15 @@ function applyLook() {
   if (m) m.content = { sylveon:'#ffd6ea', umbreon:'#1b1937', mew:'#ffd9ea' }[S.settings.theme] || '#ffd6ea';
 }
 
-/* companion dock: Nuvi + speech bubble (max 2 lines) + read-aloud for German */
+/* companion dock: Nuvi + speech bubble (max 2 lines); no read-aloud: the device voice clashed with the recorded clips */
 function dock(mood = 'happy', text = '') {
-  const d = el(`<div class="dock"><button class="mini" style="border:0;background:none;padding:0" aria-label="Nuvi">${ART.nuvi(mood)}</button><div class="bubble"><span class="txt"></span><button class="ibtn" aria-label="Vorlesen">${IC('speaker')}</button></div></div>`);
+  const d = el(`<div class="dock"><button class="mini" style="border:0;background:none;padding:0" aria-label="Nuvi">${ART.nuvi(mood)}</button><div class="bubble"><span class="txt"></span></div></div>`);
   let taps = 0;
   d.querySelector('.mini').onclick = () => {
     taps++; Sfx.play('pop');
     if (taps === 7) { taps = 0; setDock(d, 'cheer', 'Psst: Mein Lieblings-Pokémon ist … Umbreon! Nein, Sylveon! Nein, Mew! 😵‍💫'); return; }
     setDock(d, 'cheer', rnd(CONTENT.lines.idle));
   };
-  d.querySelector('.bubble .ibtn').onclick = () => sayDe(d.dataset.say || '');
   setDock(d, mood, text);
   return d;
 }
@@ -43,7 +42,6 @@ function setDock(d, mood, text, soft = false) {
   b.classList.toggle('soft', soft);
   b.style.visibility = text ? 'visible' : 'hidden';
   b.querySelector('.txt').innerHTML = fmt(text);
-  d.dataset.say = plain(text);
   b.style.animation = 'none'; void b.offsetWidth; b.style.animation = '';
   if (text) live(plain(text));
 }

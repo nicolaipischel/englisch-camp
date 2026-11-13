@@ -43,10 +43,8 @@ SCREENS.onb = step => {
   } else {
     node = el(`<div class="screen onb">${dots}
       <div class="hero" style="width:200px">${ART.nuvi('cheer', 'cheer')}</div>
-      <div class="bubble" style="flex:none"><span class="txt">${fmt('Ich bin Nuvi, dein Trainingspartner! [[Hello]], ' + playerName() + '!')}</span><button class="ibtn" data-say aria-label="Anhören">${IC('speaker')}</button></div>
+      <div class="bubble" style="flex:none"><span class="txt">${fmt('Ich bin Nuvi, dein Trainingspartner! [[Hello]], ' + playerName() + '!')}</span></div>
       <button class="btn pri big block" data-n>Zum ersten Level!</button></div>`);
-    $('[data-say]', node).onclick = () => sayEn('Hello, ' + playerName() + '!');
-    setTimeout(() => sayEn('Hello, ' + playerName() + '!'), 300);
     $('[data-n]', node).onclick = () => { S.onboarded = true; save(); startLevel(CONTENT.levels[0].id); };
   }
   return node;
@@ -163,12 +161,11 @@ function levelSheet(lv) {
   const resumeHere = S.resume && S.resume.levelId === lv.id;
   const it = lv.reward && ITEM(lv.reward);
   sheet(`<div class="row"><span style="width:44px;color:var(--pri)">${IC(lv.type)}</span><div><span class="tag">${{ catch:'Fangen', listen:'Hören', memory:'Memory', dialogue:'Gespräch', spell:'Schreiben', codelab:'Code Lab', bughunt:'Bug-Jagd', boss:'Boss', falling:'Mini-Game' }[lv.type] || ''} · ca. ${esc(lv.minutes || '3')} Min.</span><h2 style="margin:0">${esc(lv.title)}</h2></div></div>
-    <div class="dock" style="padding:6px 0"><div class="mini">${ART.nuvi(lv.type === 'boss' ? 'surprised' : 'happy')}</div><div class="bubble"><span class="txt">${fmt(lv.story ? lv.story.before : '')}</span><button class="ibtn" data-sd aria-label="Vorlesen">${IC('speaker')}</button></div></div>
+    <div class="dock" style="padding:6px 0"><div class="mini">${ART.nuvi(lv.type === 'boss' ? 'surprised' : 'happy')}</div><div class="bubble"><span class="txt">${fmt(lv.story ? lv.story.before : '')}</span></div></div>
     <div class="row wrap" style="margin:6px 0 14px">${done ? `<span class="chip">${[1, 2, 3].map(k => ART.star(k <= rec.stars)).join('')}</span>` : ''}
       <span class="chip">${it && !S.owned.includes(it.id) ? '🎁 Überraschung' : ART.coin() + ' Bonus-Münzen'}</span></div>
     <div class="stack"><button class="btn pri big block" data-start>${resumeHere ? 'Weitermachen' : done ? 'Nochmal spielen' : 'Start!'}</button>
     ${resumeHere ? '<button class="btn ghost block" data-fresh>Von vorne beginnen</button>' : ''}</div>`, sh => {
-    sh.querySelector('[data-sd]').onclick = () => sayDe(plain(lv.story ? lv.story.before : ''));
     sh.querySelector('[data-start]').onclick = () => { closeSheet(); resumeHere ? resumeLevel() : startLevel(lv.id); };
     const f = sh.querySelector('[data-fresh]'); if (f) f.onclick = () => { closeSheet(); startLevel(lv.id); };
   });
@@ -193,7 +190,7 @@ SCREENS.result = r => {
     ${r.turbo != null ? `<div class="bigword"><span style="font-size:3rem;font-weight:900">${r.turbo}</span><br><span class="muted" style="font-size:1rem">richtige Antworten</span></div>`
       : `<div class="bigstars" aria-label="${r.stars} von 3 Sternen">${[1, 2, 3].map(k => ART.star(k <= r.stars, k <= r.stars ? 'on' : '')).join('')}</div>`}
     <div class="gains"><span class="chip">+${r.xp} XP</span><span class="chip">${ART.coin()} +${r.coins}</span></div>
-    ${r.story ? `<div class="bubble" style="flex:none;width:100%"><span class="txt">${fmt(r.story)}</span><button class="ibtn" data-sd aria-label="Vorlesen">${IC('speaker')}</button></div>` : ''}
+    ${r.story ? `<div class="bubble" style="flex:none;width:100%"><span class="txt">${fmt(r.story)}</span></div>` : ''}
     <div class="reveal-area stack" style="width:100%;align-items:center">
       ${r.prize ? `<button class="gift" data-gift aria-label="Geschenk öffnen">${ART.gift(false)}</button><b>Tipp aufs Geschenk!</b>` : ''}
     </div>
@@ -202,7 +199,6 @@ SCREENS.result = r => {
   Sfx.play('reward'); vib([30, 40, 30]);
   if (r.stars === 3 || r.best) setTimeout(() => burst(innerWidth / 2, innerHeight * .3, 18), 400);
   const area = $('.reveal-area', node);
-  const sd = $('[data-sd]', node); if (sd) sd.onclick = () => sayDe(plain(r.story));
   const gift = $('[data-gift]', node);
   if (gift) gift.onclick = async () => {
     gift.style.animation = 'none'; gift.innerHTML = ART.gift(true); Sfx.play('pop');
