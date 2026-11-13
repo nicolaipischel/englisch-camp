@@ -135,6 +135,33 @@ const note = m => { problems.push(m); console.log('PROBLEM:', m); };
           await tap(`.tok[data-i="${t.bug}"]`);
           await page.locator(`[data-o]`).filter({ hasText: await page.evaluate(f => sub(f), t.fix) }).first().click();
           await page.waitForTimeout(300); await tap('.foot .btn'); break;
+        case 'order': {
+          const lines = await page.evaluate(() => Run.tasks[Run.idx].lines.map(sub));
+          for (const l of lines) await page.evaluate(p => [...document.querySelectorAll('.otile:not(.used)')].find(b => b.dataset.p === p).click(), l);
+          await page.waitForTimeout(300); await tap('.foot .btn'); break;
+        }
+        case 'trace': {
+          // steps advance in order: answer step k with steps[k].v
+          const steps = await page.evaluate(() => Run.tasks[Run.idx].steps.map(s => s.v));
+          for (const v of steps) {
+            const okClick = await page.evaluate(val => { const b = [...document.querySelectorAll('.topts [data-o]')].find(x => x.dataset.o === val); if (b) b.click(); return !!b; }, v);
+            if (!okClick) { note('trace: expected value not offered in ' + st.level); break; }
+            await page.waitForTimeout(250);
+          }
+          await tap('.foot .btn'); break;
+        }
+        case 'py': {
+          const sol = await page.evaluate(() => sub(Run.tasks[Run.idx].solution));
+          await page.fill('.pyed', sol);
+          await page.waitForFunction(() => !document.querySelector('[data-run]') || !document.querySelector('[data-run]').disabled || document.querySelector('[data-skip]'), null, { timeout: 180000 });
+          if (await page.locator('[data-skip]').count()) { note('py: Python did not load, skipped ' + st.level); await tap('[data-skip]'); }
+          else await tap('[data-run]');
+          await page.waitForFunction(() => document.querySelector('.foot .btn') || document.querySelector('.console.meh') || document.querySelector('[data-skip]'), null, { timeout: 60000 });
+          if (await page.locator('.console.meh').count()) { note('py: solution failed in ' + st.level + ': ' + await page.locator('.out').innerText()); break; }
+          if (await page.locator('[data-skip]').count() && !(await page.locator('.foot .btn').count())) { note('py: Python failed ' + st.level); await tap('[data-skip]'); }
+          if (!shotKinds.has('py-done')) { shotKinds.add('py-done'); await shot('k-py-done-' + st.level); }
+          await tap('.foot .btn'); break;
+        }
         case 'falling': {
           let g = 0;
           while (g++ < 20) {
@@ -161,22 +188,41 @@ const note = m => { problems.push(m); console.log('PROBLEM:', m); };
 
   // first level started from onboarding
   let s = await playLevel(); await finishResult('u1l1');
-  const order = ['u1l2', 'u1l3', 'u1l4', 'u1l5', 'u1l6', 'u1l7', 'u1boss', 'u1secret'];
-  for (const id of order) {
+  // --units=u2,u3 plays only these units (earlier units are marked done); default: all open units
+  const ONLY = (process.argv.find(a => a.startsWith('--units=')) || '').slice(8).split(',').filter(Boolean);
+  const units = await page.evaluate(() => CONTENT.units.filter(u => u.status === 'open').map(u => u.id));
+  const gate = await page.evaluate(() => ({ u2: unitOpen('u2'), u11: unitOpen('u11') }));
+  if (gate.u2 || gate.u11) note('unit gating: u2/u11 open before their prerequisite boss: ' + JSON.stringify(gate));
+  if (ONLY.length) {
+    await page.evaluate(only => { CONTENT.levels.filter(l => !only.includes(l.unit) && !l.secret).forEach(l => { S.levels[l.id] = { done: true, stars: 3, plays: 1 }; }); save(); go('map'); }, ONLY);
+  }
+  const play = ONLY.length ? ONLY : units;
+  for (const uid of play) {
+    const ids = await page.evaluate(u => CONTENT.levels.filter(l => l.unit === u).map(l => l.id), uid);
+    for (const id of ids) {
+      if (id === 'u1l1') continue;
+      await page.waitForTimeout(300);
+      if (id === 'u1l2') { await shot('map-after-l1'); await checkLayout('map'); }
+      if (id === 'u5l1' && !ONLY.length && !(await page.evaluate(() => unitOpen('u11')))) note('unit gating: u11 not open after u4 boss');
+      const found = await page.evaluate(i => { const n = document.querySelector(`.node[data-l="${i}"]`); if (n) n.scrollIntoView({ block: 'center' }); return !!n; }, id);
+      if (!found) { note('map node missing: ' + id); continue; }
+      await tap(`.node[data-l="${id}"]`);
+      await page.waitForTimeout(300);
+      if (id === 'u1l2') await shot('sheet');
+      await tap('[data-start]');
+      s = await playLevel();
+      await finishResult(id);
+    }
     await page.waitForTimeout(300);
-    if (id === 'u1l2') { await shot('map-after-l1'); await checkLayout('map'); }
-    await page.evaluate(i => document.querySelector(`.node[data-l="${i}"]`).scrollIntoView({block:"center"}), id);
-    await tap(`.node[data-l="${id}"]`);
-    await page.waitForTimeout(300);
-    if (id === 'u1l2') await shot('sheet');
-    await tap('[data-start]');
-    s = await playLevel();
-    await finishResult(id);
+    await page.evaluate(u => { const n = document.querySelector(`.node[data-l="${CONTENT.levels.find(l => l.unit === u).id}"]`); if (n) n.closest('.unit').scrollIntoView({ block: 'start' }); }, uid);
+    await page.waitForTimeout(200);
+    await shot('map-' + uid); await checkLayout('map ' + uid);
   }
   await shot('map-end');
-  const summary = await page.evaluate(() => ({ levels: S.levels, coins: S.coins, xp: S.xp, owned: S.owned, badges: S.badges, words: Object.keys(S.words).length, stage: monsterStage('u1'), resume: S.resume }));
+  const summary = await page.evaluate(() => ({ levels: Object.keys(S.levels).length, coins: S.coins, xp: S.xp, owned: S.owned.length, badges: S.badges, words: Object.keys(S.words).length, resume: S.resume }));
   console.log('SUMMARY', JSON.stringify(summary));
-  if (Object.keys(summary.levels).length !== 9) note('not all levels done');
+  const missing = await page.evaluate(play2 => CONTENT.levels.filter(l => play2.includes(l.unit) && !isDone(l.id)).map(l => l.id), play);
+  if (missing.length) note('levels not done: ' + missing.join(','));
 
   // other screens
   for (const sc of ['album', 'shop', 'room', 'settings']) { await page.evaluate(n => go(n), sc); await page.waitForTimeout(250); await shot('scr-' + sc); await checkLayout(sc); }
