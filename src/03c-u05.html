@@ -1,0 +1,150 @@
+<script>
+/* ==========================================================================================
+   WORLD u5 – Blockdorf (blocky village, terracotta). Rooms + furniture; there is/are,
+   in/on/under. Code Lab: for loops. Boss: Blockgolem Klotz, who wants a home of his own.
+   ========================================================================================== */
+addWorld({
+  unit: { id:'u5', num:5, title:'Blockdorf', subtitle:'Mein Zuhause', accent:'#d9774f', scene:'blocks', status:'open', after:'u4',
+    monster:['brick-1','brick-2','brick-3'], monsterNames:['Bausi','Bausteinchen','Baumeistrix'],
+    intro:'Im Blockdorf wird gebaut! Aber ein Golem versperrt den Weg. 🧱' },
+
+  words: [
+    { id:'house',    unit:'u5', cat:'room',  en:'house',    de:'Haus',          icon:'house',    emoji:'🏠', pron:'haus',       exampleEn:'My house is big.',              exampleDe:'Mein Haus ist groß.' },
+    { id:'kitchen',  unit:'u5', cat:'room',  en:'kitchen',  de:'Küche',         icon:'kitchen',  emoji:'🍳', pron:'KIT-schen',  exampleEn:'Mum is in the kitchen.',        exampleDe:'Mama ist in der Küche.' },
+    { id:'bathroom', unit:'u5', cat:'room',  en:'bathroom', de:'Badezimmer',    icon:'bathroom', emoji:'🛁',                    exampleEn:'The bathroom is blue.',         exampleDe:'Das Badezimmer ist blau.' },
+    { id:'bedroom',  unit:'u5', cat:'room',  en:'bedroom',  de:'Schlafzimmer',  icon:'bedroom',  emoji:'🛌', pron:'BÄD-ruum',   exampleEn:'This is my bedroom.',           exampleDe:'Das ist mein Schlafzimmer.' },
+    { id:'garden',   unit:'u5', cat:'room',  en:'garden',   de:'Garten',        icon:'garden',   emoji:'🌻', pron:'GAA-den',    exampleEn:'The cat is in the garden.',     exampleDe:'Die Katze ist im Garten.' },
+    { id:'bed',      unit:'u5', cat:'thing', en:'bed',      de:'Bett',          icon:'bed',      emoji:'🛏️', pron:'bädd',       exampleEn:'There is a cat on my bed.',     exampleDe:'Auf meinem Bett ist eine Katze.' },
+    { id:'lamp',     unit:'u5', cat:'thing', en:'lamp',     de:'Lampe',         icon:'lamp',     emoji:'💡', pron:'lämp',       exampleEn:'The lamp is on the table.',     exampleDe:'Die Lampe steht auf dem Tisch.' },
+    { id:'window',   unit:'u5', cat:'thing', en:'window',   de:'Fenster',       icon:'window',   emoji:'🪟',                    exampleEn:'Open the window, please.',      exampleDe:'Öffne bitte das Fenster.' },
+    { id:'door',     unit:'u5', cat:'thing', en:'door',     de:'Tür',           icon:'door',     emoji:'🚪', pron:'door',       exampleEn:'Close the door, please.',       exampleDe:'Schließ bitte die Tür.' },
+    { id:'sofa',     unit:'u5', cat:'thing', en:'sofa',     de:'Sofa',          icon:'sofa',     emoji:'🛋️', pron:'SOU-fa',     exampleEn:'Dad is on the sofa.',           exampleDe:'Papa ist auf dem Sofa.' },
+    { id:'cupboard', unit:'u5', cat:'thing', en:'cupboard', de:'Schrank',       icon:'cupboard', emoji:'🗄️', pron:'KA-berd',    exampleEn:'My books are in the cupboard.', exampleDe:'Meine Bücher sind im Schrank.' },
+    { id:'computer', unit:'u5', cat:'thing', en:'computer', de:'Computer',      icon:'computer', emoji:'💻', pron:'kom-PJUU-ter', exampleEn:'There is a computer in my room.', exampleDe:'In meinem Zimmer ist ein Computer.' },
+    { id:'in',       unit:'u5', cat:'where', en:'in',       de:'in',            icon:'in',                                      exampleEn:'The ball is in the box.',       exampleDe:'Der Ball ist in der Kiste.' },
+    { id:'on',       unit:'u5', cat:'where', en:'on',       de:'auf',           icon:'on',                                      exampleEn:'The ball is on the box.',       exampleDe:'Der Ball ist auf der Kiste.' },
+    { id:'under',    unit:'u5', cat:'where', en:'under',    de:'unter',         icon:'under',                    pron:'AN-der', exampleEn:'The ball is under the table.',  exampleDe:'Der Ball ist unter dem Tisch.' },
+    { id:'whereis',  unit:'u5', cat:'phrase', en:'Where is the cat?', de:'Wo ist die Katze?', icon:'whereis', emoji:'🔍',       exampleEn:"Where is the cat? – It's under the bed.", exampleDe:'Wo ist die Katze? – Sie ist unter dem Bett.' }
+  ],
+
+  levels: [
+    { id:'u5l1', unit:'u5', type:'catch', title:'Rundgang', minutes:'2–3',
+      story:{ before:'Willkommen im Blockdorf! Mach einen Rundgang durchs Haus.', after:'Du kennst dich schon richtig gut aus! 🏠' },
+      plan:[ {intro:['house','kitchen','bathroom','bedroom']},
+             {k:'catch', words:['house','kitchen','bathroom','bedroom'], reps:2, opts:3} ] },
+
+    { id:'u5l2', unit:'u5', type:'listen', title:'Möbel-Lieferung', minutes:'3',
+      story:{ before:'Der Möbelwagen ist da! Hör, was ausgeladen wird. 🚚', after:'Alle Möbel sind im Haus. Stark gehört!' },
+      plan:[ {intro:['bed','lamp','sofa','cupboard','computer']},
+             {k:'listen', words:['bed','lamp','sofa','cupboard','computer'], reps:2, opts:3},
+             {k:'speak', words:['cupboard','computer']} ] },
+
+    { id:'u5l3', unit:'u5', type:'memory', title:'Garten-Memory', minutes:'3',
+      story:{ before:'Im Garten liegen Karten verstreut. Finde die Paare!', after:'Alle Paare gefunden! 🌻' },
+      plan:[ {intro:['garden','window','door']},
+             {k:'memory', words:['garden','window','door','house','bed','lamp']},
+             {k:'listen', words:['garden','window','door'], reps:2, opts:3} ] },
+
+    { id:'u5l4', unit:'u5', type:'dialogue', title:'Wo ist die Katze?', minutes:'3–4',
+      story:{ before:'Juno sucht ihre Katze Mimi. Hilfst du suchen?', after:'Mimi ist wieder da und schnurrt. 🐱' },
+      plan:[ {intro:['in','on','under','whereis']},
+             {k:'dialogue', id:'d_u5_juno'},
+             {k:'speak', words:['whereis','under']} ] },
+
+    { id:'u5l5', unit:'u5', type:'spell', title:'Der Bauplan', minutes:'3–4',
+      story:{ before:'Auf dem Bauplan fehlen die Wörter. Schreibst du sie?', after:'Der Bauplan ist fertig! ✨' },
+      plan:[ {k:'spell', words:['house','bed','lamp','door','sofa','in','on','under','garden'], mode:'tiles'},
+             {k:'spell', words:['kitchen','bedroom','bathroom','window','cupboard','computer'], mode:'first'} ] },
+
+    { id:'u5l6', unit:'u5', type:'codelab', title:'Code Lab: for-Schleifen', minutes:'4–5', reward:'room_house',
+      story:{ before:'Prof. Pixel will ein ganzes Haus bauen – Block für Block. Zu viel Arbeit? Nicht mit einer Schleife!', after:'Die Schleife baut von allein. Compile successful! 💻' },
+      plan:[
+        {k:'card', title:'for-Schleife 🔁', text:'Eine Schleife wiederholt Code. [[for i in range(3):]] heißt: Mach das 3-mal! Was eingerückt ist, wird wiederholt.', code:'for i in range(3):\n    print("Klotz!")', out:'Klotz!\nKlotz!\nKlotz!'},
+        {k:'predict', code:'for i in range(2):\n    print("Knock!")', options:['Knock!\nKnock!','Knock!','Knock!\nKnock!\nKnock!'], answer:0, explain:'[[range(2)]] heißt: 2-mal. Klopf, klopf an die Tür!', uses:['door']},
+        {k:'card', title:'Durch eine Liste 📋', text:'Eine Schleife kann auch durch eine Liste laufen. Jedes Teil kommt einmal dran.', code:'rooms = ["kitchen", "bathroom"]\nfor room in rooms:\n    print(room)', out:'kitchen\nbathroom'},
+        {k:'predict', code:'rooms = ["bedroom", "garden", "kitchen"]\nfor room in rooms:\n    print(room)', options:['bedroom\ngarden\nkitchen','kitchen\ngarden\nbedroom','room\nroom\nroom'], answer:0, explain:'Die Schleife nimmt die Teile der Reihe nach – von vorne nach hinten.', uses:['bedroom','garden','kitchen']},
+        {k:'order', de:'Bau das Programm: Zeig jedes Möbelstück an.', lines:['things = ["bed", "lamp", "sofa"]','for thing in things:','    print(thing)'], extra:['    print("thing")'], out:'bed\nlamp\nsofa', explain:'Ohne Anführungszeichen ist [[thing]] die Box – in jeder Runde mit einem anderen Möbelstück.', uses:['bed','lamp','sofa']},
+        {k:'trace', code:'blocks = 0\nfor i in range(3):\n    blocks = blocks + 2', var:'blocks', steps:[{line:0, v:'0', alt:['2','3']},{line:2, v:'2', alt:['0','3']},{line:2, v:'4', alt:['3','6']},{line:2, v:'6', alt:['5','8']}], explain:'Zeile 3 läuft 3-mal: 2, 4, 6 Blöcke.', uses:['house']},
+        {k:'build', parts:['There','is','a','lamp','in','my','room.'], de:'In meinem Zimmer ist eine Lampe.', py:'print("There is a lamp in my room.")', uses:['lamp','in']},
+        {k:'build', code:true, parts:['for','i','in','range(4)',':'], de:'Bau eine Schleife, die 4-mal läuft!', py:'for i in range(4):\n    print("Block!")', uses:[]},
+        {k:'predict', code:'for i in range(3):\n    print("on")\nprint("under")', options:['on\non\non\nunder','on\nunder\non\nunder\non\nunder','under\non\non\non'], answer:0, explain:'Nur die eingerückte Zeile gehört zur Schleife. [[under]] kommt danach – nur einmal.', uses:['on','under']}
+      ] },
+
+    { id:'u5l7', unit:'u5', type:'bughunt', title:'Bug-Jagd: there is / are', minutes:'3–4',
+      story:{ before:'Im Blockdorf krabbeln Bugs über die Baupläne! 🐞', after:'Alle Bugs gefangen! Nuvi baut ihnen ein Bug-Hotel.' },
+      plan:[
+        {k:'card', title:'Bug-Jagd 🐞', text:'[[There is]] + eins: [[There is a bed.]] [[There are]] + mehrere: [[There are two lamps.]] Wo? [[in]] = in, [[on]] = auf, [[under]] = unter.'},
+        {k:'bug', tokens:['There','are','a','sofa.'], bug:1, options:['is','am','be'], fix:'is', explain:'Ein Sofa = eins: [[There is a sofa.]]', uses:['sofa']},
+        {k:'bug', tokens:['There','is','two','lamps.'], bug:1, options:['are','am','be'], fix:'are', explain:'Zwei Lampen = mehrere: [[There are two lamps.]]', uses:['lamp']},
+        {k:'bug', tokens:['The','ball','is','unda','the','sofa.'], bug:3, options:['under','unter','ander'], fix:'under', explain:'Unter = [[under]].', uses:['under','sofa']},
+        {k:'bug', tokens:['My','bed','is','in','my','bedrom.'], bug:5, options:['bedroom.','bedrum.','bettroom.'], fix:'bedroom.', explain:'Schlafzimmer = [[bedroom]] – mit zwei o.', uses:['bed','bedroom','in']},
+        {k:'bug', tokens:['Open','the','windo,','please.'], bug:2, options:['window,','windoh,','vindow,'], fix:'window,', explain:'Fenster = [[window]] – mit w am Ende.', uses:['window']},
+        {k:'bug', tokens:['Mum','is','in','the','kitchn.'], bug:4, options:['kitchen.','kitschen.','kichen.'], fix:'kitchen.', explain:'Küche = [[kitchen]] – mit t-c-h.', uses:['kitchen','in']},
+        {k:'bug', tokens:['There','are','three','door.'], bug:3, options:['doors.','dooren.','doorz.'], fix:'doors.', explain:'Drei Türen: [[doors]].', uses:['door']},
+        {k:'bug', tokens:['Where','are','the','computer?'], bug:1, options:['is','am','be'], fix:'is', explain:'Ein Computer: [[Where is the computer?]]', uses:['whereis','computer']},
+        {k:'bug', tokens:['The','lamp','is','of','the','table.'], bug:3, options:['on','an','om'], fix:'on', explain:'Auf = [[on]]: [[on the table]].', uses:['lamp','on']},
+        {k:'bug', tokens:['My','books','are','in','the','cubboard.'], bug:5, options:['cupboard.','kubboard.','cupbord.'], fix:'cupboard.', explain:'Schrank = [[cupboard]] – man sagt „KA-berd“!', uses:['cupboard']}
+      ] },
+
+    { id:'u5boss', unit:'u5', type:'boss', title:'Boss: Blockgolem Klotz', minutes:'6–8', reward:'acc_hardhat',
+      boss:{ name:'Klotz', art:'golem' },
+      story:{ before:'Blockgolem Klotz versperrt die Straße. Er stampft und brummt. Was will er nur?',
+              after:{ flag:'u5bed', bed:'Klotz hat jetzt ein Haus – und ein riesiges Bett. Mimi schläft gleich mit! 🧱',
+                      window:'Klotz hat jetzt ein Haus mit dem größten Fenster im ganzen Dorf! 🧱',
+                      default:'Klotz hat endlich ein Zuhause. Er strahlt! 🧱' } },
+      plan:[
+        {k:'catch', words:['house'], opts:3},
+        {k:'listen', words:['bathroom'], opts:3},
+        {k:'spell', words:['door'], mode:'tiles'},
+        {k:'listen', words:['cupboard','computer'], opts:4},
+        {k:'speak', words:['window']},
+        {k:'bug', tokens:['There','are','a','garden.'], bug:1, options:['is','am','be'], fix:'is', explain:'Ein Garten = eins: [[There is a garden.]]', uses:['garden']},
+        {k:'catch', words:['in','on'], opts:3},
+        {k:'build', parts:['The','cat','is','under','the','bed.'], de:'Die Katze ist unter dem Bett.', py:'print("The cat is under the bed.")', uses:['under','bed']},
+        {k:'predict', code:'for i in range(3):\n    print("Block")', options:['Block\nBlock\nBlock','Block','Block Block Block'], answer:0, explain:'3-mal [[print]] – 3 Zeilen. Klotz baut mit!', uses:[]},
+        {k:'listen', words:['kitchen','bedroom'], opts:4},
+        {k:'catch', words:['sofa','lamp'], opts:4},
+        {k:'spell', words:['bed'], mode:'tiles'},
+        {k:'listen', words:['whereis','under'], opts:4},
+        {k:'build', parts:['Where','is','the','cat?'], de:'Wo ist die Katze?', py:'print("Where is the cat?")', uses:['whereis']},
+        {k:'dialogue', id:'d_klotz'}
+      ] },
+
+    { id:'u5secret', unit:'u5', type:'falling', secret:true, title:'Geheim: Klötzchenregen', minutes:'3', reward:'room_blocks',
+      story:{ before:'Psst … hinter dem Golem-Haus regnet es Klötzchen! ☔', after:'Du hast den Klötzchenregen gemeistert! 🧱' },
+      plan:[ {k:'falling', words:['house','kitchen','bed','lamp','sofa','door','window','garden'], rounds:8, opts:3} ] }
+  ],
+
+  dialogues: {
+    d_u5_juno: { npc:'juno', nodes:[
+      { say:'Help! Where is my cat?', de:'Hilfe! Wo ist meine Katze?' },
+      { ask:'Frag: Ist sie in der Küche?', options:[ {en:'Is it in the kitchen?', ok:true}, {en:'Is it a kitchen?', hint:'Frag, ob die Katze IN der Küche ist.'} ] },
+      { say:"No. It isn't in the kitchen.", de:'Nein. Sie ist nicht in der Küche.' },
+      { ask:'Unter dem Sofa schaut ein Schwanz hervor!', options:[ {en:'Look! It is on the lamp.', hint:'Schau mal unter das Sofa 🛋️'}, {en:'Look! It is under the sofa.', ok:true} ] },
+      { say:'Yes! There it is! Thank you!', de:'Ja! Da ist sie! Danke!' },
+      { story:'Juno fragt, wo Mimi heute schlafen soll.', flag:'u5bed', options:[ {de:'🛏️ Auf meinem Bett', value:'bed'}, {de:'🪟 Am Fenster', value:'window'} ] },
+      { say:'Good idea! There is a basket for her too.', de:'Gute Idee! Da ist auch ein Körbchen für sie.' },
+      { ask:'Frag, wo das Körbchen ist!', options:[ {en:'Where is the basket?', ok:true}, {en:'Who is the basket?', hint:'Frag nach dem Ort: [[Where]] heißt wo.'} ] },
+      { say:"It's in my bedroom.", de:'Es ist in meinem Schlafzimmer.' }
+    ]},
+    d_klotz: { npc:'golem', nodes:[
+      { say:'Klotz! Klotz! No house for Klotz!', de:'Klotz! Klotz! Kein Haus für Klotz!' },
+      { ask:'Frag ihn freundlich!', options:[ {en:'Hello! Can I help you?', ok:true}, {en:'Go away, Klotz!', hint:'Klotz ist traurig, nicht böse 🧱'} ] },
+      { say:'I want a house. With a door and a window.', de:'Ich will ein Haus. Mit einer Tür und einem Fenster.' },
+      { ask:'Bau ihm ein Haus! Sag: Hier ist eine Tür.', options:[ {en:'Here is a sofa.', hint:'Zuerst braucht Klotz eine Tür 🚪'}, {en:'Here is a door.', ok:true} ] },
+      { say:'A door! And a window?', de:'Eine Tür! Und ein Fenster?' },
+      { ask:'Zeig auf das Fenster.', options:[ {en:'There is a window.', ok:true}, {en:'There are a window.', hint:'Bei einem Ding heißt es [[There is]].'} ] },
+      { say:'My house! I love my house! Thank you!', de:'Mein Haus! Ich liebe mein Haus! Danke!' }
+    ]}
+  },
+
+  items: [
+    { id:'acc_hardhat', kind:'acc', slot:'head', name:'Bauhelm', price:null },
+    { id:'room_house',  kind:'room', name:'Puppenhaus',   price:null, pos:{x:88,y:64,w:16} },
+    { id:'room_blocks', kind:'room', name:'Bauklötze',    price:null, pos:{x:32,y:96,w:14} },
+    { id:'room_key',    kind:'room', name:'Goldschlüssel', price:null, pos:{x:62,y:30,w:10} }
+  ],
+  badges: [ { id:'b_boss_u5', name:'Baumeisterin', desc:'Klotz hat ein Zuhause', emblem:'house', when:{level:'u5boss'} } ],
+  secrets: [ { id:'s_u5_key', unit:'u5', item:'room_key', x:86, y:24, text:'Du hast einen goldenen Schlüssel gefunden! 🔑' } ]
+});
+</script>

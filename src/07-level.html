@@ -254,7 +254,7 @@ TASKS.card = (t, api) => {
   Run.stage.append(el(`<div class="task"><div class="card stack center">
     <h2 style="margin:0">${esc(t.title)}</h2>
     <p style="margin:0;font-weight:700">${fmt(t.text)}</p>
-    ${t.code ? codeBlock(t.code) : ''}${t.out ? `<div class="console" style="text-align:left">&gt; ${esc(sub(t.out))}</div>` : ''}
+    ${t.code ? codeBlock(t.code) : ''}${t.out ? consoleOut(sub(t.out)).replace('class="console ', 'style="text-align:left" class="console ') : ''}
     <div class="row" style="justify-content:center"><button class="btn small" data-say-de="${esc(plain(t.title + '. ' + t.text))}">${IC('speaker')} Vorlesen</button></div>
   </div></div>`));
   footBtn('Verstanden!', () => api.next());
